@@ -8736,10 +8736,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-for (var i in _eases.default) {
-  console.log(_eases.default[i](0.333));
-}
-
 var Curve =
 /*#__PURE__*/
 function () {
@@ -8809,6 +8805,26 @@ function () {
       var b = cp[hiIndex];
       var t = (0, _Utils.mapLinear)(u, a[1], b[1], 0, 1);
       return (0, _Utils.lerp)(a[0], b[0], _eases.default[a[2]](t));
+    }
+  }, {
+    key: "getMinValue",
+    value: function getMinValue() {
+      if (!this.points.length) return 0;
+      var lo = Infinity;
+      this.points.forEach(function (p) {
+        lo = Math.min(p[0], lo);
+      });
+      return lo;
+    }
+  }, {
+    key: "getMaxValue",
+    value: function getMaxValue() {
+      if (!this.points.length) return 1;
+      var hi = -Infinity;
+      this.points.forEach(function (p) {
+        hi = Math.max(p[0], hi);
+      });
+      return hi;
     }
   }]);
 
@@ -9156,7 +9172,7 @@ function patchScopedSlots (instance) {
   }
 }
 
-},{}],"App.vue":[function(require,module,exports) {
+},{}],"CurveEditor.vue":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9246,6 +9262,43 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var easeTypes = Object.keys(_eases.default); //
 // transform="matrix(sx, 0, 0, sy, cx-sx*cx, cy-sy*cy)"
 //
@@ -9255,16 +9308,8 @@ var defaultCurve = function defaultCurve() {
 };
 
 var _default = {
+  name: 'curve',
   props: {
-    isShown: {
-      default: true
-    },
-    min: {
-      default: -1
-    },
-    max: {
-      default: 1
-    },
     w: {
       type: Number,
       default: window.innerWidth
@@ -9280,11 +9325,18 @@ var _default = {
   },
   data: function data() {
     return {
+      isShown: true,
       activePoint: null,
       mouseDown: false,
       dragged: false,
-      easeTypes: easeTypes
+      easeTypes: easeTypes,
+      min: -1,
+      max: 1
     };
+  },
+  mounted: function mounted() {
+    this.min = this.curve.getMinValue();
+    this.max = this.curve.getMaxValue();
   },
   methods: {
     getPath: function getPath() {
@@ -9297,15 +9349,33 @@ var _default = {
 
       return p;
     },
+    getViewBox: function getViewBox() {
+      return "0 ".concat(this.min, " 1 ").concat(Math.abs(this.max - this.min));
+    },
+    getTransform: function getTransform() {
+      // scale (we're flipping it vertically)
+      var sx = 1;
+      var sy = -1; //center
+
+      var cx = 0.5;
+      var cy = (this.max + this.min) * 0.5;
+      return "matrix(".concat(sx, ", 0, 0, ").concat(sy, ", ").concat(cx - sx * cx, ", ").concat(cy - sy * cy, ")");
+    },
+    onToggle: function onToggle(e) {
+      this.isShown = !this.isShown;
+    },
     onPointChange: function onPointChange(e) {
       if (this.activePoint) {
         switch (e.target.name) {
           case 'value':
-            this.activePoint[1] = e.target.value;
+            var val = Number(e.target.value);
+            this.activePoint[0] = val;
+            this.min = Math.min(val, this.min);
+            this.max = Math.max(val, this.max);
             break;
 
           case 'position':
-            this.activePoint[0] = e.target.value;
+            this.activePoint[1] = Number(e.target.value);
             break;
 
           case 'eases':
@@ -9317,13 +9387,15 @@ var _default = {
         this.$forceUpdate();
       }
     },
-    onEaseChange: function onEaseChange(e) {
-      var ease = e.target.value;
-
-      if (this.activePoint) {
-        this.activePoint[2] = ease;
-        this.$forceUpdate();
+    onRangeChange: function onRangeChange(e) {
+      // console.log( e.target.name );
+      if (e.target.name === 'low') {
+        this.min = Number(e.target.value);
+      } else {
+        this.max = Number(e.target.value);
       }
+
+      this.$forceUpdate();
     },
     onMouseUp: function onMouseUp(e) {
       this.mouseDown = false;
@@ -9353,9 +9425,9 @@ var _default = {
         var el = this.$el.querySelector('.work-space');
         var bb = el.getBoundingClientRect();
         var x = e.clientX;
-        var y = e.clientY;
+        var y = e.offsetY;
         var u = (0, _Utils.mapLinear)(x, bb.x, bb.x + bb.width, 0, 1);
-        var v = (0, _Utils.mapLinear)(y, bb.y, bb.y + bb.height, this.min, this.max);
+        var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
         u = Number(u.toFixed(4));
         v = Number(v.toFixed(4));
         this.activePoint[1] = u;
@@ -9370,10 +9442,12 @@ var _default = {
       if (el.tagName === 'svg') {
         if (!this.dragged && e.metaKey) {
           var bb = el.getBoundingClientRect();
-          var x = e.clientX;
-          var y = e.clientY;
-          var u = (0, _Utils.mapLinear)(x, bb.x, bb.x + bb.width, 0, 1);
-          var v = (0, _Utils.mapLinear)(y, bb.y, bb.y + bb.height, this.min, this.max);
+          var x = e.offsetX; // e.clientX
+
+          var y = e.offsetY; // e.clientY
+
+          var u = (0, _Utils.mapLinear)(x, 0, bb.width, 0, 1);
+          var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
           u = Number(u.toFixed(4));
           v = Number(v.toFixed(4));
           var p = this.curve.addPoint(v, u);
@@ -9381,6 +9455,252 @@ var _default = {
         }
       }
     }
+  }
+};
+exports.default = _default;
+        var $b35c15 = exports.default || module.exports;
+      
+      if (typeof $b35c15 === 'function') {
+        $b35c15 = $b35c15.options;
+      }
+    
+        /* template */
+        Object.assign($b35c15, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    {
+      staticStyle: {
+        position: "relative",
+        width: "calc(100%-4)",
+        border: "white solid 1px"
+      }
+    },
+    [
+      _c("div", { staticClass: "input-container" }, [
+        _c(
+          "svg",
+          {
+            staticStyle: {
+              position: "absolute",
+              right: "1",
+              top: "1",
+              width: "14px",
+              height: "14px",
+              stroke: "white",
+              "stroke-width": "1",
+              fill: "#00000055"
+            },
+            on: { click: _vm.onToggle }
+          },
+          [
+            _c("circle", {
+              attrs: {
+                r: "6",
+                cx: "7",
+                cy: "7",
+                stroke: "white",
+                fill: "inherit"
+              }
+            }),
+            _vm._v(" "),
+            _c("line", {
+              staticStyle: { stroke: "inherit", "stroke-width": "inherit" },
+              attrs: { x1: "3", y1: "7", x2: "11", y2: "7" }
+            }),
+            _vm._v(" "),
+            !_vm.isShown
+              ? _c("line", {
+                  staticStyle: { stroke: "inherit", "stroke-width": "inherit" },
+                  attrs: { y1: "3", x1: "7", y2: "11", x2: "7" }
+                })
+              : _vm._e()
+          ]
+        ),
+        _vm._v(" "),
+        _vm.isShown && _vm.activePoint
+          ? _c("div", { staticClass: "info-bar" }, [
+              _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ease:")]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  attrs: { name: "eases", value: "smooth" },
+                  on: { change: _vm.onPointChange }
+                },
+                _vm._l(_vm.easeTypes, function(e) {
+                  return _c(
+                    "option",
+                    {
+                      domProps: {
+                        value: e,
+                        selected: _vm.activePoint && _vm.activePoint[2] === e
+                      }
+                    },
+                    [_vm._v(_vm._s(e))]
+                  )
+                }),
+                0
+              ),
+              _vm._v(" "),
+              _c("label", [_vm._v("u:")]),
+              _vm._v(" "),
+              _c("input", {
+                staticStyle: { width: "7em" },
+                attrs: { type: "number", name: "position", step: "0.001" },
+                domProps: { value: Number(_vm.activePoint[1]) },
+                on: { change: _vm.onPointChange }
+              }),
+              _vm._v(" "),
+              _c("label", [_vm._v("v:")]),
+              _vm._v(" "),
+              _c("input", {
+                staticStyle: { width: "7em" },
+                attrs: { type: "number", name: "value", step: "0.001" },
+                domProps: { value: Number(_vm.activePoint[0]) },
+                on: { change: _vm.onPointChange }
+              }),
+              _vm._v(" "),
+              _c("label", [_vm._v("range:")]),
+              _vm._v(" "),
+              _c("input", {
+                staticStyle: { width: "7em" },
+                attrs: { type: "number", name: "low", step: "0.001" },
+                domProps: { value: _vm.min },
+                on: { change: _vm.onRangeChange }
+              }),
+              _vm._v(" "),
+              _c("input", {
+                staticStyle: { width: "7em" },
+                attrs: { type: "number", name: "hi", step: "0.001" },
+                domProps: { value: _vm.max },
+                on: { change: _vm.onRangeChange }
+              })
+            ])
+          : _c("div", { staticClass: "info-bar" }, [
+              _vm._v(" " + _vm._s(_vm.curve.name) + " \n  ")
+            ]),
+        _vm._v(" "),
+        _vm.isShown
+          ? _c("div", { staticClass: "curve-container" }, [
+              _c(
+                "svg",
+                {
+                  staticClass: "work-space",
+                  attrs: {
+                    viewBox: _vm.getViewBox(),
+                    preserveAspectRatio: "none",
+                    xmlns: "http://www.w3.org/2000/svg"
+                  },
+                  on: {
+                    mouseup: _vm.onMouseUp,
+                    mousedown: _vm.onMouseDown,
+                    mousemove: _vm.onMouseMove,
+                    click: _vm.handleClick
+                  }
+                },
+                [
+                  _c(
+                    "g",
+                    { attrs: { transform: _vm.getTransform() } },
+                    [
+                      _c("path", { attrs: { d: _vm.getPath() } }),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c("line", {
+                          class: [
+                            "point",
+                            p === _vm.activePoint ? "selected-point" : "",
+                            _vm.dragged ? "no-pointer" : ""
+                          ],
+                          staticStyle: {
+                            "vector-effect": "non-scaling-stroke"
+                          },
+                          attrs: {
+                            "data-index": index,
+                            x1: p[1],
+                            y1: p[0],
+                            x2: p[1],
+                            y2: p[0],
+                            fill: "red"
+                          }
+                        })
+                      })
+                    ],
+                    2
+                  )
+                ]
+              )
+            ])
+          : _vm._e()
+      ])
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-b35c15",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$b35c15', $b35c15);
+          } else {
+            api.reload('$b35c15', $b35c15);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"App.vue":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _CurveEditor = _interopRequireDefault(require("./CurveEditor"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var _default = {
+  props: ['curves'],
+  mounted: function mounted() {
+    console.log(this.curves);
+  },
+  components: {
+    CurveEditor: _CurveEditor.default
   }
 };
 exports.default = _default;
@@ -9396,111 +9716,17 @@ exports.default = _default;
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _vm._v("\n  curve composer\n\n  "),
-    _c(
-      "div",
-      {
-        staticStyle: {
-          position: "relative",
-          width: "calc(100%-4)",
-          border: "white solid 1px"
-        }
-      },
-      [
-        _c("div", { staticClass: "input-container" }, [
-          _vm.activePoint
-            ? _c("div", [
-                _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ease")]),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    attrs: { name: "eases", value: "smooth" },
-                    on: { change: _vm.onPointChange }
-                  },
-                  _vm._l(_vm.easeTypes, function(e) {
-                    return _c(
-                      "option",
-                      {
-                        domProps: {
-                          value: e,
-                          selected: _vm.activePoint && _vm.activePoint[2] === e
-                        }
-                      },
-                      [_vm._v(_vm._s(e))]
-                    )
-                  }),
-                  0
-                ),
-                _vm._v(" "),
-                _c("label", [_vm._v("u")]),
-                _vm._v(" "),
-                _c("input", {
-                  attrs: { type: "number", name: "value", step: "0.001" },
-                  domProps: { value: Number(_vm.activePoint[0]) },
-                  on: { change: _vm.onPointChange }
-                }),
-                _vm._v(" "),
-                _c("label", [_vm._v("v")]),
-                _vm._v(" "),
-                _c("input", {
-                  attrs: { type: "number", name: "position", step: "0.001" },
-                  domProps: { value: Number(_vm.activePoint[1]) },
-                  on: { change: _vm.onPointChange }
-                })
-              ])
-            : _c("div", [_vm._v(" " + _vm._s(_vm.curve.name) + " ")])
-        ]),
-        _vm._v(" "),
-        _vm.isShown
-          ? _c("div", { staticClass: "curve-container" }, [
-              _c(
-                "svg",
-                {
-                  staticClass: "work-space",
-                  attrs: {
-                    viewBox:
-                      "0 " + _vm.min + " 1 " + Math.abs(_vm.max - _vm.min),
-                    preserveAspectRatio: "none",
-                    xmlns: "http://www.w3.org/2000/svg"
-                  },
-                  on: {
-                    mouseup: _vm.onMouseUp,
-                    mousedown: _vm.onMouseDown,
-                    mousemove: _vm.onMouseMove,
-                    click: _vm.handleClick
-                  }
-                },
-                [
-                  _c("g", [_c("path", { attrs: { d: _vm.getPath() } })]),
-                  _vm._v(" "),
-                  _vm._l(_vm.curve.points, function(p, index) {
-                    return _c("line", {
-                      class: [
-                        "point",
-                        p === _vm.activePoint ? "selected-point" : "",
-                        _vm.dragged ? "no-pointer" : ""
-                      ],
-                      staticStyle: { "vector-effect": "non-scaling-stroke" },
-                      attrs: {
-                        "data-index": index,
-                        x1: p[1],
-                        y1: p[0],
-                        x2: p[1],
-                        y2: p[0],
-                        fill: "red"
-                      }
-                    })
-                  })
-                ],
-                2
-              )
-            ])
-          : _vm._e()
-      ]
-    )
-  ])
+  return _c(
+    "div",
+    { staticClass: "container" },
+    [
+      _vm._v("\n  curve composer\n\n  "),
+      _vm._l(_vm.curves, function(c) {
+        return _c("CurveEditor", { attrs: { curve: c } })
+      })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -9535,29 +9761,56 @@ render._withStripped = true
       
       }
     })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"main.js":[function(require,module,exports) {
+},{"./CurveEditor":"CurveEditor.vue","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"main.js":[function(require,module,exports) {
 "use strict";
 
 var _vue = _interopRequireDefault(require("vue"));
 
 var _App = _interopRequireDefault(require("./App"));
 
+var _Curve = _interopRequireDefault(require("./Composer/Curve"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-if (false && module.hot) {
+if (true && module.hot) {
   module.hot.accept(function () {
     window.location.reload(true);
   });
 }
 
-// import Router from 'vue-router'
-new _vue.default({
+var crvs = []; // value, u, ease
+
+for (var i = 0; i < 4; i++) {
+  crvs.push(new _Curve.default({
+    name: 'curve_' + (i + 1),
+    points: [[-2, 0, 'smooth'], [0, 0.5, 'smooth'], [-1, 1, 'smooth']]
+  }));
+}
+
+_vue.default.config.productionTip = false; // //https://css-tricks.com/creating-vue-js-component-instances-programmatically/
+
+var CurveEditor = _vue.default.extend(_App.default);
+
+var instance = new CurveEditor({
   el: '#app',
-  render: function render(h) {
-    return h(_App.default);
+  propsData: {
+    curves: crvs
   }
 });
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+console.log(instance); // import Vue from 'vue';
+// import App from './App';
+// import Curve from './Composer/Curve'
+// var crvs = []
+// for(var i=0; i<4; i++) {
+//   crvs.push(new Curve())
+// }
+// // import Router from 'vue-router'
+// new Vue({
+//   el: '#app',
+//   render: h => h(App)
+// })
+// console.log( 'wtf' );
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -9584,7 +9837,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59503" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54334" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

@@ -3,11 +3,6 @@ import {mapLinear, lerp, clamp} from './Utils'
 import eases from './eases'
 
 
-for(var i in eases) {
-  console.log( eases[i]( 0.333) );
-}
-
-
 class Curve {
 
   constructor(options) {
@@ -74,6 +69,31 @@ class Curve {
     var t = mapLinear(u, a[1], b[1], 0, 1 )
 
     return  lerp( a[0], b[0], eases[a[2]]( t ) );
+  }
+
+  getMinValue() {
+
+    if(!this.points.length)  return 0;
+
+    var lo = Infinity
+
+    this.points.forEach( ( p ) => {
+      lo = Math.min(p[0], lo)
+    });
+
+    return lo
+  }
+  getMaxValue() {
+
+    if(!this.points.length)  return 1;
+
+    var hi = -Infinity
+
+    this.points.forEach( ( p ) => {
+      hi = Math.max(p[0], hi)
+    });
+
+    return hi
   }
 
 
