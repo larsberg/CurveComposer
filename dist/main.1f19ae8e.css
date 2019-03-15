@@ -1,0 +1,64 @@
+.container[data-v-fc2010]{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: magenta;
+  color: white;
+  vector-effect: non-scaling-stroke;
+}
+input[data-v-fc2010], select[data-v-fc2010] {
+  margin-right: 10px;
+}
+path[data-v-fc2010], line[data-v-fc2010] {
+  fill: none;
+  stroke: #ffffff99;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+path[data-v-fc2010] {
+  pointer-events: none;
+}
+.point[data-v-fc2010] {
+  stroke-width: 5;
+  stroke: white;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.point[data-v-fc2010]:hover {
+  stroke: #ff00ff;
+}
+.selected-point[data-v-fc2010] {
+  stroke: magenta;
+  stroke-width: 7;
+  /*pointer-events: none;*/
+}
+.no-pointer[data-v-fc2010] {
+  pointer-events: none;
+}
+.input-container[data-v-fc2010] {
+  position: relative;
+  min-height: 20px;
+  width: 100%;
+  background: #00000044;
+}
+.curve-container[data-v-fc2010]{
+  position: relative;
+  height: 100px;
+  width: 100%;
+  background: #00000055;
+}
+.work-space[data-v-fc2010]{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #00000044;
+  fill: none;
+  stroke: white;
+  stroke-weight: 1;
+}
