@@ -32,29 +32,9 @@
 
       <!-- <div class="toggle">{{isShown ? '+' : '-' }}</div> -->
 
-      <div class="info-bar" v-if="isShown && activePoint">
-        <label>{{curve.name}} ease:</label>
-        <select name="eases" value="smooth" @change="onPointChange">
-          <option v-for="e in easeTypes"
-            :value='e'
-            :selected="activePoint && activePoint[2] === e">{{e}}</option>
-        </select>
-        <label>u:</label>
-        <input
-          style="width: 7em"
-          type="number"
-          name="position"
-          step="0.001"
-          :value="Number(activePoint[1])"
-          @change="onPointChange">
-        <label>v:</label>
-        <input
-          style="width: 7em"
-          type="number"
-          name="value"
-          step="0.001"
-          :value="Number(activePoint[0])"
-          @change="onPointChange">
+      <div class="info-bar" v-if="isShown">
+        <label>{{curve.name}} </label>
+
         <label>range:</label>
         <input
           style="width: 7em"
@@ -70,6 +50,32 @@
           step="0.001"
           :value="max"
           @change="onRangeChange">
+
+        <label v-if="activePoint">pt:</label>
+        <select v-if="activePoint" name="eases" value="smooth" @change="onPointChange">
+          <option v-for="e in easeTypes"
+            :value='e'
+            :selected="activePoint && activePoint[2] === e">{{e}}</option>
+        </select>
+        <label v-if="activePoint">u:</label>
+        <input
+          v-if="activePoint"
+          style="width: 7em"
+          type="number"
+          name="position"
+          step="0.001"
+          :value="Number(activePoint[1])"
+          @change="onPointChange">
+        <label v-if="activePoint">v:</label>
+        <input
+          v-if="activePoint"
+          style="width: 7em"
+          type="number"
+          name="value"
+          step="0.001"
+          :value="Number(activePoint[0])"
+          @change="onPointChange">
+
       </div>
       <div class="info-bar" v-else> {{curve.name}} </span>
     </div>
@@ -328,6 +334,9 @@ export default {
 
 input, select {
   margin-right: 10px;
+  background: #00000099;
+  color: white;
+  border: none;
 }
 path, line {
   fill: none;
@@ -387,6 +396,7 @@ path {
 }
 
 .info-bar{
+  padding-top: 6px;
   min-height: 22px
 }
 

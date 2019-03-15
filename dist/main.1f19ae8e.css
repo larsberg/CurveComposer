@@ -1,5 +1,8 @@
 input[data-v-b35c15], select[data-v-b35c15] {
   margin-right: 10px;
+  background: #00000099;
+  color: white;
+  border: none;
 }
 path[data-v-b35c15], line[data-v-b35c15] {
   fill: none;
@@ -51,6 +54,7 @@ path[data-v-b35c15] {
   stroke-weight: 1;
 }
 .info-bar[data-v-b35c15]{
+  padding-top: 6px;
   min-height: 22px
 }.container[data-v-fc2010]{
   font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;

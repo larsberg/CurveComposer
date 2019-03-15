@@ -9299,6 +9299,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
 var easeTypes = Object.keys(_eases.default); //
 // transform="matrix(sx, 0, 0, sy, cx-sx*cx, cy-sy*cy)"
 //
@@ -9521,48 +9527,9 @@ exports.default = _default;
           ]
         ),
         _vm._v(" "),
-        _vm.isShown && _vm.activePoint
+        _vm.isShown
           ? _c("div", { staticClass: "info-bar" }, [
-              _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ease:")]),
-              _vm._v(" "),
-              _c(
-                "select",
-                {
-                  attrs: { name: "eases", value: "smooth" },
-                  on: { change: _vm.onPointChange }
-                },
-                _vm._l(_vm.easeTypes, function(e) {
-                  return _c(
-                    "option",
-                    {
-                      domProps: {
-                        value: e,
-                        selected: _vm.activePoint && _vm.activePoint[2] === e
-                      }
-                    },
-                    [_vm._v(_vm._s(e))]
-                  )
-                }),
-                0
-              ),
-              _vm._v(" "),
-              _c("label", [_vm._v("u:")]),
-              _vm._v(" "),
-              _c("input", {
-                staticStyle: { width: "7em" },
-                attrs: { type: "number", name: "position", step: "0.001" },
-                domProps: { value: Number(_vm.activePoint[1]) },
-                on: { change: _vm.onPointChange }
-              }),
-              _vm._v(" "),
-              _c("label", [_vm._v("v:")]),
-              _vm._v(" "),
-              _c("input", {
-                staticStyle: { width: "7em" },
-                attrs: { type: "number", name: "value", step: "0.001" },
-                domProps: { value: Number(_vm.activePoint[0]) },
-                on: { change: _vm.onPointChange }
-              }),
+              _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ")]),
               _vm._v(" "),
               _c("label", [_vm._v("range:")]),
               _vm._v(" "),
@@ -9578,7 +9545,55 @@ exports.default = _default;
                 attrs: { type: "number", name: "hi", step: "0.001" },
                 domProps: { value: _vm.max },
                 on: { change: _vm.onRangeChange }
-              })
+              }),
+              _vm._v(" "),
+              _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
+              _vm._v(" "),
+              _vm.activePoint
+                ? _c(
+                    "select",
+                    {
+                      attrs: { name: "eases", value: "smooth" },
+                      on: { change: _vm.onPointChange }
+                    },
+                    _vm._l(_vm.easeTypes, function(e) {
+                      return _c(
+                        "option",
+                        {
+                          domProps: {
+                            value: e,
+                            selected:
+                              _vm.activePoint && _vm.activePoint[2] === e
+                          }
+                        },
+                        [_vm._v(_vm._s(e))]
+                      )
+                    }),
+                    0
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
+              _vm._v(" "),
+              _vm.activePoint
+                ? _c("input", {
+                    staticStyle: { width: "7em" },
+                    attrs: { type: "number", name: "position", step: "0.001" },
+                    domProps: { value: Number(_vm.activePoint[1]) },
+                    on: { change: _vm.onPointChange }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.activePoint ? _c("label", [_vm._v("v:")]) : _vm._e(),
+              _vm._v(" "),
+              _vm.activePoint
+                ? _c("input", {
+                    staticStyle: { width: "7em" },
+                    attrs: { type: "number", name: "value", step: "0.001" },
+                    domProps: { value: Number(_vm.activePoint[0]) },
+                    on: { change: _vm.onPointChange }
+                  })
+                : _vm._e()
             ])
           : _c("div", { staticClass: "info-bar" }, [
               _vm._v(" " + _vm._s(_vm.curve.name) + " \n  ")
@@ -9837,7 +9852,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54334" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50111" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
