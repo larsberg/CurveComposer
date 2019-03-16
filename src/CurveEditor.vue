@@ -21,7 +21,7 @@
 
       <div class="info-bar" v-if="isShown">
         <div style="width: 100%; font-size: 0.75em;">
-          {{curve.name}}
+          {{curve.name}} {{ bUpdateCrosshairs ? Number(curve.currentSample.toFixed(3)) : ''}}
         </div>
 
         <label style="color: darkgrey;">hi:</label>
@@ -97,13 +97,13 @@
         <g :transform="getTransform()">
 
           <!-- mouse position cross hairs -->
-          <line v-if="isMouseOver" class="no-pointer" style="stroke: #99009966;"
+          <line v-if="isMouseOver" class="no-pointer" style="stroke: #ffffff66;"
             :x1="mouse.x"
             :y1="min"
             :x2="mouse.x"
             :y2="max" />
 
-          <line v-if="isMouseOver" class="no-pointer" style="stroke: #99009966;"
+          <line v-if="isMouseOver" class="no-pointer" style="stroke: #ffffff66;"
             :x1="0"
             :y1="mouse.y"
             :x2="1"
@@ -122,7 +122,7 @@
 
           <line
             v-if="bUpdateCrosshairs"
-            class="no-pointer" style="stroke: #99999933;"
+            class="no-pointer" style="stroke: #ffffff33;"
             :x1="0"
             :y1="curve.currentSample"
             :x2="1"
@@ -163,7 +163,6 @@
 <script>
 import {mapLinear, lerp, clamp} from './Composer/Utils'
 import Curve from './Composer/Curve'
-import Crosshairs from './Crosshairs'
 import eases from './Composer/eases'
 
 const easeTypes = Object.keys(eases)
@@ -206,10 +205,6 @@ export default {
       path: this.getPath(),
       bUpdateCrosshairs: true
     }
-  },
-
-  components: {
-    Crosshairs
   },
 
   mounted () {

@@ -8799,10 +8799,11 @@ function () {
       // curvePoint = [value, u, ease]
       if (!this.points.length) return 0;
       var cp = this.points;
-      var sample = 0; // return first or last values when on the edges.
-      // I think this makes things faster but never tested it...
+      var sample = 0;
 
       if (cp[cp.length - 1][1] <= u) {
+        // return first or last values when on the edges.
+        // I think this makes things faster but never tested it...
         sample = cp[cp.length - 1][0];
       } else if (cp[0][1] > u) {
         sample = cp[0][0];
@@ -9193,93 +9194,7 @@ function patchScopedSlots (instance) {
   }
 }
 
-},{}],"Crosshairs.vue":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var _default = {
-  props: ['x', 'y', 'min', 'max']
-};
-exports.default = _default;
-        var $ffc649 = exports.default || module.exports;
-      
-      if (typeof $ffc649 === 'function') {
-        $ffc649 = $ffc649.options;
-      }
-    
-        /* template */
-        Object.assign($ffc649, (function () {
-          var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("svg", [
-    _c("line", {
-      staticStyle: { stroke: "#99999933", "pointer-events": "none" },
-      attrs: { x1: _vm.x, y1: _vm.min, x2: _vm.x, y2: _vm.max }
-    }),
-    _vm._v(" "),
-    _c("line", {
-      staticStyle: { stroke: "#99999933", "pointer-events": "none" },
-      attrs: { x1: 0, y1: _vm.y, x2: 1, y2: _vm.y }
-    })
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-          return {
-            render: render,
-            staticRenderFns: staticRenderFns,
-            _compiled: true,
-            _scopeId: null,
-            functional: undefined
-          };
-        })());
-      
-    /* hot reload */
-    (function () {
-      if (module.hot) {
-        var api = require('vue-hot-reload-api');
-        api.install(require('vue'));
-        if (api.compatible) {
-          module.hot.accept();
-          if (!module.hot.data) {
-            api.createRecord('$ffc649', $ffc649);
-          } else {
-            api.reload('$ffc649', $ffc649);
-          }
-        }
-
-        
-      }
-    })();
-},{"_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"CurveEditor.vue":[function(require,module,exports) {
+},{}],"CurveEditor.vue":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9290,8 +9205,6 @@ exports.default = void 0;
 var _Utils = require("./Composer/Utils");
 
 var _Curve = _interopRequireDefault(require("./Composer/Curve"));
-
-var _Crosshairs = _interopRequireDefault(require("./Crosshairs"));
 
 var _eases = _interopRequireDefault(require("./Composer/eases"));
 
@@ -9499,9 +9412,6 @@ var _default = {
       bUpdateCrosshairs: true
     };
   },
-  components: {
-    Crosshairs: _Crosshairs.default
-  },
   mounted: function mounted() {
     this.min = this.curve.getMinValue();
     this.max = this.curve.getMaxValue();
@@ -9704,7 +9614,19 @@ exports.default = _default;
               _c(
                 "div",
                 { staticStyle: { width: "100%", "font-size": "0.75em" } },
-                [_vm._v("\n        " + _vm._s(_vm.curve.name) + "\n      ")]
+                [
+                  _vm._v(
+                    "\n        " +
+                      _vm._s(_vm.curve.name) +
+                      " " +
+                      _vm._s(
+                        _vm.bUpdateCrosshairs
+                          ? Number(_vm.curve.currentSample.toFixed(3))
+                          : ""
+                      ) +
+                      "\n      "
+                  )
+                ]
               ),
               _vm._v(" "),
               _c("label", { staticStyle: { color: "darkgrey" } }, [
@@ -9847,7 +9769,7 @@ exports.default = _default;
                       _vm.isMouseOver
                         ? _c("line", {
                             staticClass: "no-pointer",
-                            staticStyle: { stroke: "#99009966" },
+                            staticStyle: { stroke: "#ffffff66" },
                             attrs: {
                               x1: _vm.mouse.x,
                               y1: _vm.min,
@@ -9860,7 +9782,7 @@ exports.default = _default;
                       _vm.isMouseOver
                         ? _c("line", {
                             staticClass: "no-pointer",
-                            staticStyle: { stroke: "#99009966" },
+                            staticStyle: { stroke: "#ffffff66" },
                             attrs: {
                               x1: 0,
                               y1: _vm.mouse.y,
@@ -9886,7 +9808,7 @@ exports.default = _default;
                       _vm.bUpdateCrosshairs
                         ? _c("line", {
                             staticClass: "no-pointer",
-                            staticStyle: { stroke: "#99999933" },
+                            staticStyle: { stroke: "#ffffff33" },
                             attrs: {
                               x1: 0,
                               y1: _vm.curve.currentSample,
@@ -9988,7 +9910,7 @@ render._withStripped = true
       
       }
     })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Crosshairs":"Crosshairs.vue","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
+},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10523,7 +10445,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64496" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54861" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

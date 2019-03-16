@@ -58,21 +58,14 @@ class Curve {
     if(!this.points.length)  return 0;
 
     var cp = this.points
-
     var sample = 0
 
-    // return first or last values when on the edges.
-    // I think this makes things faster but never tested it...
     if(cp[cp.length - 1][1] <= u) {
-
+      // return first or last values when on the edges.
+      // I think this makes things faster but never tested it...
       sample = cp[cp.length - 1][0]
-
-    }
-
-    else if(cp[0][1] > u) {
-
+    } else if(cp[0][1] > u) {
       sample = cp[0][0]
-
     } else {
 
       // find high and low indices
