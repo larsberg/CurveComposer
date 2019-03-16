@@ -1,7 +1,5 @@
 <template>
   <div
-    tabIndex=0
-    @keyup.delete="onDelete"
     style="
       position: relative;
       width: calc(100%-4);
@@ -33,28 +31,28 @@
 
       </svg>
 
-      <div class="info-bar" v-if="isShown">
+      <div tabIndex=1 class="info-bar" v-if="isShown">
         <label>{{curve.name}} </label>
 
-        <label>low:</label>
+        <label style="color: darkgrey;">hi:</label>
         <input
-          style="width: 7em"
-          type="number"
-          name="low"
-          step="0.001"
-          :value="min"
-          @change="onRangeChange">
-        <label>hi:</label>
-        <input
-          style="width: 7em"
+          style="width: 7em; color: cyan;"
           type="number"
           name="hi"
           step="0.001"
           :value="max"
           @change="onRangeChange">
+        <label style="color: darkgrey;">low:</label>
+        <input
+          style="width: 7em; color: cyan;"
+          type="number"
+          name="low"
+          step="0.001"
+          :value="min"
+          @change="onRangeChange">
 
         <label v-if="activePoint">pt:</label>
-        <select v-if="activePoint" name="eases" value="smooth" @change="onPointChange">
+        <select style="color: magenta;" v-if="activePoint" name="eases" value="smooth" @change="onPointChange">
           <option v-for="e in easeTypes"
             :value='e'
             :selected="activePoint && activePoint[2] === e">{{e}}</option>
@@ -62,7 +60,7 @@
         <label v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
-          style="width: 7em"
+          style="width: 7em;color: magenta;"
           type="number"
           name="position"
           step="0.001"
@@ -71,7 +69,7 @@
         <label v-if="activePoint">v:</label>
         <input
           v-if="activePoint"
-          style="width: 7em"
+          style="width: 7em;color: magenta;"
           type="number"
           name="value"
           step="0.001"
@@ -82,6 +80,8 @@
       <label class="info-bar" v-else> {{curve.name}} </label>
     </div>
     <div
+      tabIndex=1
+      @keyup.delete="onDelete"
       v-if="isShown"
       class="curve-container">
       <svg
@@ -112,8 +112,8 @@
           style="vector-effect: non-scaling-stroke;" />
         </g>
       </svg>
-      <div style="position: absolute; top: 0; right: 0; font-size: 0.75em;">{{max}}</div>
-      <div style="position: absolute; bottom: 0; right: 0; font-size: 0.75em;">{{min}}</div>
+      <div style="color: cyan;position: absolute; top: 0; right: 0; font-size: 0.75em;">{{max}}</div>
+      <div style="color: cyan;position: absolute; bottom: 0; right: 0; font-size: 0.75em;">{{min}}</div>
     </div>
   </div>
 </template>
@@ -202,7 +202,10 @@ export default {
     },
 
     onDelete(e) {
-      if(this.activePoint) {
+
+      console.log( e.target );
+
+      if( this.activePoint) {
         this.curve.findAndRemove(this.activePoint)
         this.activePoint = null
         // this.$forceUpdate()

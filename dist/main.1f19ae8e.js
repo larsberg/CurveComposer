@@ -9380,6 +9380,8 @@ var _default = {
       return "matrix(".concat(sx, ", 0, 0, ").concat(sy, ", ").concat(cx - sx * cx, ", ").concat(cy - sy * cy, ")");
     },
     onDelete: function onDelete(e) {
+      console.log(e.target);
+
       if (this.activePoint) {
         this.curve.findAndRemove(this.activePoint);
         this.activePoint = null; // this.$forceUpdate()
@@ -9501,22 +9503,6 @@ exports.default = _default;
         position: "relative",
         width: "calc(100%-4)",
         "border-bottom": "#ffffffaa solid 0.5px"
-      },
-      attrs: { tabindex: "0" },
-      on: {
-        keyup: function($event) {
-          if (
-            !$event.type.indexOf("key") &&
-            _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
-              "Backspace",
-              "Delete",
-              "Del"
-            ])
-          ) {
-            return null
-          }
-          return _vm.onDelete($event)
-        }
       }
     },
     [
@@ -9562,24 +9548,28 @@ exports.default = _default;
         ),
         _vm._v(" "),
         _vm.isShown
-          ? _c("div", { staticClass: "info-bar" }, [
+          ? _c("div", { staticClass: "info-bar", attrs: { tabindex: "1" } }, [
               _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ")]),
               _vm._v(" "),
-              _c("label", [_vm._v("low:")]),
+              _c("label", { staticStyle: { color: "darkgrey" } }, [
+                _vm._v("hi:")
+              ]),
               _vm._v(" "),
               _c("input", {
-                staticStyle: { width: "7em" },
-                attrs: { type: "number", name: "low", step: "0.001" },
-                domProps: { value: _vm.min },
+                staticStyle: { width: "7em", color: "cyan" },
+                attrs: { type: "number", name: "hi", step: "0.001" },
+                domProps: { value: _vm.max },
                 on: { change: _vm.onRangeChange }
               }),
               _vm._v(" "),
-              _c("label", [_vm._v("hi:")]),
+              _c("label", { staticStyle: { color: "darkgrey" } }, [
+                _vm._v("low:")
+              ]),
               _vm._v(" "),
               _c("input", {
-                staticStyle: { width: "7em" },
-                attrs: { type: "number", name: "hi", step: "0.001" },
-                domProps: { value: _vm.max },
+                staticStyle: { width: "7em", color: "cyan" },
+                attrs: { type: "number", name: "low", step: "0.001" },
+                domProps: { value: _vm.min },
                 on: { change: _vm.onRangeChange }
               }),
               _vm._v(" "),
@@ -9589,6 +9579,7 @@ exports.default = _default;
                 ? _c(
                     "select",
                     {
+                      staticStyle: { color: "magenta" },
                       attrs: { name: "eases", value: "smooth" },
                       on: { change: _vm.onPointChange }
                     },
@@ -9613,7 +9604,7 @@ exports.default = _default;
               _vm._v(" "),
               _vm.activePoint
                 ? _c("input", {
-                    staticStyle: { width: "7em" },
+                    staticStyle: { width: "7em", color: "magenta" },
                     attrs: { type: "number", name: "position", step: "0.001" },
                     domProps: { value: Number(_vm.activePoint[1]) },
                     on: { change: _vm.onPointChange }
@@ -9624,7 +9615,7 @@ exports.default = _default;
               _vm._v(" "),
               _vm.activePoint
                 ? _c("input", {
-                    staticStyle: { width: "7em" },
+                    staticStyle: { width: "7em", color: "magenta" },
                     attrs: { type: "number", name: "value", step: "0.001" },
                     domProps: { value: Number(_vm.activePoint[0]) },
                     on: { change: _vm.onPointChange }
@@ -9637,80 +9628,106 @@ exports.default = _default;
       ]),
       _vm._v(" "),
       _vm.isShown
-        ? _c("div", { staticClass: "curve-container" }, [
-            _c(
-              "svg",
-              {
-                staticClass: "work-space",
-                attrs: {
-                  viewBox: _vm.getViewBox(),
-                  preserveAspectRatio: "none",
-                  xmlns: "http://www.w3.org/2000/svg"
+        ? _c(
+            "div",
+            {
+              staticClass: "curve-container",
+              attrs: { tabindex: "1" },
+              on: {
+                keyup: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
+                      "Backspace",
+                      "Delete",
+                      "Del"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.onDelete($event)
+                }
+              }
+            },
+            [
+              _c(
+                "svg",
+                {
+                  staticClass: "work-space",
+                  attrs: {
+                    viewBox: _vm.getViewBox(),
+                    preserveAspectRatio: "none",
+                    xmlns: "http://www.w3.org/2000/svg"
+                  },
+                  on: {
+                    mouseup: _vm.onMouseUp,
+                    mousedown: _vm.onMouseDown,
+                    mousemove: _vm.onMouseMove,
+                    click: _vm.handleClick
+                  }
                 },
-                on: {
-                  mouseup: _vm.onMouseUp,
-                  mousedown: _vm.onMouseDown,
-                  mousemove: _vm.onMouseMove,
-                  click: _vm.handleClick
-                }
-              },
-              [
-                _c(
-                  "g",
-                  { attrs: { transform: _vm.getTransform() } },
-                  [
-                    _c("path", { attrs: { d: _vm.getPath() } }),
-                    _vm._v(" "),
-                    _vm._l(_vm.curve.points, function(p, index) {
-                      return _c("line", {
-                        class: [
-                          "point",
-                          p === _vm.activePoint ? "selected-point" : "",
-                          _vm.dragged ? "no-pointer" : ""
-                        ],
-                        staticStyle: { "vector-effect": "non-scaling-stroke" },
-                        attrs: {
-                          "data-index": index,
-                          x1: p[1],
-                          y1: p[0],
-                          x2: p[1],
-                          y2: p[0],
-                          fill: "red"
-                        }
+                [
+                  _c(
+                    "g",
+                    { attrs: { transform: _vm.getTransform() } },
+                    [
+                      _c("path", { attrs: { d: _vm.getPath() } }),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c("line", {
+                          class: [
+                            "point",
+                            p === _vm.activePoint ? "selected-point" : "",
+                            _vm.dragged ? "no-pointer" : ""
+                          ],
+                          staticStyle: {
+                            "vector-effect": "non-scaling-stroke"
+                          },
+                          attrs: {
+                            "data-index": index,
+                            x1: p[1],
+                            y1: p[0],
+                            x2: p[1],
+                            y2: p[0],
+                            fill: "red"
+                          }
+                        })
                       })
-                    })
-                  ],
-                  2
-                )
-              ]
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticStyle: {
-                  position: "absolute",
-                  top: "0",
-                  right: "0",
-                  "font-size": "0.75em"
-                }
-              },
-              [_vm._v(_vm._s(_vm.max))]
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticStyle: {
-                  position: "absolute",
-                  bottom: "0",
-                  right: "0",
-                  "font-size": "0.75em"
-                }
-              },
-              [_vm._v(_vm._s(_vm.min))]
-            )
-          ])
+                    ],
+                    2
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "cyan",
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                    "font-size": "0.75em"
+                  }
+                },
+                [_vm._v(_vm._s(_vm.max))]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "cyan",
+                    position: "absolute",
+                    bottom: "0",
+                    right: "0",
+                    "font-size": "0.75em"
+                  }
+                },
+                [_vm._v(_vm._s(_vm.min))]
+              )
+            ]
+          )
         : _vm._e()
     ]
   )
@@ -10311,7 +10328,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56216" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53934" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
