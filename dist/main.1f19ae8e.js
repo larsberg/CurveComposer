@@ -8775,6 +8775,15 @@ function () {
       this.points.splice(index, 1);
     }
   }, {
+    key: "findAndRemove",
+    value: function findAndRemove(p) {
+      var index = this.points.indexOf(p);
+
+      if (index !== -1) {
+        this.removePoint(index);
+      }
+    }
+  }, {
     key: "getPointIndex",
     value: function getPointIndex(pt) {
       return this.points.findIndex(function (p) {
@@ -9305,6 +9314,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
 var easeTypes = Object.keys(_eases.default); //
 // transform="matrix(sx, 0, 0, sy, cx-sx*cx, cy-sy*cy)"
 //
@@ -9366,6 +9378,12 @@ var _default = {
       var cx = 0.5;
       var cy = (this.max + this.min) * 0.5;
       return "matrix(".concat(sx, ", 0, 0, ").concat(sy, ", ").concat(cx - sx * cx, ", ").concat(cy - sy * cy, ")");
+    },
+    onDelete: function onDelete(e) {
+      if (this.activePoint) {
+        this.curve.findAndRemove(this.activePoint);
+        this.activePoint = null; // this.$forceUpdate()
+      }
     },
     onToggle: function onToggle(e) {
       this.isShown = !this.isShown;
@@ -9482,7 +9500,23 @@ exports.default = _default;
       staticStyle: {
         position: "relative",
         width: "calc(100%-4)",
-        border: "white solid 1px"
+        "border-bottom": "#ffffffaa solid 0.5px"
+      },
+      attrs: { tabindex: "0" },
+      on: {
+        keyup: function($event) {
+          if (
+            !$event.type.indexOf("key") &&
+            _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
+              "Backspace",
+              "Delete",
+              "Del"
+            ])
+          ) {
+            return null
+          }
+          return _vm.onDelete($event)
+        }
       }
     },
     [
@@ -9492,8 +9526,8 @@ exports.default = _default;
           {
             staticStyle: {
               position: "absolute",
-              right: "1",
-              top: "1",
+              right: "3",
+              top: "3",
               width: "14px",
               height: "14px",
               stroke: "white",
@@ -9531,7 +9565,7 @@ exports.default = _default;
           ? _c("div", { staticClass: "info-bar" }, [
               _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ")]),
               _vm._v(" "),
-              _c("label", [_vm._v("range:")]),
+              _c("label", [_vm._v("low:")]),
               _vm._v(" "),
               _c("input", {
                 staticStyle: { width: "7em" },
@@ -9539,6 +9573,8 @@ exports.default = _default;
                 domProps: { value: _vm.min },
                 on: { change: _vm.onRangeChange }
               }),
+              _vm._v(" "),
+              _c("label", [_vm._v("hi:")]),
               _vm._v(" "),
               _c("input", {
                 staticStyle: { width: "7em" },
@@ -9595,63 +9631,87 @@ exports.default = _default;
                   })
                 : _vm._e()
             ])
-          : _c("div", { staticClass: "info-bar" }, [
-              _vm._v(" " + _vm._s(_vm.curve.name) + " \n  ")
-            ]),
-        _vm._v(" "),
-        _vm.isShown
-          ? _c("div", { staticClass: "curve-container" }, [
-              _c(
-                "svg",
-                {
-                  staticClass: "work-space",
-                  attrs: {
-                    viewBox: _vm.getViewBox(),
-                    preserveAspectRatio: "none",
-                    xmlns: "http://www.w3.org/2000/svg"
-                  },
-                  on: {
-                    mouseup: _vm.onMouseUp,
-                    mousedown: _vm.onMouseDown,
-                    mousemove: _vm.onMouseMove,
-                    click: _vm.handleClick
-                  }
-                },
-                [
-                  _c(
-                    "g",
-                    { attrs: { transform: _vm.getTransform() } },
-                    [
-                      _c("path", { attrs: { d: _vm.getPath() } }),
-                      _vm._v(" "),
-                      _vm._l(_vm.curve.points, function(p, index) {
-                        return _c("line", {
-                          class: [
-                            "point",
-                            p === _vm.activePoint ? "selected-point" : "",
-                            _vm.dragged ? "no-pointer" : ""
-                          ],
-                          staticStyle: {
-                            "vector-effect": "non-scaling-stroke"
-                          },
-                          attrs: {
-                            "data-index": index,
-                            x1: p[1],
-                            y1: p[0],
-                            x2: p[1],
-                            y2: p[0],
-                            fill: "red"
-                          }
-                        })
-                      })
-                    ],
-                    2
-                  )
-                ]
-              )
+          : _c("label", { staticClass: "info-bar" }, [
+              _vm._v(" " + _vm._s(_vm.curve.name) + " ")
             ])
-          : _vm._e()
-      ])
+      ]),
+      _vm._v(" "),
+      _vm.isShown
+        ? _c("div", { staticClass: "curve-container" }, [
+            _c(
+              "svg",
+              {
+                staticClass: "work-space",
+                attrs: {
+                  viewBox: _vm.getViewBox(),
+                  preserveAspectRatio: "none",
+                  xmlns: "http://www.w3.org/2000/svg"
+                },
+                on: {
+                  mouseup: _vm.onMouseUp,
+                  mousedown: _vm.onMouseDown,
+                  mousemove: _vm.onMouseMove,
+                  click: _vm.handleClick
+                }
+              },
+              [
+                _c(
+                  "g",
+                  { attrs: { transform: _vm.getTransform() } },
+                  [
+                    _c("path", { attrs: { d: _vm.getPath() } }),
+                    _vm._v(" "),
+                    _vm._l(_vm.curve.points, function(p, index) {
+                      return _c("line", {
+                        class: [
+                          "point",
+                          p === _vm.activePoint ? "selected-point" : "",
+                          _vm.dragged ? "no-pointer" : ""
+                        ],
+                        staticStyle: { "vector-effect": "non-scaling-stroke" },
+                        attrs: {
+                          "data-index": index,
+                          x1: p[1],
+                          y1: p[0],
+                          x2: p[1],
+                          y2: p[0],
+                          fill: "red"
+                        }
+                      })
+                    })
+                  ],
+                  2
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: {
+                  position: "absolute",
+                  top: "0",
+                  right: "0",
+                  "font-size": "0.75em"
+                }
+              },
+              [_vm._v(_vm._s(_vm.max))]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: {
+                  position: "absolute",
+                  bottom: "0",
+                  right: "0",
+                  "font-size": "0.75em"
+                }
+              },
+              [_vm._v(_vm._s(_vm.min))]
+            )
+          ])
+        : _vm._e()
     ]
   )
 }
@@ -9688,7 +9748,272 @@ render._withStripped = true
       
       }
     })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"App.vue":[function(require,module,exports) {
+},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* FileSaver.js
+ * A saveAs() FileSaver implementation.
+ *
+ * By Eli Grey, http://eligrey.com
+ * ES6ified by Cole Chamberlain, https://github.com/cchamberlain
+ *
+ * License: MIT
+ *   See https://github.com/eligrey/FileSaver.js/blob/master/LICENSE.md
+ */
+
+/*global self */
+/*jslint bitwise: true, indent: 4, laxbreak: true, laxcomma: true, smarttabs: true, plusplus: true */
+
+/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
+
+var saveAs = exports.saveAs = window.saveAs || function (view) {
+  // IE <10 is explicitly unsupported
+  if (typeof navigator !== 'undefined' && /MSIE [1-9]\./.test(navigator.userAgent)) return;
+  var doc = view.document;
+  // only get URL when necessary in case Blob.js hasn't overridden it yet
+  var get_URL = function get_URL() {
+    return view.URL || view.webkitURL || view;
+  };
+  var save_link = doc.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+  var can_use_save_link = 'download' in save_link;
+  var click = function click(node) {
+    var event = new MouseEvent('click');
+    node.dispatchEvent(event);
+  };
+  var is_safari = /Version\/[\d\.]+.*Safari/.test(navigator.userAgent);
+  var webkit_req_fs = view.webkitRequestFileSystem;
+  var req_fs = view.requestFileSystem || webkit_req_fs || view.mozRequestFileSystem;
+  var throw_outside = function throw_outside(ex) {
+    (view.setImmediate || view.setTimeout)(function () {
+      throw ex;
+    }, 0);
+  };
+  var force_saveable_type = 'application/octet-stream';
+  var fs_min_size = 0;
+  // the Blob API is fundamentally broken as there is no "downloadfinished" event to subscribe to
+  var arbitrary_revoke_timeout = 1000 * 40; // in ms
+  var revoke = function revoke(file) {
+    var revoker = function revoker() {
+      if (typeof file === 'string') // file is an object URL
+        get_URL().revokeObjectURL(file);else // file is a File
+        file.remove();
+    };
+    /* // Take note W3C:
+    var
+      uri = typeof file === "string" ? file : file.toURL()
+    , revoker = function(evt) {
+      // idealy DownloadFinishedEvent.data would be the URL requested
+      if (evt.data === uri) {
+        if (typeof file === "string") { // file is an object URL
+          get_URL().revokeObjectURL(file);
+        } else { // file is a File
+          file.remove();
+        }
+      }
+    }
+    ;
+    view.addEventListener("downloadfinished", revoker);
+    */
+    setTimeout(revoker, arbitrary_revoke_timeout);
+  };
+  var dispatch = function dispatch(filesaver, event_types, event) {
+    event_types = [].concat(event_types);
+    var i = event_types.length;
+    while (i--) {
+      var listener = filesaver['on' + event_types[i]];
+      if (typeof listener === 'function') {
+        try {
+          listener.call(filesaver, event || filesaver);
+        } catch (ex) {
+          throw_outside(ex);
+        }
+      }
+    }
+  };
+  var auto_bom = function auto_bom(blob) {
+    // prepend BOM for UTF-8 XML and text/* types (including HTML)
+    if (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(blob.type)) return new Blob(['﻿', blob], { type: blob.type });
+    return blob;
+  };
+
+  var FileSaver = function FileSaver(blob, name, no_auto_bom) {
+    _classCallCheck(this, FileSaver);
+
+    if (!no_auto_bom) blob = auto_bom(blob);
+    // First try a.download, then web filesystem, then object URLs
+    var filesaver = this,
+        type = blob.type,
+        blob_changed = false,
+        object_url,
+        target_view,
+        dispatch_all = function dispatch_all() {
+      dispatch(filesaver, 'writestart progress write writeend'.split(' '));
+    }
+    // on any filesys errors revert to saving with object URLs
+    ,
+        fs_error = function fs_error() {
+      if (target_view && is_safari && typeof FileReader !== 'undefined') {
+        // Safari doesn't allow downloading of blob urls
+        var reader = new FileReader();
+        reader.onloadend = function () {
+          var base64Data = reader.result;
+          target_view.location.href = 'data:attachment/file' + base64Data.slice(base64Data.search(/[,;]/));
+          filesaver.readyState = filesaver.DONE;
+          dispatch_all();
+        };
+        reader.readAsDataURL(blob);
+        filesaver.readyState = filesaver.INIT;
+        return;
+      }
+      // don't create more object URLs than needed
+      if (blob_changed || !object_url) {
+        object_url = get_URL().createObjectURL(blob);
+      }
+      if (target_view) {
+        target_view.location.href = object_url;
+      } else {
+        var new_tab = view.open(object_url, '_blank');
+        if (new_tab === undefined && is_safari) {
+          //Apple do not allow window.open, see http://bit.ly/1kZffRI
+          view.location.href = object_url;
+        }
+      }
+      filesaver.readyState = filesaver.DONE;
+      dispatch_all();
+      revoke(object_url);
+    },
+        abortable = function abortable(func) {
+      return function () {
+        if (filesaver.readyState !== filesaver.DONE) {
+          return func.apply(this, arguments);
+        }
+      };
+    },
+        create_if_not_found = { create: true, exclusive: false },
+        slice;
+
+    filesaver.readyState = filesaver.INIT;
+    if (!name) {
+      name = 'download';
+    }
+    if (can_use_save_link) {
+      object_url = get_URL().createObjectURL(blob);
+      setTimeout(function () {
+        save_link.href = object_url;
+        save_link.download = name;
+        click(save_link);
+        dispatch_all();
+        revoke(object_url);
+        filesaver.readyState = filesaver.DONE;
+      });
+      return;
+    }
+    // Object and web filesystem URLs have a problem saving in Google Chrome when
+    // viewed in a tab, so I force save with application/octet-stream
+    // http://code.google.com/p/chromium/issues/detail?id=91158
+    // Update: Google errantly closed 91158, I submitted it again:
+    // https://code.google.com/p/chromium/issues/detail?id=389642
+    if (view.chrome && type && type !== force_saveable_type) {
+      slice = blob.slice || blob.webkitSlice;
+      blob = slice.call(blob, 0, blob.size, force_saveable_type);
+      blob_changed = true;
+    }
+    // Since I can't be sure that the guessed media type will trigger a download
+    // in WebKit, I append .download to the filename.
+    // https://bugs.webkit.org/show_bug.cgi?id=65440
+    if (webkit_req_fs && name !== 'download') {
+      name += '.download';
+    }
+    if (type === force_saveable_type || webkit_req_fs) {
+      target_view = view;
+    }
+    if (!req_fs) {
+      fs_error();
+      return;
+    }
+    fs_min_size += blob.size;
+    req_fs(view.TEMPORARY, fs_min_size, abortable(function (fs) {
+      fs.root.getDirectory('saved', create_if_not_found, abortable(function (dir) {
+        var save = function save() {
+          dir.getFile(name, create_if_not_found, abortable(function (file) {
+            file.createWriter(abortable(function (writer) {
+              writer.onwriteend = function (event) {
+                target_view.location.href = file.toURL();
+                filesaver.readyState = filesaver.DONE;
+                dispatch(filesaver, 'writeend', event);
+                revoke(file);
+              };
+              writer.onerror = function () {
+                var error = writer.error;
+                if (error.code !== error.ABORT_ERR) {
+                  fs_error();
+                }
+              };
+              'writestart progress write abort'.split(' ').forEach(function (event) {
+                writer['on' + event] = filesaver['on' + event];
+              });
+              writer.write(blob);
+              filesaver.abort = function () {
+                writer.abort();
+                filesaver.readyState = filesaver.DONE;
+              };
+              filesaver.readyState = filesaver.WRITING;
+            }), fs_error);
+          }), fs_error);
+        };
+        dir.getFile(name, { create: false }, abortable(function (file) {
+          // delete file if it already exists
+          file.remove();
+          save();
+        }), abortable(function (ex) {
+          if (ex.code === ex.NOT_FOUND_ERR) {
+            save();
+          } else {
+            fs_error();
+          }
+        }));
+      }), fs_error);
+    }), fs_error);
+  };
+
+  var FS_proto = FileSaver.prototype;
+  var saveAs = function saveAs(blob, name, no_auto_bom) {
+    return new FileSaver(blob, name, no_auto_bom);
+  };
+
+  // IE 10+ (native saveAs)
+  if (typeof navigator !== 'undefined' && navigator.msSaveOrOpenBlob) {
+    return function (blob, name, no_auto_bom) {
+      if (!no_auto_bom) blob = auto_bom(blob);
+      return navigator.msSaveOrOpenBlob(blob, name || 'download');
+    };
+  }
+
+  FS_proto.abort = function () {
+    var filesaver = this;
+    filesaver.readyState = filesaver.DONE;
+    dispatch(filesaver, 'abort');
+  };
+  FS_proto.readyState = FS_proto.INIT = 0;
+  FS_proto.WRITING = 1;
+  FS_proto.DONE = 2;
+
+  FS_proto.error = FS_proto.onwritestart = FS_proto.onprogress = FS_proto.onwrite = FS_proto.onabort = FS_proto.onerror = FS_proto.onwriteend = null;
+
+  return saveAs;
+}(typeof self !== 'undefined' && self || typeof window !== 'undefined' && window || undefined.content);
+// `self` is undefined in Firefox for Android content script context
+// while `this` is nsIContentFrameMessageManager
+// with an attribute `content` that corresponds to the window
+
+exports.default = saveAs;
+},{}],"App.vue":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9697,6 +10022,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _CurveEditor = _interopRequireDefault(require("./CurveEditor"));
+
+var _Curve = _interopRequireDefault(require("./Composer/Curve"));
+
+var _saveAs = _interopRequireDefault(require("save-as"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9709,13 +10038,73 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+function loadJSON(file, callback) {
+  var reader = new FileReader();
+  reader.addEventListener('load', function (event) {
+    var contents = event.target.result;
+    callback(JSON.parse(contents));
+  }, false);
+  reader.readAsText(file);
+}
+
+;
 var _default = {
-  props: ['curves'],
-  mounted: function mounted() {
-    console.log(this.curves);
+  props: {
+    curves: {
+      default: function _default() {
+        return [];
+      }
+    },
+    title: {
+      default: 'curve composer'
+    }
   },
   components: {
     CurveEditor: _CurveEditor.default
+  },
+  methods: {
+    loadJSON: function loadJSON(json) {
+      // remove the current curves
+      this.curves.length = 0; // add the json curves
+
+      for (var i in json) {
+        this.curves.push(new _Curve.default(json[i]));
+      }
+    },
+    onLoad: function onLoad(e) {
+      var file = e.target.files[0];
+      var filename = file.name;
+      var extension = filename.split('.').pop().toLowerCase();
+
+      if (extension !== 'json') {
+        console.warn("this doesn't support ".concat(extension, " file types"));
+      } else {
+        loadJSON(file, this.loadJSON.bind(this));
+      }
+    },
+    save: function save() {
+      var data = this.curves.map(function (c) {
+        return {
+          name: c.name,
+          points: c.points
+        };
+      });
+      var blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      });
+      (0, _saveAs.default)(blob, 'curves.json');
+    }
   }
 };
 exports.default = _default;
@@ -9735,7 +10124,31 @@ exports.default = _default;
     "div",
     { staticClass: "container" },
     [
-      _vm._v("\n  curve composer\n\n  "),
+      _c("div", { staticStyle: { height: "24px" } }, [
+        _vm._v("\n\n    " + _vm._s(_vm.title) + "\n\n    "),
+        _c("label", { staticClass: "loadsave", attrs: { for: "saveInput" } }, [
+          _vm._v("save")
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            attrs: { hidden: "", id: "saveInput", type: "file" },
+            on: { click: _vm.save }
+          },
+          [_vm._v("save")]
+        ),
+        _vm._v(" "),
+        _c("label", { staticClass: "loadsave", attrs: { for: "loadInput" } }, [
+          _vm._v("load")
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          attrs: { hidden: "", id: "loadInput", type: "file" },
+          on: { change: _vm.onLoad }
+        })
+      ]),
+      _vm._v(" "),
       _vm._l(_vm.curves, function(c) {
         return _c("CurveEditor", { attrs: { curve: c } })
       })
@@ -9776,7 +10189,18 @@ render._withStripped = true
       
       }
     })();
-},{"./CurveEditor":"CurveEditor.vue","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"main.js":[function(require,module,exports) {
+},{"./CurveEditor":"CurveEditor.vue","./Composer/Curve":"Composer/Curve.js","save-as":"../node_modules/save-as/lib/index.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"test.json":[function(require,module,exports) {
+module.exports = [{
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.28, 0.0569, "smooth"], [-0.56, 0.22, "smooth"], [-1.1, 0.3135, "smooth"], [0, 0.5, "smooth"], [-0.88, 0.555, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.88, 0.1922, "smooth"], [-1.5, 0.292, "smooth"], [-1.84, 0.2984, "smooth"], [-1.76, 0.4994, "smooth"], [0, 0.5, "smooth"], [-0.84, 0.737, "smooth"], [-1.42, 0.8217, "smooth"], [-0.7, 0.8622, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.46, 0.3464, "smooth"], [0, 0.5, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}];
+},{}],"main.js":[function(require,module,exports) {
 "use strict";
 
 var _vue = _interopRequireDefault(require("vue"));
@@ -9784,6 +10208,8 @@ var _vue = _interopRequireDefault(require("vue"));
 var _App = _interopRequireDefault(require("./App"));
 
 var _Curve = _interopRequireDefault(require("./Composer/Curve"));
+
+var _test = _interopRequireDefault(require("./test.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9793,14 +10219,17 @@ if (true && module.hot) {
   });
 }
 
-var crvs = []; // value, u, ease
-
-for (var i = 0; i < 4; i++) {
-  crvs.push(new _Curve.default({
-    name: 'curve_' + (i + 1),
-    points: [[-2, 0, 'smooth'], [0, 0.5, 'smooth'], [-1, 1, 'smooth']]
-  }));
-}
+var crvs = []; // // value, u, ease
+// for(var i=0; i<4; i++) {
+//   crvs.push(new Curve({
+//     name: 'curve_' + (i + 1),
+//     points: [
+//       [-2,0, 'smooth'],
+//       [0,0.5, 'smooth'],
+//       [-1,1, 'smooth']
+//     ]
+//   }))
+// }
 
 _vue.default.config.productionTip = false; // //https://css-tricks.com/creating-vue-js-component-instances-programmatically/
 
@@ -9812,20 +10241,50 @@ var instance = new CurveEditor({
     curves: crvs
   }
 });
-console.log(instance); // import Vue from 'vue';
-// import App from './App';
-// import Curve from './Composer/Curve'
-// var crvs = []
-// for(var i=0; i<4; i++) {
-//   crvs.push(new Curve())
+
+function addCurve() {
+  var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'CURVE';
+  var points = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [[-2, 0, 'smooth'], [0, 0.5, 'smooth'], [-1, 1, 'smooth']];
+  var c = new _Curve.default({
+    name: name,
+    points: points
+  });
+  crvs.push(c);
+}
+
+function loadJSON(json) {
+  for (var i in json) {
+    crvs.push(new _Curve.default(json[i]));
+  }
+} // function save (config, suggestedName) {
+//   var data = crvs.map( c => {
+//     return {
+//       name: c.name,
+//       points: c.points
+//     }
+//   })
+//   let blob = new Blob( [JSON.stringify(data, null, 2 )], { type : 'application/json' } )
+//   saveAs( blob, suggestedName || 'oohwee.json' )
 // }
-// // import Router from 'vue-router'
-// new Vue({
-//   el: '#app',
-//   render: h => h(App)
-// })
-// console.log( 'wtf' );
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+
+loadJSON(_test.default); // // <input type="file" hidden @change="onLoadInputChange"/>
+// var loadInput = document.body.insertAdjacentHTML('beforeend', `<input type="file" hidden/>`);
+// console.log( 'loadInput', loadInput );
+// function load(file, callback) {
+//   var reader = new FileReader();
+//   reader.addEventListener( 'load', function ( result ) {
+//     console.log( result );
+//     // var data = event.target.result;
+//     // console.log( data );
+//     // callback( JSON.parse( contents ) );
+//   }, false );
+//   reader.readAsText( file );
+// };
+// setTimeout(function(){
+//   load('./test.json')
+// }, 1000)
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./test.json":"test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -9852,7 +10311,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50111" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56216" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

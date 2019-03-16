@@ -1,8 +1,11 @@
 <template>
-  <div style="
-    position: relative;
-    width: calc(100%-4);
-    border: white solid 1px;">
+  <div
+    tabIndex=0
+    @keyup.delete="onDelete"
+    style="
+      position: relative;
+      width: calc(100%-4);
+      border-bottom: #ffffffaa solid 0.5px;">
 
     <div class="input-container">
 
@@ -10,8 +13,8 @@
       @click="onToggle"
       style="
         position: absolute;
-        right: 1;
-        top: 1;
+        right: 3;
+        top: 3;
         width: 14px;
         height: 14px;
         stroke: white;
@@ -30,12 +33,10 @@
 
       </svg>
 
-      <!-- <div class="toggle">{{isShown ? '+' : '-' }}</div> -->
-
       <div class="info-bar" v-if="isShown">
         <label>{{curve.name}} </label>
 
-        <label>range:</label>
+        <label>low:</label>
         <input
           style="width: 7em"
           type="number"
@@ -43,6 +44,7 @@
           step="0.001"
           :value="min"
           @change="onRangeChange">
+        <label>hi:</label>
         <input
           style="width: 7em"
           type="number"
@@ -77,7 +79,7 @@
           @change="onPointChange">
 
       </div>
-      <div class="info-bar" v-else> {{curve.name}} </span>
+      <label class="info-bar" v-else> {{curve.name}} </label>
     </div>
     <div
       v-if="isShown"
@@ -109,8 +111,9 @@
           fill="red"
           style="vector-effect: non-scaling-stroke;" />
         </g>
-
       </svg>
+      <div style="position: absolute; top: 0; right: 0; font-size: 0.75em;">{{max}}</div>
+      <div style="position: absolute; bottom: 0; right: 0; font-size: 0.75em;">{{min}}</div>
     </div>
   </div>
 </template>
@@ -196,6 +199,14 @@ export default {
       var cy = (this.max + this.min) * 0.5
 
       return `matrix(${sx}, 0, 0, ${sy}, ${cx-sx*cx}, ${cy-sy*cy})`
+    },
+
+    onDelete(e) {
+      if(this.activePoint) {
+        this.curve.findAndRemove(this.activePoint)
+        this.activePoint = null
+        // this.$forceUpdate()
+      }
     },
 
     onToggle(e) {
@@ -361,7 +372,7 @@ path {
 
 .selected-point {
   stroke: magenta;
-  stroke-width: 7;
+  stroke-width: 8;
   /*pointer-events: none;*/
 }
 
@@ -397,7 +408,12 @@ path {
 
 .info-bar{
   padding-top: 6px;
-  min-height: 22px
+  min-height: 22px;
+  border: solid 1px #ffffff44;
+}
+
+label {
+  font-size: 0.75em;
 }
 
 </style>

@@ -6,21 +6,24 @@ if(true && module.hot){
 import Vue from 'vue';
 import App from './App';
 import Curve from './Composer/Curve'
+// import saveAs from 'save-as'
 
-var crvs = []
+import testSettings from './test.json'
+
+const crvs = []
 
 
-// value, u, ease
-for(var i=0; i<4; i++) {
-  crvs.push(new Curve({
-    name: 'curve_' + (i + 1),
-    points: [
-      [-2,0, 'smooth'],
-      [0,0.5, 'smooth'],
-      [-1,1, 'smooth']
-    ]
-  }))
-}
+// // value, u, ease
+// for(var i=0; i<4; i++) {
+//   crvs.push(new Curve({
+//     name: 'curve_' + (i + 1),
+//     points: [
+//       [-2,0, 'smooth'],
+//       [0,0.5, 'smooth'],
+//       [-1,1, 'smooth']
+//     ]
+//   }))
+// }
 
 Vue.config.productionTip = false
 
@@ -36,29 +39,60 @@ var instance = new CurveEditor({
 })
 
 
-console.log( instance );
+function addCurve(name='CURVE', points=[ [-2,0, 'smooth'], [0,0.5, 'smooth'], [-1,1, 'smooth'] ]) {
+  var c = new Curve({
+    name: name,
+    points: points
+  })
+
+  crvs.push(c)
+}
 
 
+function loadJSON( json ) {
+  for(var i in json) {
+    crvs.push(new Curve(json[i]))
+  }
+}
 
+// function save (config, suggestedName) {
 
+//   var data = crvs.map( c => {
+//     return {
+//       name: c.name,
+//       points: c.points
+//     }
+//   })
 
-
-// import Vue from 'vue';
-// import App from './App';
-
-// import Curve from './Composer/Curve'
-
-// var crvs = []
-
-// for(var i=0; i<4; i++) {
-//   crvs.push(new Curve())
+//   let blob = new Blob( [JSON.stringify(data, null, 2 )], { type : 'application/json' } )
+//   saveAs( blob, suggestedName || 'oohwee.json' )
 // }
-// // import Router from 'vue-router'
-
-// new Vue({
-//   el: '#app',
-//   render: h => h(App)
-// })
 
 
-// console.log( 'wtf' );
+
+loadJSON(testSettings)
+
+// // <input type="file" hidden @change="onLoadInputChange"/>
+// var loadInput = document.body.insertAdjacentHTML('beforeend', `<input type="file" hidden/>`);
+// console.log( 'loadInput', loadInput );
+
+// function load(file, callback) {
+
+//   var reader = new FileReader();
+
+//   reader.addEventListener( 'load', function ( result ) {
+//     console.log( result );
+//     // var data = event.target.result;
+//     // console.log( data );
+//     // callback( JSON.parse( contents ) );
+//   }, false );
+
+//   reader.readAsText( file );
+
+// };
+
+// setTimeout(function(){
+//   load('./test.json')
+// }, 1000)
+
+

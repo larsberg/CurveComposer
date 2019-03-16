@@ -39,6 +39,13 @@ class Curve {
     this.points.splice( index, 1 )
   }
 
+  findAndRemove(p) {
+    var index = this.points.indexOf(p)
+    if(index !== -1) {
+      this.removePoint(index)
+    }
+  }
+
   getPointIndex( pt ){
     return this.points.findIndex( p => pt === p )
   }
