@@ -23,7 +23,7 @@ import CurveEditor from './CurveEditor'
 import Curve from './Composer/Curve'
 import saveAs from 'save-as'
 
-function loadJSON (file, callback) {
+function loadFile (file, callback) {
 
   var reader = new FileReader();
 
@@ -51,6 +51,14 @@ export default {
 
   methods: {
 
+    addCurve(curve) {
+      this.curves.push(curve)
+    },
+
+    createCurve(options) {
+      this.addCurve( new Curve(options) )
+    },
+
     loadJSON(json){
 
       // remove the current curves
@@ -71,7 +79,7 @@ export default {
       if(extension !== 'json') {
         console.warn( `this doesn't support ${extension} file types` );
       } else {
-        loadJSON( file, this.loadJSON.bind(this) );
+        loadFile( file, this.loadJSON.bind(this) );
       }
     },
 

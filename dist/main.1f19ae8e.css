@@ -30,6 +30,9 @@ path[data-v-b35c15] {
 .no-pointer[data-v-b35c15] {
   pointer-events: none;
 }
+.non-scale[data-v-b35c15] {
+  vector-effect: non-scaling-stroke
+}
 .input-container[data-v-b35c15] {
   position: relative;
   min-height: 20px;
@@ -60,6 +63,16 @@ path[data-v-b35c15] {
 }
 label[data-v-b35c15] {
   font-size: 0.75em;
+}
+.expandToggle[data-v-b35c15]{
+  position: absolute;
+  right: 3;
+  top: 3;
+  width: 14px;
+  height: 14px;
+  stroke: white;
+  stroke-width: 1;
+  fill: #00000055
 }.container[data-v-fc2010]{
   font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
   position: fixed;

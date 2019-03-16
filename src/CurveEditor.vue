@@ -7,36 +7,26 @@
 
     <div class="input-container">
 
+      <!-- toggle expand -->
       <svg
       @click="onToggle"
-      style="
-        position: absolute;
-        right: 3;
-        top: 3;
-        width: 14px;
-        height: 14px;
-        stroke: white;
-        stroke-width: 1;
-        fill: #00000055">
+      class="expandToggle">
 
-        <circle
-          r="6"
-          cx="7"
-          cy="7"
-          stroke="white"
-          fill="inherit"/>
+        <circle r="6" cx="7" cy="7" stroke="white" fill="inherit"/>
 
         <line x1="3" y1="7" x2="11" y2="7" style="stroke: inherit; stroke-width: inherit;" />
         <line v-if="!isShown" y1="3" x1="7" y2="11" x2="7" style="stroke: inherit; stroke-width: inherit;" />
 
       </svg>
 
-      <div tabIndex=1 class="info-bar" v-if="isShown">
-        <label>{{curve.name}} </label>
+      <div class="info-bar" v-if="isShown">
+        <div style="width: 100%; font-size: 0.75em;">
+          {{curve.name}}
+        </div>
 
         <label style="color: darkgrey;">hi:</label>
         <input
-          style="width: 7em; color: cyan;"
+          style="width: 5em; color: cyan;"
           type="number"
           name="hi"
           step="0.001"
@@ -44,7 +34,7 @@
           @change="onRangeChange">
         <label style="color: darkgrey;">low:</label>
         <input
-          style="width: 7em; color: cyan;"
+          style="width: 5em; color: cyan;"
           type="number"
           name="low"
           step="0.001"
@@ -75,15 +65,18 @@
           step="0.001"
           :value="Number(activePoint[0])"
           @change="onPointChange">
-
       </div>
       <label class="info-bar" v-else> {{curve.name}} </label>
     </div>
+      <!--  -->
     <div
       tabIndex=1
       @keyup.delete="onDelete"
+      @mouseleave="onMouseLeave"
       v-if="isShown"
       class="curve-container">
+
+
       <svg
         @mouseup="onMouseUp"
         @mousedown="onMouseDown"
@@ -95,25 +88,61 @@
         class="work-space">
 
         <g :transform="getTransform()">
-          <path :d="getPath()"/>
 
-        <line
-          v-for="(p, index) in curve.points"
-          :class="[
-            'point',
-            p === activePoint ? 'selected-point' : '',
-            dragged ? 'no-pointer' : '' ]"
-          :data-index="index"
-          :x1="p[1]"
-          :y1="p[0]"
-          :x2="p[1]"
-          :y2="p[0]"
-          fill="red"
-          style="vector-effect: non-scaling-stroke;" />
+          <!-- mouse position cross hairs -->
+          <line v-if="isMouseOver" class="no-pointer" style="stroke: #99009966;"
+            :x1="mouse.x"
+            :y1="min"
+            :x2="mouse.x"
+            :y2="max" />
+
+          <line v-if="isMouseOver" class="no-pointer" style="stroke: #99009966;"
+            :x1="0"
+            :y1="mouse.y"
+            :x2="1"
+            :y2="mouse.y"/>
+
+          <!-- current sample crosshairs -->
+          <line class="no-pointer" style="stroke: #99999933;"
+            :x1="curve.currentPosition"
+            :y1="min"
+            :x2="curve.currentPosition"
+            :y2="max" />
+
+          <line class="no-pointer" style="stroke: #99999933;"
+            :x1="0"
+            :y1="curve.currentSample"
+            :x2="1"
+            :y2="curve.currentSample"/>
+
+          <!-- curve points rendered as rounded lines with no length -->
+          <line
+            v-for="(p, index) in curve.points"
+            :class="[
+              'non-scale',
+              'point',
+              p === activePoint ? 'selected-point' : '',
+              dragged ? 'no-pointer' : '' ]"
+            :data-index="index"
+            :x1="p[1]"
+            :y1="p[0]"
+            :x2="p[1]"
+            :y2="p[0]"
+            fill="red"/>
+
+          <!-- the animation curve -->
+          <path :d="path"/>
+
         </g>
+
       </svg>
-      <div style="color: cyan;position: absolute; top: 0; right: 0; font-size: 0.75em;">{{max}}</div>
-      <div style="color: cyan;position: absolute; bottom: 0; right: 0; font-size: 0.75em;">{{min}}</div>
+
+      <div style="color: cyan;position: absolute; top: 0; right: 0; font-size: 0.75em;">
+        {{max}}
+      </div>
+      <div style="color: cyan;position: absolute; bottom: 0; right: 0; font-size: 0.75em;">
+        {{min}}
+      </div>
     </div>
   </div>
 </template>
@@ -124,10 +153,6 @@ import Curve from './Composer/Curve'
 import eases from './Composer/eases'
 
 const easeTypes = Object.keys(eases)
-
-//
-// transform="matrix(sx, 0, 0, sy, cx-sx*cx, cy-sy*cy)"
-//
 
 const defaultCurve = () => (new Curve())
 
@@ -162,6 +187,9 @@ export default {
       easeTypes: easeTypes,
       min: -1,
       max: 1,
+      isMouseOver: false,
+      mouse: {x: 0, y: 0},
+      path: this.getPath()
     }
   },
 
@@ -172,16 +200,22 @@ export default {
 
   methods: {
 
+    mapLinear: mapLinear,
+
     getPath: function(){
 
       var w = this.w
       var p = 'M'
 
       for(var i=0; i<=w; i+=1) {
-        p += `${i/w} ${this.curve.sample(i/w)} `
+        p += `${i/w} ${this.curve.sample(i/w, false)} `
       }
 
       return p
+    },
+
+    updatePath(){
+      this.path = this.getPath()
     },
 
     getViewBox() {
@@ -203,12 +237,10 @@ export default {
 
     onDelete(e) {
 
-      console.log( e.target );
-
       if( this.activePoint) {
         this.curve.findAndRemove(this.activePoint)
         this.activePoint = null
-        // this.$forceUpdate()
+        this.updatePath()
       }
     },
 
@@ -238,7 +270,8 @@ export default {
         }
 
         this.curve.sortPoints()
-        this.$forceUpdate()
+        this.updatePath()
+        // this.$forceUpdate()
 
       }
 
@@ -257,6 +290,20 @@ export default {
     onMouseUp(e) {
       this.mouseDown = false
       this.dragged = false
+    },
+
+    getEventPosition(e) {
+      var el = this.$el.querySelector('.work-space')
+      var bb = el.getBoundingClientRect()
+      var x = e.offsetX
+      var y = e.offsetY
+      var u = mapLinear(x, bb.x, bb.x + bb.width, 0, 1)
+      var v = mapLinear(y, 0, bb.height, this.max, this.min)
+
+      return {
+        x: Number(u.toFixed(4)),
+        y: Number(v.toFixed(4))
+      }
     },
 
     onMouseDown(e) {
@@ -280,7 +327,18 @@ export default {
       }
     },
 
+    onMouseLeave(e) {
+      this.isMouseOver = false
+    },
+
     onMouseMove(e) {
+
+      this.isMouseOver=true
+
+      var pos = this.getEventPosition(e)
+      this.mouse.x = pos.x
+      this.mouse.y = pos.y
+
       if(this.mouseDown && !e.metaKey ) {
         this.dragged = true
         this.onDrag(e)
@@ -291,24 +349,14 @@ export default {
 
       if(this.activePoint) {
 
-        // var el = e.target
-        var el = this.$el.querySelector('.work-space')
-        var bb = el.getBoundingClientRect()
-        var x = e.clientX
-        var y = e.offsetY
-        var u = mapLinear(x, bb.x, bb.x + bb.width, 0, 1)
-        var v = mapLinear(y, 0, bb.height, this.max, this.min)
+        var pos = this.getEventPosition(e)
 
-
-        u = Number(u.toFixed(4))
-        v = Number(v.toFixed(4))
-
-        this.activePoint[1] = u
-        this.activePoint[0] = v
-
-        this.$forceUpdate()
+        this.activePoint[1] = pos.x
+        this.activePoint[0] = pos.y
 
         this.curve.sortPoints()
+
+        this.updatePath()
       }
     },
 
@@ -320,19 +368,13 @@ export default {
 
         if(!this.dragged && e.metaKey) {
 
-          var bb = el.getBoundingClientRect()
-          var x = e.offsetX // e.clientX
-          var y = e.offsetY // e.clientY
+          var pos = this.getEventPosition(e)
 
-          var u = mapLinear(x, 0, bb.width, 0, 1)
-          var v = mapLinear(y, 0, bb.height, this.max, this.min)
-
-          u = Number(u.toFixed(4))
-          v = Number(v.toFixed(4))
-
-          var p = this.curve.addPoint(v, u)
+          var p = this.curve.addPoint(pos.y, pos.x)
 
           this.activePoint = p
+
+          this.updatePath()
         }
 
       }
@@ -383,6 +425,10 @@ path {
   pointer-events: none;
 }
 
+.non-scale {
+  vector-effect: non-scaling-stroke
+}
+
 .input-container {
   position: relative;
   min-height: 20px;
@@ -417,6 +463,17 @@ path {
 
 label {
   font-size: 0.75em;
+}
+
+.expandToggle{
+  position: absolute;
+  right: 3;
+  top: 3;
+  width: 14px;
+  height: 14px;
+  stroke: white;
+  stroke-width: 1;
+  fill: #00000055
 }
 
 </style>

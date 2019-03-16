@@ -8744,7 +8744,9 @@ function () {
 
     Object.assign(this, {
       name: "curve_name",
-      points: []
+      points: [],
+      currentPosition: 0,
+      currentSample: 0
     }, options || {});
   }
 
@@ -8793,27 +8795,37 @@ function () {
   }, {
     key: "sample",
     value: function sample(u) {
+      var bSetCurrentPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       // curvePoint = [value, u, ease]
       if (!this.points.length) return 0;
-      var cp = this.points; // return first or last values when on the edges.
+      var cp = this.points;
+      var sample = 0; // return first or last values when on the edges.
       // I think this makes things faster but never tested it...
 
       if (cp[cp.length - 1][1] <= u) {
-        return cp[cp.length - 1][0];
+        sample = cp[cp.length - 1][0];
       } else if (cp[0][1] > u) {
-        return cp[0][0];
-      } // find high and low indices
+        sample = cp[0][0];
+      } else {
+        // find high and low indices
+        var hiIndex = cp.findIndex(function (p) {
+          return p[1] > u;
+        });
+        var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex; // return interpolation between hi and lo using the lower ease
+
+        var a = cp[loIndex];
+        var b = cp[hiIndex];
+        var t = (0, _Utils.mapLinear)(u, a[1], b[1], 0, 1);
+        sample = (0, _Utils.lerp)(a[0], b[0], _eases.default[a[2]](t));
+      } // this is used to set the current position
 
 
-      var hiIndex = cp.findIndex(function (p) {
-        return p[1] > u;
-      });
-      var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex; // return interpolation between hi and lo using the lower ease
+      if (bSetCurrentPosition) {
+        this.currentPosition = u;
+        this.currentSample = sample;
+      }
 
-      var a = cp[loIndex];
-      var b = cp[hiIndex];
-      var t = (0, _Utils.mapLinear)(u, a[1], b[1], 0, 1);
-      return (0, _Utils.lerp)(a[0], b[0], _eases.default[a[2]](t));
+      return sample;
     }
   }, {
     key: "getMinValue",
@@ -9317,9 +9329,36 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-var easeTypes = Object.keys(_eases.default); //
-// transform="matrix(sx, 0, 0, sy, cx-sx*cx, cy-sy*cy)"
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var easeTypes = Object.keys(_eases.default);
 
 var defaultCurve = function defaultCurve() {
   return new _Curve.default();
@@ -9349,7 +9388,13 @@ var _default = {
       dragged: false,
       easeTypes: easeTypes,
       min: -1,
-      max: 1
+      max: 1,
+      isMouseOver: false,
+      mouse: {
+        x: 0,
+        y: 0
+      },
+      path: this.getPath()
     };
   },
   mounted: function mounted() {
@@ -9357,15 +9402,19 @@ var _default = {
     this.max = this.curve.getMaxValue();
   },
   methods: {
+    mapLinear: _Utils.mapLinear,
     getPath: function getPath() {
       var w = this.w;
       var p = 'M';
 
       for (var i = 0; i <= w; i += 1) {
-        p += "".concat(i / w, " ").concat(this.curve.sample(i / w), " ");
+        p += "".concat(i / w, " ").concat(this.curve.sample(i / w, false), " ");
       }
 
       return p;
+    },
+    updatePath: function updatePath() {
+      this.path = this.getPath();
     },
     getViewBox: function getViewBox() {
       return "0 ".concat(this.min, " 1 ").concat(Math.abs(this.max - this.min));
@@ -9380,11 +9429,10 @@ var _default = {
       return "matrix(".concat(sx, ", 0, 0, ").concat(sy, ", ").concat(cx - sx * cx, ", ").concat(cy - sy * cy, ")");
     },
     onDelete: function onDelete(e) {
-      console.log(e.target);
-
       if (this.activePoint) {
         this.curve.findAndRemove(this.activePoint);
-        this.activePoint = null; // this.$forceUpdate()
+        this.activePoint = null;
+        this.updatePath();
       }
     },
     onToggle: function onToggle(e) {
@@ -9410,7 +9458,7 @@ var _default = {
         }
 
         this.curve.sortPoints();
-        this.$forceUpdate();
+        this.updatePath(); // this.$forceUpdate()
       }
     },
     onRangeChange: function onRangeChange(e) {
@@ -9427,6 +9475,18 @@ var _default = {
       this.mouseDown = false;
       this.dragged = false;
     },
+    getEventPosition: function getEventPosition(e) {
+      var el = this.$el.querySelector('.work-space');
+      var bb = el.getBoundingClientRect();
+      var x = e.offsetX;
+      var y = e.offsetY;
+      var u = (0, _Utils.mapLinear)(x, bb.x, bb.x + bb.width, 0, 1);
+      var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
+      return {
+        x: Number(u.toFixed(4)),
+        y: Number(v.toFixed(4))
+      };
+    },
     onMouseDown: function onMouseDown(e) {
       this.mouseDown = true;
 
@@ -9439,7 +9499,15 @@ var _default = {
         this.activePoint = null;
       }
     },
+    onMouseLeave: function onMouseLeave(e) {
+      this.isMouseOver = false;
+    },
     onMouseMove: function onMouseMove(e) {
+      this.isMouseOver = true;
+      var pos = this.getEventPosition(e);
+      this.mouse.x = pos.x;
+      this.mouse.y = pos.y;
+
       if (this.mouseDown && !e.metaKey) {
         this.dragged = true;
         this.onDrag(e);
@@ -9447,19 +9515,11 @@ var _default = {
     },
     onDrag: function onDrag(e) {
       if (this.activePoint) {
-        // var el = e.target
-        var el = this.$el.querySelector('.work-space');
-        var bb = el.getBoundingClientRect();
-        var x = e.clientX;
-        var y = e.offsetY;
-        var u = (0, _Utils.mapLinear)(x, bb.x, bb.x + bb.width, 0, 1);
-        var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
-        u = Number(u.toFixed(4));
-        v = Number(v.toFixed(4));
-        this.activePoint[1] = u;
-        this.activePoint[0] = v;
-        this.$forceUpdate();
+        var pos = this.getEventPosition(e);
+        this.activePoint[1] = pos.x;
+        this.activePoint[0] = pos.y;
         this.curve.sortPoints();
+        this.updatePath();
       }
     },
     handleClick: function handleClick(e) {
@@ -9467,17 +9527,10 @@ var _default = {
 
       if (el.tagName === 'svg') {
         if (!this.dragged && e.metaKey) {
-          var bb = el.getBoundingClientRect();
-          var x = e.offsetX; // e.clientX
-
-          var y = e.offsetY; // e.clientY
-
-          var u = (0, _Utils.mapLinear)(x, 0, bb.width, 0, 1);
-          var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
-          u = Number(u.toFixed(4));
-          v = Number(v.toFixed(4));
-          var p = this.curve.addPoint(v, u);
+          var pos = this.getEventPosition(e);
+          var p = this.curve.addPoint(pos.y, pos.x);
           this.activePoint = p;
+          this.updatePath();
         }
       }
     }
@@ -9509,19 +9562,7 @@ exports.default = _default;
       _c("div", { staticClass: "input-container" }, [
         _c(
           "svg",
-          {
-            staticStyle: {
-              position: "absolute",
-              right: "3",
-              top: "3",
-              width: "14px",
-              height: "14px",
-              stroke: "white",
-              "stroke-width": "1",
-              fill: "#00000055"
-            },
-            on: { click: _vm.onToggle }
-          },
+          { staticClass: "expandToggle", on: { click: _vm.onToggle } },
           [
             _c("circle", {
               attrs: {
@@ -9548,15 +9589,19 @@ exports.default = _default;
         ),
         _vm._v(" "),
         _vm.isShown
-          ? _c("div", { staticClass: "info-bar", attrs: { tabindex: "1" } }, [
-              _c("label", [_vm._v(_vm._s(_vm.curve.name) + " ")]),
+          ? _c("div", { staticClass: "info-bar" }, [
+              _c(
+                "div",
+                { staticStyle: { width: "100%", "font-size": "0.75em" } },
+                [_vm._v("\n        " + _vm._s(_vm.curve.name) + "\n      ")]
+              ),
               _vm._v(" "),
               _c("label", { staticStyle: { color: "darkgrey" } }, [
                 _vm._v("hi:")
               ]),
               _vm._v(" "),
               _c("input", {
-                staticStyle: { width: "7em", color: "cyan" },
+                staticStyle: { width: "5em", color: "cyan" },
                 attrs: { type: "number", name: "hi", step: "0.001" },
                 domProps: { value: _vm.max },
                 on: { change: _vm.onRangeChange }
@@ -9567,7 +9612,7 @@ exports.default = _default;
               ]),
               _vm._v(" "),
               _c("input", {
-                staticStyle: { width: "7em", color: "cyan" },
+                staticStyle: { width: "5em", color: "cyan" },
                 attrs: { type: "number", name: "low", step: "0.001" },
                 domProps: { value: _vm.min },
                 on: { change: _vm.onRangeChange }
@@ -9646,7 +9691,8 @@ exports.default = _default;
                     return null
                   }
                   return _vm.onDelete($event)
-                }
+                },
+                mouseleave: _vm.onMouseLeave
               }
             },
             [
@@ -9671,18 +9717,62 @@ exports.default = _default;
                     "g",
                     { attrs: { transform: _vm.getTransform() } },
                     [
-                      _c("path", { attrs: { d: _vm.getPath() } }),
+                      _vm.isMouseOver
+                        ? _c("line", {
+                            staticClass: "no-pointer",
+                            staticStyle: { stroke: "#99009966" },
+                            attrs: {
+                              x1: _vm.mouse.x,
+                              y1: _vm.min,
+                              x2: _vm.mouse.x,
+                              y2: _vm.max
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.isMouseOver
+                        ? _c("line", {
+                            staticClass: "no-pointer",
+                            staticStyle: { stroke: "#99009966" },
+                            attrs: {
+                              x1: 0,
+                              y1: _vm.mouse.y,
+                              x2: 1,
+                              y2: _vm.mouse.y
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("line", {
+                        staticClass: "no-pointer",
+                        staticStyle: { stroke: "#99999933" },
+                        attrs: {
+                          x1: _vm.curve.currentPosition,
+                          y1: _vm.min,
+                          x2: _vm.curve.currentPosition,
+                          y2: _vm.max
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("line", {
+                        staticClass: "no-pointer",
+                        staticStyle: { stroke: "#99999933" },
+                        attrs: {
+                          x1: 0,
+                          y1: _vm.curve.currentSample,
+                          x2: 1,
+                          y2: _vm.curve.currentSample
+                        }
+                      }),
                       _vm._v(" "),
                       _vm._l(_vm.curve.points, function(p, index) {
                         return _c("line", {
                           class: [
+                            "non-scale",
                             "point",
                             p === _vm.activePoint ? "selected-point" : "",
                             _vm.dragged ? "no-pointer" : ""
                           ],
-                          staticStyle: {
-                            "vector-effect": "non-scaling-stroke"
-                          },
                           attrs: {
                             "data-index": index,
                             x1: p[1],
@@ -9692,7 +9782,9 @@ exports.default = _default;
                             fill: "red"
                           }
                         })
-                      })
+                      }),
+                      _vm._v(" "),
+                      _c("path", { attrs: { d: _vm.path } })
                     ],
                     2
                   )
@@ -9710,7 +9802,7 @@ exports.default = _default;
                     "font-size": "0.75em"
                   }
                 },
-                [_vm._v(_vm._s(_vm.max))]
+                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
               ),
               _vm._v(" "),
               _c(
@@ -9724,7 +9816,7 @@ exports.default = _default;
                     "font-size": "0.75em"
                   }
                 },
-                [_vm._v(_vm._s(_vm.min))]
+                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
               )
             ]
           )
@@ -10066,7 +10158,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-function loadJSON(file, callback) {
+function loadFile(file, callback) {
   var reader = new FileReader();
   reader.addEventListener('load', function (event) {
     var contents = event.target.result;
@@ -10091,6 +10183,12 @@ var _default = {
     CurveEditor: _CurveEditor.default
   },
   methods: {
+    addCurve: function addCurve(curve) {
+      this.curves.push(curve);
+    },
+    createCurve: function createCurve(options) {
+      this.addCurve(new _Curve.default(options));
+    },
     loadJSON: function loadJSON(json) {
       // remove the current curves
       this.curves.length = 0; // add the json curves
@@ -10107,7 +10205,7 @@ var _default = {
       if (extension !== 'json') {
         console.warn("this doesn't support ".concat(extension, " file types"));
       } else {
-        loadJSON(file, this.loadJSON.bind(this));
+        loadFile(file, this.loadJSON.bind(this));
       }
     },
     save: function save() {
@@ -10236,27 +10334,13 @@ if (true && module.hot) {
   });
 }
 
-var crvs = []; // // value, u, ease
-// for(var i=0; i<4; i++) {
-//   crvs.push(new Curve({
-//     name: 'curve_' + (i + 1),
-//     points: [
-//       [-2,0, 'smooth'],
-//       [0,0.5, 'smooth'],
-//       [-1,1, 'smooth']
-//     ]
-//   }))
-// }
+_vue.default.config.productionTip = false;
 
-_vue.default.config.productionTip = false; // //https://css-tricks.com/creating-vue-js-component-instances-programmatically/
-
+// //https://css-tricks.com/creating-vue-js-component-instances-programmatically/
 var CurveEditor = _vue.default.extend(_App.default);
 
 var instance = new CurveEditor({
-  el: '#app',
-  propsData: {
-    curves: crvs
-  }
+  el: '#app'
 });
 
 function addCurve() {
@@ -10269,38 +10353,17 @@ function addCurve() {
   crvs.push(c);
 }
 
-function loadJSON(json) {
-  for (var i in json) {
-    crvs.push(new _Curve.default(json[i]));
-  }
-} // function save (config, suggestedName) {
-//   var data = crvs.map( c => {
-//     return {
-//       name: c.name,
-//       points: c.points
-//     }
-//   })
-//   let blob = new Blob( [JSON.stringify(data, null, 2 )], { type : 'application/json' } )
-//   saveAs( blob, suggestedName || 'oohwee.json' )
-// }
+instance.loadJSON(_test.default);
+var u = 0;
 
+function sampleTheCurves() {
+  u = (u + 0.001) % 1;
+  instance.curves.forEach(function (c) {
+    c.sample(u);
+  }); // window.requestAnimationFrame(sampleTheCurves)
+}
 
-loadJSON(_test.default); // // <input type="file" hidden @change="onLoadInputChange"/>
-// var loadInput = document.body.insertAdjacentHTML('beforeend', `<input type="file" hidden/>`);
-// console.log( 'loadInput', loadInput );
-// function load(file, callback) {
-//   var reader = new FileReader();
-//   reader.addEventListener( 'load', function ( result ) {
-//     console.log( result );
-//     // var data = event.target.result;
-//     // console.log( data );
-//     // callback( JSON.parse( contents ) );
-//   }, false );
-//   reader.readAsText( file );
-// };
-// setTimeout(function(){
-//   load('./test.json')
-// }, 1000)
+window.requestAnimationFrame(sampleTheCurves);
 },{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./test.json":"test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -10328,7 +10391,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53934" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58189" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

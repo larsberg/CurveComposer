@@ -8,7 +8,9 @@ class Curve {
   constructor(options) {
     Object.assign(this, {
       name: "curve_name",
-      points: []
+      points: [],
+      currentPosition: 0,
+      currentSample: 0
     }, options || {})
   }
 
@@ -50,32 +52,50 @@ class Curve {
     return this.points.findIndex( p => pt === p )
   }
 
-  sample( u ) {
+  sample( u, bSetCurrentPosition=true ) {
 
     // curvePoint = [value, u, ease]
     if(!this.points.length)  return 0;
 
     var cp = this.points
 
+    var sample = 0
+
     // return first or last values when on the edges.
     // I think this makes things faster but never tested it...
     if(cp[cp.length - 1][1] <= u) {
-      return cp[cp.length - 1][0]
+
+      sample = cp[cp.length - 1][0]
+
     }
+
     else if(cp[0][1] > u) {
-      return cp[0][0]
+
+      sample = cp[0][0]
+
+    } else {
+
+      // find high and low indices
+      var hiIndex = cp.findIndex( p => p[1] > u )
+      var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex
+
+      // return interpolation between hi and lo using the lower ease
+      var a = cp[loIndex]
+      var b = cp[hiIndex]
+      var t = mapLinear(u, a[1], b[1], 0, 1 )
+
+      sample = lerp( a[0], b[0], eases[a[2]]( t ) );
     }
 
-    // find high and low indices
-    var hiIndex = cp.findIndex( p => p[1] > u )
-    var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex
 
-    // return interpolation between hi and lo using the lower ease
-    var a = cp[loIndex]
-    var b = cp[hiIndex]
-    var t = mapLinear(u, a[1], b[1], 0, 1 )
+    // this is used to set the current position
+    if(bSetCurrentPosition){
+      this.currentPosition = u
+      this.currentSample = sample
+    }
 
-    return  lerp( a[0], b[0], eases[a[2]]( t ) );
+    return sample
+
   }
 
   getMinValue() {
