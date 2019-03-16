@@ -31,7 +31,9 @@
           name="hi"
           step="0.001"
           :value="max"
-          @change="onRangeChange">
+          @change="onRangeChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
         <label style="color: darkgrey;">low:</label>
         <input
           style="width: 5em; color: cyan;"
@@ -39,7 +41,9 @@
           name="low"
           step="0.001"
           :value="min"
-          @change="onRangeChange">
+          @change="onRangeChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
 
         <label v-if="activePoint">pt:</label>
         <select style="color: magenta;" v-if="activePoint" name="eases" value="smooth" @change="onPointChange">
@@ -55,7 +59,9 @@
           name="position"
           step="0.001"
           :value="Number(activePoint[1])"
-          @change="onPointChange">
+          @change="onPointChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
         <label v-if="activePoint">v:</label>
         <input
           v-if="activePoint"
@@ -64,7 +70,9 @@
           name="value"
           step="0.001"
           :value="Number(activePoint[0])"
-          @change="onPointChange">
+          @change="onPointChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
       </div>
       <label class="info-bar" v-else> {{curve.name}} </label>
     </div>
@@ -75,7 +83,6 @@
       @mouseleave="onMouseLeave"
       v-if="isShown"
       class="curve-container">
-
 
       <svg
         @mouseup="onMouseUp"
@@ -102,14 +109,20 @@
             :x2="1"
             :y2="mouse.y"/>
 
+
+
           <!-- current sample crosshairs -->
-          <line class="no-pointer" style="stroke: #99999933;"
+          <line
+            v-if="bUpdateCrosshairs"
+            class="no-pointer" style="stroke: #99999933;"
             :x1="curve.currentPosition"
             :y1="min"
             :x2="curve.currentPosition"
             :y2="max" />
 
-          <line class="no-pointer" style="stroke: #99999933;"
+          <line
+            v-if="bUpdateCrosshairs"
+            class="no-pointer" style="stroke: #99999933;"
             :x1="0"
             :y1="curve.currentSample"
             :x2="1"
@@ -150,6 +163,7 @@
 <script>
 import {mapLinear, lerp, clamp} from './Composer/Utils'
 import Curve from './Composer/Curve'
+import Crosshairs from './Crosshairs'
 import eases from './Composer/eases'
 
 const easeTypes = Object.keys(eases)
@@ -189,8 +203,13 @@ export default {
       max: 1,
       isMouseOver: false,
       mouse: {x: 0, y: 0},
-      path: this.getPath()
+      path: this.getPath(),
+      bUpdateCrosshairs: true
     }
+  },
+
+  components: {
+    Crosshairs
   },
 
   mounted () {
@@ -285,6 +304,14 @@ export default {
         this.max = Number(e.target.value)
       }
       this.$forceUpdate()
+    },
+
+    onInputFocus(e) {
+      this.bUpdateCrosshairs = false
+    },
+
+    onInputBlur(e) {
+      this.bUpdateCrosshairs = true
     },
 
     onMouseUp(e) {

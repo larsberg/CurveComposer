@@ -9193,7 +9193,93 @@ function patchScopedSlots (instance) {
   }
 }
 
-},{}],"CurveEditor.vue":[function(require,module,exports) {
+},{}],"Crosshairs.vue":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var _default = {
+  props: ['x', 'y', 'min', 'max']
+};
+exports.default = _default;
+        var $ffc649 = exports.default || module.exports;
+      
+      if (typeof $ffc649 === 'function') {
+        $ffc649 = $ffc649.options;
+      }
+    
+        /* template */
+        Object.assign($ffc649, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("svg", [
+    _c("line", {
+      staticStyle: { stroke: "#99999933", "pointer-events": "none" },
+      attrs: { x1: _vm.x, y1: _vm.min, x2: _vm.x, y2: _vm.max }
+    }),
+    _vm._v(" "),
+    _c("line", {
+      staticStyle: { stroke: "#99999933", "pointer-events": "none" },
+      attrs: { x1: 0, y1: _vm.y, x2: 1, y2: _vm.y }
+    })
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$ffc649', $ffc649);
+          } else {
+            api.reload('$ffc649', $ffc649);
+          }
+        }
+
+        
+      }
+    })();
+},{"_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"CurveEditor.vue":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9205,10 +9291,25 @@ var _Utils = require("./Composer/Utils");
 
 var _Curve = _interopRequireDefault(require("./Composer/Curve"));
 
+var _Crosshairs = _interopRequireDefault(require("./Crosshairs"));
+
 var _eases = _interopRequireDefault(require("./Composer/eases"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -9394,8 +9495,12 @@ var _default = {
         x: 0,
         y: 0
       },
-      path: this.getPath()
+      path: this.getPath(),
+      bUpdateCrosshairs: true
     };
+  },
+  components: {
+    Crosshairs: _Crosshairs.default
   },
   mounted: function mounted() {
     this.min = this.curve.getMinValue();
@@ -9470,6 +9575,12 @@ var _default = {
       }
 
       this.$forceUpdate();
+    },
+    onInputFocus: function onInputFocus(e) {
+      this.bUpdateCrosshairs = false;
+    },
+    onInputBlur: function onInputBlur(e) {
+      this.bUpdateCrosshairs = true;
     },
     onMouseUp: function onMouseUp(e) {
       this.mouseDown = false;
@@ -9604,7 +9715,11 @@ exports.default = _default;
                 staticStyle: { width: "5em", color: "cyan" },
                 attrs: { type: "number", name: "hi", step: "0.001" },
                 domProps: { value: _vm.max },
-                on: { change: _vm.onRangeChange }
+                on: {
+                  change: _vm.onRangeChange,
+                  focus: _vm.onInputFocus,
+                  blur: _vm.onInputBlur
+                }
               }),
               _vm._v(" "),
               _c("label", { staticStyle: { color: "darkgrey" } }, [
@@ -9615,7 +9730,11 @@ exports.default = _default;
                 staticStyle: { width: "5em", color: "cyan" },
                 attrs: { type: "number", name: "low", step: "0.001" },
                 domProps: { value: _vm.min },
-                on: { change: _vm.onRangeChange }
+                on: {
+                  change: _vm.onRangeChange,
+                  focus: _vm.onInputFocus,
+                  blur: _vm.onInputBlur
+                }
               }),
               _vm._v(" "),
               _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
@@ -9652,7 +9771,11 @@ exports.default = _default;
                     staticStyle: { width: "7em", color: "magenta" },
                     attrs: { type: "number", name: "position", step: "0.001" },
                     domProps: { value: Number(_vm.activePoint[1]) },
-                    on: { change: _vm.onPointChange }
+                    on: {
+                      change: _vm.onPointChange,
+                      focus: _vm.onInputFocus,
+                      blur: _vm.onInputBlur
+                    }
                   })
                 : _vm._e(),
               _vm._v(" "),
@@ -9663,7 +9786,11 @@ exports.default = _default;
                     staticStyle: { width: "7em", color: "magenta" },
                     attrs: { type: "number", name: "value", step: "0.001" },
                     domProps: { value: Number(_vm.activePoint[0]) },
-                    on: { change: _vm.onPointChange }
+                    on: {
+                      change: _vm.onPointChange,
+                      focus: _vm.onInputFocus,
+                      blur: _vm.onInputBlur
+                    }
                   })
                 : _vm._e()
             ])
@@ -9743,27 +9870,31 @@ exports.default = _default;
                           })
                         : _vm._e(),
                       _vm._v(" "),
-                      _c("line", {
-                        staticClass: "no-pointer",
-                        staticStyle: { stroke: "#99999933" },
-                        attrs: {
-                          x1: _vm.curve.currentPosition,
-                          y1: _vm.min,
-                          x2: _vm.curve.currentPosition,
-                          y2: _vm.max
-                        }
-                      }),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticClass: "no-pointer",
+                            staticStyle: { stroke: "#99999933" },
+                            attrs: {
+                              x1: _vm.curve.currentPosition,
+                              y1: _vm.min,
+                              x2: _vm.curve.currentPosition,
+                              y2: _vm.max
+                            }
+                          })
+                        : _vm._e(),
                       _vm._v(" "),
-                      _c("line", {
-                        staticClass: "no-pointer",
-                        staticStyle: { stroke: "#99999933" },
-                        attrs: {
-                          x1: 0,
-                          y1: _vm.curve.currentSample,
-                          x2: 1,
-                          y2: _vm.curve.currentSample
-                        }
-                      }),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticClass: "no-pointer",
+                            staticStyle: { stroke: "#99999933" },
+                            attrs: {
+                              x1: 0,
+                              y1: _vm.curve.currentSample,
+                              x2: 1,
+                              y2: _vm.curve.currentSample
+                            }
+                          })
+                        : _vm._e(),
                       _vm._v(" "),
                       _vm._l(_vm.curve.points, function(p, index) {
                         return _c("line", {
@@ -9857,7 +9988,7 @@ render._withStripped = true
       
       }
     })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
+},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Crosshairs":"Crosshairs.vue","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10360,7 +10491,8 @@ function sampleTheCurves() {
   u = (u + 0.001) % 1;
   instance.curves.forEach(function (c) {
     c.sample(u);
-  }); // window.requestAnimationFrame(sampleTheCurves)
+  });
+  window.requestAnimationFrame(sampleTheCurves);
 }
 
 window.requestAnimationFrame(sampleTheCurves);
@@ -10391,7 +10523,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58189" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64496" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

@@ -41,7 +41,7 @@ function sampleTheCurves() {
     c.sample(u)
   })
 
-  // window.requestAnimationFrame(sampleTheCurves)
+  window.requestAnimationFrame(sampleTheCurves)
 }
 
 window.requestAnimationFrame(sampleTheCurves)
