@@ -1,5 +1,5 @@
 {
-  "name": "trax",
+  "name": "CurveComposer",
   "version": "0.0.1",
   "description": "animtion curve ditor",
   "main": "build/CurveComposer.js",
