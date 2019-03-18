@@ -2,10 +2,11 @@
   "name": "trax",
   "version": "0.0.1",
   "description": "animtion curve ditor",
-  "main": "main.js",
+  "main": "build/CurveComposer.js",
   "scripts": {
-    "dev": "parcel src/index.html",
-    "build": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.js --no-source-maps --no-cache --no-minify"
+    "dev": "parcel src/index.html --open",
+    "build": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.js",
+    "test": "parcel test/index.html --out-dir test/dist --open"
   },
   "author": "lars berg",
   "license": "ISC",

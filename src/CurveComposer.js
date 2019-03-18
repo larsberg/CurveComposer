@@ -25,6 +25,7 @@ function CurveCopmoser( elementId = "#app") {
 
   return instance
 }
+
 Vue.config.productionTip = false
 
 module.exports = CurveCopmoser

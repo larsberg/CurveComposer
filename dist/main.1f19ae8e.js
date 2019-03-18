@@ -10721,7 +10721,7 @@ function CurveCopmoser() {
 
 _vue.default.config.productionTip = false;
 module.exports = CurveCopmoser;
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"test.json":[function(require,module,exports) {
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"../src/test.json":[function(require,module,exports) {
 module.exports = [{
   "name": "CURVE",
   "points": [[-2, 0, "smooth"], [-0.28, 0.0569, "smooth"], [-0.56, 0.22, "smooth"], [-1.1, 0.3135, "smooth"], [0, 0.5, "smooth"], [-0.88, 0.555, "smooth"], [-1, 1, "smooth"]]
@@ -10744,7 +10744,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // main.js
 var cc = (0, _CurveComposer.default)('#app');
 cc.loadCurves(_test.default);
-},{"./CurveComposer":"CurveComposer.js","./test.json":"test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./CurveComposer":"CurveComposer.js","./test.json":"../src/test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -10771,7 +10771,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50697" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54033" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
