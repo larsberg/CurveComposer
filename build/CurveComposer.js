@@ -9783,7 +9783,11 @@ function $qLB$var$CurveComposer(elementId = "#CurveComposer") {
 }
 
 $QPfz$export$default.config.productionTip = false;
-$qLB$exports = $qLB$var$CurveComposer;
+var $z1Ec$$interop$default = $parcel$interopDefault($z1Ec$exports);
+$qLB$exports = {
+  setup: $qLB$var$CurveComposer,
+  curve: $z1Ec$$interop$default.d
+};
 
 if (typeof exports === "object" && typeof module !== "undefined") {
   // CommonJS

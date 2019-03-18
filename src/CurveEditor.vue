@@ -408,8 +408,6 @@ export default {
 
         this.curve.sortPoints()
         this.updatePath()
-        // this.$forceUpdate()
-
       }
 
     },

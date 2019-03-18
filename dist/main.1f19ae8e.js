@@ -10729,7 +10729,10 @@ function CurveComposer() {
 }
 
 _vue.default.config.productionTip = false;
-module.exports = CurveComposer;
+module.exports = {
+  setup: CurveComposer,
+  curve: _Curve.default
+};
 },{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"testTwo.json":[function(require,module,exports) {
 module.exports = [{
   "name": "CURVE",
@@ -10778,8 +10781,15 @@ var _testTwo = _interopRequireDefault(require("./testTwo.json"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // main.js
-var cc = (0, _CurveComposer.default)();
+var cc = _CurveComposer.default.setup();
+
 cc.loadCurves(_testTwo.default);
+/*
+TODO:
+  - [ ] input options:
+    - [ ] collapse all the curves
+    - [ ] background hex-color
+ */
 },{"./CurveComposer":"CurveComposer.js","./testTwo.json":"testTwo.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -10808,7 +10818,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56120" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61351" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

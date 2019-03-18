@@ -2,5 +2,12 @@
 import CurveComposer from './CurveComposer'
 import testJSON from './testTwo.json'
 
-var cc = CurveComposer()
+var cc = CurveComposer.setup()
 cc.loadCurves(testJSON)
+
+/*
+TODO:
+  - [ ] input options:
+    - [ ] collapse all the curves
+    - [ ] background hex-color
+ */

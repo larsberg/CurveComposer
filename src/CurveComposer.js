@@ -28,4 +28,10 @@ function CurveComposer( elementId = "#CurveComposer") {
 
 Vue.config.productionTip = false
 
-module.exports = CurveComposer
+module.exports = {
+
+  setup: CurveComposer,
+
+  curve: Curve
+
+}
