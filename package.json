@@ -2,7 +2,7 @@
   "name": "CurveComposer",
   "version": "0.0.1",
   "description": "animtion curve ditor",
-  "main": "build/CurveComposer.js",
+  "main": "./build/CurveComposer.js",
   "scripts": {
     "dev": "parcel src/index.html --open",
     "build": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.js",
