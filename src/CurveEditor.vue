@@ -440,9 +440,9 @@ export default {
     getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]')
       var bb = el.getBoundingClientRect()
-      var x = e.offsetX
-      var y = e.offsetY
-      var u = mapLinear(x, bb.x, bb.x + bb.width, 0, 1)
+      var x = e.offsetX // e.clientX - bb.x //
+      var y = e.offsetY // e.clientY - bb.y //
+      var u = mapLinear(x, 0, bb.width, 0, 1)
       var v = mapLinear(y, 0, bb.height, this.max, this.min)
 
       return {

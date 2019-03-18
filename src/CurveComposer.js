@@ -18,7 +18,7 @@ import Curve from './Composer/Curve'
 const CurveEditor = Vue.extend(App)
 
 
-function CurveCopmoser( elementId = "#app") {
+function CurveComposer( elementId = "#CurveComposer") {
   var instance = new CurveEditor({
     el: elementId
   })
@@ -28,4 +28,4 @@ function CurveCopmoser( elementId = "#app") {
 
 Vue.config.productionTip = false
 
-module.exports = CurveCopmoser
+module.exports = CurveComposer

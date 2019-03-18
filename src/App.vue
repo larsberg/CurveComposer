@@ -1,14 +1,11 @@
 <template>
   <div style='
     font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
-    position: fixed;
-    left: 0;
-    top: 0;
+    background: #00000099;
     width: 100%;
     height: 100%;
-    background: #111112;
-    color: white;
-    overflow: scroll;'>
+    overflow: scroll;
+    color: white;'>
 
     <div style="height: 24px;">
 

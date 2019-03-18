@@ -1,6 +1,6 @@
 // main.js
 import CurveComposer from './CurveComposer'
-import testJSON from './test.json'
+import testJSON from './testTwo.json'
 
-var cc = CurveComposer('#app')
+var cc = CurveComposer()
 cc.loadCurves(testJSON)

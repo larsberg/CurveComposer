@@ -5,8 +5,6 @@
 //
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
-
-// eslint-disable-next-line no-global-assign
 parcelRequire = (function (modules, cache, entry, globalName) {
   // Save the require from previous bundle to this closure if any
   var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
@@ -77,8 +75,16 @@ parcelRequire = (function (modules, cache, entry, globalName) {
     }, {}];
   };
 
+  var error;
   for (var i = 0; i < entry.length; i++) {
-    newRequire(entry[i]);
+    try {
+      newRequire(entry[i]);
+    } catch (e) {
+      // Save first error but execute all entries
+      if (!error) {
+        error = e;
+      }
+    }
   }
 
   if (entry.length) {
@@ -103,6 +109,13 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   // Override the current require with this new one
+  parcelRequire = newRequire;
+
+  if (error) {
+    // throw error from earlier, _after updating parcelRequire_
+    throw error;
+  }
+
   return newRequire;
 })({"../node_modules/vue/dist/vue.runtime.esm.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -8870,7 +8883,7 @@ function getBundleURL() {
   try {
     throw new Error();
   } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
 
     if (matches) {
       return getBaseURL(matches[0]);
@@ -8881,7 +8894,7 @@ function getBundleURL() {
 }
 
 function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
 exports.getBundleURL = getBundleURLCached;
@@ -9621,9 +9634,11 @@ var _default = {
     getEventPosition: function getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]');
       var bb = el.getBoundingClientRect();
-      var x = e.offsetX;
-      var y = e.offsetY;
-      var u = (0, _Utils.mapLinear)(x, bb.x, bb.x + bb.width, 0, 1);
+      var x = e.offsetX; // e.clientX - bb.x //
+
+      var y = e.offsetY; // e.clientY - bb.y //
+
+      var u = (0, _Utils.mapLinear)(x, 0, bb.width, 0, 1);
       var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
       return {
         x: Number(u.toFixed(4)),
@@ -9938,7 +9953,7 @@ exports.default = _default;
                 width: "100%",
                 background: "#00000055"
               },
-              attrs: { tabindex: "1", name: "workspace" },
+              attrs: { tabIndex: "1", name: "workspace" },
               on: {
                 keyup: function($event) {
                   if (
@@ -10071,8 +10086,8 @@ exports.default = _default;
                               p === _vm.activePoint ? "magenta" : "#ffffffaa"
                           },
                           attrs: {
-                            onmouseover: "this.style.strokeWidth=7;",
-                            onmouseout: "this.style.strokeWidth=5;",
+                            onMouseOver: "this.style.strokeWidth=7;",
+                            onMouseOut: "this.style.strokeWidth=5;",
                             "data-index": index,
                             x1: p[1],
                             y1: p[0],
@@ -10495,9 +10510,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-//
-//
-//
 function loadFile(file, callback) {
   var reader = new FileReader();
   reader.addEventListener('load', function (event) {
@@ -10587,14 +10599,11 @@ exports.default = _default;
       staticStyle: {
         "font-family":
           '"Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace',
-        position: "fixed",
-        left: "0",
-        top: "0",
+        background: "#00000099",
         width: "100%",
         height: "100%",
-        background: "#111112",
-        color: "white",
-        overflow: "scroll"
+        overflow: "scroll",
+        color: "white"
       }
     },
     [
@@ -10711,8 +10720,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // document.head.appendChild(style)
 var CurveEditor = _vue.default.extend(_App.default);
 
-function CurveCopmoser() {
-  var elementId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#app";
+function CurveComposer() {
+  var elementId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#CurveComposer";
   var instance = new CurveEditor({
     el: elementId
   });
@@ -10720,31 +10729,58 @@ function CurveCopmoser() {
 }
 
 _vue.default.config.productionTip = false;
-module.exports = CurveCopmoser;
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"../src/test.json":[function(require,module,exports) {
+module.exports = CurveComposer;
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"testTwo.json":[function(require,module,exports) {
 module.exports = [{
   "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.28, 0.0569, "smooth"], [-0.56, 0.22, "smooth"], [-1.1, 0.3135, "smooth"], [0, 0.5, "smooth"], [-0.88, 0.555, "smooth"], [-1, 1, "smooth"]]
+  "points": [[-2, 0, "smooth"], [-0.56, 0.22, "smooth"], [0, 0.5, "smooth"], [-1, 1, "smooth"]]
 }, {
   "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.88, 0.1922, "smooth"], [-1.5, 0.292, "smooth"], [-1.84, 0.2984, "smooth"], [-1.76, 0.4994, "smooth"], [0, 0.5, "smooth"], [-0.84, 0.737, "smooth"], [-1.42, 0.8217, "smooth"], [-0.7, 0.8622, "smooth"], [-1, 1, "smooth"]]
+  "points": [[-2, 0, "smooth"], [-0.88, 0.1922, "smooth"], [-1.5, 0.6953, "smooth"], [-1, 1, "smooth"]]
 }, {
   "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.46, 0.3464, "smooth"], [0, 0.5, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
+}, {
+  "name": "CURVE",
+  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
 }];
 },{}],"main.js":[function(require,module,exports) {
 "use strict";
 
 var _CurveComposer = _interopRequireDefault(require("./CurveComposer"));
 
-var _test = _interopRequireDefault(require("./test.json"));
+var _testTwo = _interopRequireDefault(require("./testTwo.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // main.js
-var cc = (0, _CurveComposer.default)('#app');
-cc.loadCurves(_test.default);
-},{"./CurveComposer":"CurveComposer.js","./test.json":"../src/test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var cc = (0, _CurveComposer.default)();
+cc.loadCurves(_testTwo.default);
+},{"./CurveComposer":"CurveComposer.js","./testTwo.json":"testTwo.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -10766,26 +10802,46 @@ function Module(moduleName) {
 }
 
 module.bundle.Module = Module;
+var checkedAssets, assetsToAccept;
 var parent = module.bundle.parent;
 
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54033" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56120" + '/');
 
   ws.onmessage = function (event) {
+    checkedAssets = {};
+    assetsToAccept = [];
     var data = JSON.parse(event.data);
 
     if (data.type === 'update') {
-      console.clear();
-      data.assets.forEach(function (asset) {
-        hmrApply(global.parcelRequire, asset);
-      });
+      var handled = false;
       data.assets.forEach(function (asset) {
         if (!asset.isNew) {
-          hmrAccept(global.parcelRequire, asset.id);
+          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
+
+          if (didAccept) {
+            handled = true;
+          }
         }
+      }); // Enable HMR for CSS by default.
+
+      handled = handled || data.assets.every(function (asset) {
+        return asset.type === 'css' && asset.generated.js;
       });
+
+      if (handled) {
+        console.clear();
+        data.assets.forEach(function (asset) {
+          hmrApply(global.parcelRequire, asset);
+        });
+        assetsToAccept.forEach(function (v) {
+          hmrAcceptRun(v[0], v[1]);
+        });
+      } else {
+        window.location.reload();
+      }
     }
 
     if (data.type === 'reload') {
@@ -10873,7 +10929,7 @@ function hmrApply(bundle, asset) {
   }
 }
 
-function hmrAccept(bundle, id) {
+function hmrAcceptCheck(bundle, id) {
   var modules = bundle.modules;
 
   if (!modules) {
@@ -10881,9 +10937,27 @@ function hmrAccept(bundle, id) {
   }
 
   if (!modules[id] && bundle.parent) {
-    return hmrAccept(bundle.parent, id);
+    return hmrAcceptCheck(bundle.parent, id);
   }
 
+  if (checkedAssets[id]) {
+    return;
+  }
+
+  checkedAssets[id] = true;
+  var cached = bundle.cache[id];
+  assetsToAccept.push([bundle, id]);
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    return true;
+  }
+
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAcceptCheck(global.parcelRequire, id);
+  });
+}
+
+function hmrAcceptRun(bundle, id) {
   var cached = bundle.cache[id];
   bundle.hotData = {};
 
@@ -10908,10 +10982,6 @@ function hmrAccept(bundle, id) {
 
     return true;
   }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAccept(global.parcelRequire, id);
-  });
 }
 },{}]},{},["../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.js"], null)
-//# sourceMappingURL=/main.1f19ae8e.map
+//# sourceMappingURL=/main.1f19ae8e.js.map
