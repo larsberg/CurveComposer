@@ -104,7 +104,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"../node_modules/vue/dist/vue.runtime.esm.js":[function(require,module,exports) {
+})({"QPfz":[function(require,module,exports) {
 var global = arguments[3];
 "use strict";
 
@@ -495,12 +495,12 @@ var config = {
   /**
    * Show production mode tip message on boot?
    */
-  productionTip: "development" !== 'production',
+  productionTip: "production" !== 'production',
 
   /**
    * Whether to enable devtools
    */
-  devtools: "development" !== 'production',
+  devtools: "production" !== 'production',
 
   /**
    * Whether to record perf
@@ -734,7 +734,7 @@ var generateComponentTrace = noop; // work around flow check
 
 var formatComponentName = noop;
 
-if ("development" !== 'production') {
+if ("production" !== 'production') {
   var hasConsole = typeof console !== 'undefined';
   var classifyRE = /(?:^|[-_])(\w)/g;
 
@@ -858,7 +858,7 @@ Dep.prototype.notify = function notify() {
   // stabilize the subscriber list first
   var subs = this.subs.slice();
 
-  if ("development" !== 'production' && !config.async) {
+  if ("production" !== 'production' && !config.async) {
     // subs aren't sorted in scheduler if not running async
     // we need to sort them now to make sure they fire in correct
     // order
@@ -1175,7 +1175,7 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
       /* eslint-enable no-self-compare */
 
 
-      if ("development" !== 'production' && customSetter) {
+      if ("production" !== 'production' && customSetter) {
         customSetter();
       } // #7981: for accessor properties without setter
 
@@ -1203,7 +1203,7 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
 
 
 function set(target, key, val) {
-  if ("development" !== 'production' && (isUndef(target) || isPrimitive(target))) {
+  if ("production" !== 'production' && (isUndef(target) || isPrimitive(target))) {
     warn("Cannot set reactive property on undefined, null, or primitive value: " + target);
   }
 
@@ -1221,7 +1221,7 @@ function set(target, key, val) {
   var ob = target.__ob__;
 
   if (target._isVue || ob && ob.vmCount) {
-    "development" !== 'production' && warn('Avoid adding reactive properties to a Vue instance or its root $data ' + 'at runtime - declare it upfront in the data option.');
+    "production" !== 'production' && warn('Avoid adding reactive properties to a Vue instance or its root $data ' + 'at runtime - declare it upfront in the data option.');
     return val;
   }
 
@@ -1240,7 +1240,7 @@ function set(target, key, val) {
 
 
 function del(target, key) {
-  if ("development" !== 'production' && (isUndef(target) || isPrimitive(target))) {
+  if ("production" !== 'production' && (isUndef(target) || isPrimitive(target))) {
     warn("Cannot delete reactive property on undefined, null, or primitive value: " + target);
   }
 
@@ -1252,7 +1252,7 @@ function del(target, key) {
   var ob = target.__ob__;
 
   if (target._isVue || ob && ob.vmCount) {
-    "development" !== 'production' && warn('Avoid deleting properties on a Vue instance or its root $data ' + '- just set it to null.');
+    "production" !== 'production' && warn('Avoid deleting properties on a Vue instance or its root $data ' + '- just set it to null.');
     return;
   }
 
@@ -1298,7 +1298,7 @@ var strats = config.optionMergeStrategies;
  * Options with restrictions
  */
 
-if ("development" !== 'production') {
+if ("production" !== 'production') {
   strats.el = strats.propsData = function (parent, child, vm, key) {
     if (!vm) {
       warn("option \"" + key + "\" can only be used during instance " + 'creation with the `new` keyword.');
@@ -1381,7 +1381,7 @@ function mergeDataOrFn(parentVal, childVal, vm) {
 strats.data = function (parentVal, childVal, vm) {
   if (!vm) {
     if (childVal && typeof childVal !== 'function') {
-      "development" !== 'production' && warn('The "data" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
+      "production" !== 'production' && warn('The "data" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
       return parentVal;
     }
 
@@ -1427,7 +1427,7 @@ function mergeAssets(parentVal, childVal, vm, key) {
   var res = Object.create(parentVal || null);
 
   if (childVal) {
-    "development" !== 'production' && assertObjectType(key, childVal, vm);
+    "production" !== 'production' && assertObjectType(key, childVal, vm);
     return extend(res, childVal);
   } else {
     return res;
@@ -1460,7 +1460,7 @@ strats.watch = function (parentVal, childVal, vm, key) {
     return Object.create(parentVal || null);
   }
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     assertObjectType(key, childVal, vm);
   }
 
@@ -1490,7 +1490,7 @@ strats.watch = function (parentVal, childVal, vm, key) {
 
 
 strats.props = strats.methods = strats.inject = strats.computed = function (parentVal, childVal, vm, key) {
-  if (childVal && "development" !== 'production') {
+  if (childVal && "production" !== 'production') {
     assertObjectType(key, childVal, vm);
   }
 
@@ -1563,7 +1563,7 @@ function normalizeProps(options, vm) {
         res[name] = {
           type: null
         };
-      } else if ("development" !== 'production') {
+      } else if ("production" !== 'production') {
         warn('props must be strings when using array syntax.');
       }
     }
@@ -1575,7 +1575,7 @@ function normalizeProps(options, vm) {
         type: val
       };
     }
-  } else if ("development" !== 'production') {
+  } else if ("production" !== 'production') {
     warn("Invalid value for option \"props\": expected an Array or an Object, " + "but got " + toRawType(props) + ".", vm);
   }
 
@@ -1610,7 +1610,7 @@ function normalizeInject(options, vm) {
         from: val
       };
     }
-  } else if ("development" !== 'production') {
+  } else if ("production" !== 'production') {
     warn("Invalid value for option \"inject\": expected an Array or an Object, " + "but got " + toRawType(inject) + ".", vm);
   }
 }
@@ -1648,7 +1648,7 @@ function assertObjectType(name, value, vm) {
 
 
 function mergeOptions(parent, child, vm) {
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     checkComponents(child);
   }
 
@@ -1729,7 +1729,7 @@ function resolveAsset(options, type, id, warnMissing) {
 
   var res = assets[id] || assets[camelizedId] || assets[PascalCaseId];
 
-  if ("development" !== 'production' && warnMissing && !res) {
+  if ("production" !== 'production' && warnMissing && !res) {
     warn('Failed to resolve ' + type.slice(0, -1) + ': ' + id, options);
   }
 
@@ -1770,7 +1770,7 @@ function validateProp(key, propOptions, propsData, vm) {
     toggleObserving(prevShouldObserve);
   }
 
-  if ("development" !== 'production' && // skip validation for weex recycle-list child component props
+  if ("production" !== 'production' && // skip validation for weex recycle-list child component props
   !false) {
     assertProp(prop, key, value, vm, absent);
   }
@@ -1790,7 +1790,7 @@ function getPropDefaultValue(vm, prop, key) {
 
   var def = prop.default; // warn against non-factory defaults for Object & Array
 
-  if ("development" !== 'production' && isObject(def)) {
+  if ("production" !== 'production' && isObject(def)) {
     warn('Invalid default value for prop "' + key + '": ' + 'Props with type Object/Array must use a factory function ' + 'to return the default value.', vm);
   } // the raw prop value was also undefined from previous render,
   // return previous default value to avoid unnecessary watcher trigger
@@ -2027,7 +2027,7 @@ function globalHandleError(err, vm, info) {
 }
 
 function logError(err, vm, info) {
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     warn("Error in " + info + ": \"" + err.toString() + "\"", vm);
   }
   /* istanbul ignore else */
@@ -2158,7 +2158,7 @@ function nextTick(cb, ctx) {
 
 var initProxy;
 
-if ("development" !== 'production') {
+if ("production" !== 'production') {
   var allowedGlobals = makeMap('Infinity,undefined,NaN,isFinite,isNaN,' + 'parseFloat,parseInt,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,' + 'Math,Number,Date,Array,Object,Boolean,String,RegExp,Map,Set,JSON,Intl,' + 'require' // for Webpack/Browserify
   );
 
@@ -2281,7 +2281,7 @@ function _traverse(val, seen) {
 var mark;
 var measure;
 
-if ("development" !== 'production') {
+if ("production" !== 'production') {
   var perf = inBrowser && window.performance;
   /* istanbul ignore if */
 
@@ -2346,7 +2346,7 @@ function updateListeners(on, oldOn, add, remove$$1, createOnceHandler, vm) {
     event = normalizeEvent(name);
 
     if (isUndef(cur)) {
-      "development" !== 'production' && warn("Invalid handler for event \"" + event.name + "\": got " + String(cur), vm);
+      "production" !== 'production' && warn("Invalid handler for event \"" + event.name + "\": got " + String(cur), vm);
     } else if (isUndef(old)) {
       if (isUndef(cur.fns)) {
         cur = on[name] = createFnInvoker(cur, vm);
@@ -2427,7 +2427,7 @@ function extractPropsFromVNodeData(data, Ctor, tag) {
     for (var key in propOptions) {
       var altKey = hyphenate(key);
 
-      if ("development" !== 'production') {
+      if ("production" !== 'production') {
         var keyInLowerCase = key.toLowerCase();
 
         if (key !== keyInLowerCase && attrs && hasOwn(attrs, keyInLowerCase)) {
@@ -2571,7 +2571,7 @@ function initInjections(vm) {
     toggleObserving(false);
     Object.keys(result).forEach(function (key) {
       /* istanbul ignore else */
-      if ("development" !== 'production') {
+      if ("production" !== 'production') {
         defineReactive$$1(vm, key, result[key], function () {
           warn("Avoid mutating an injected value directly since the changes will be " + "overwritten whenever the provided component re-renders. " + "injection being mutated: \"" + key + "\"", vm);
         });
@@ -2612,7 +2612,7 @@ function resolveInject(inject, vm) {
         if ('default' in inject[key]) {
           var provideDefault = inject[key].default;
           result[key] = typeof provideDefault === 'function' ? provideDefault.call(vm) : provideDefault;
-        } else if ("development" !== 'production') {
+        } else if ("production" !== 'production') {
           warn("Injection \"" + key + "\" not found", vm);
         }
       }
@@ -2813,7 +2813,7 @@ function renderSlot(name, fallback, props, bindObject) {
     props = props || {};
 
     if (bindObject) {
-      if ("development" !== 'production' && !isObject(bindObject)) {
+      if ("production" !== 'production' && !isObject(bindObject)) {
         warn('slot v-bind without argument expects an Object', this);
       }
 
@@ -2883,7 +2883,7 @@ function checkKeyCodes(eventKeyCode, key, builtInKeyCode, eventKeyName, builtInK
 function bindObjectProps(data, tag, value, asProp, isSync) {
   if (value) {
     if (!isObject(value)) {
-      "development" !== 'production' && warn('v-bind without argument expects an Object or Array value', this);
+      "production" !== 'production' && warn('v-bind without argument expects an Object or Array value', this);
     } else {
       if (Array.isArray(value)) {
         value = toObject(value);
@@ -2977,7 +2977,7 @@ function markStaticNode(node, key, isOnce) {
 function bindObjectListeners(data, value) {
   if (value) {
     if (!isPlainObject(value)) {
-      "development" !== 'production' && warn('v-on without argument expects an Object value', this);
+      "production" !== 'production' && warn('v-on without argument expects an Object value', this);
     } else {
       var on = data.on = data.on ? extend({}, data.on) : {};
 
@@ -3031,7 +3031,7 @@ function bindDynamicKeys(baseObj, values) {
 
     if (typeof key === 'string' && key) {
       baseObj[values[i]] = values[i + 1];
-    } else if ("development" !== 'production' && key !== '' && key !== null) {
+    } else if ("production" !== 'production' && key !== '' && key !== null) {
       // null is a speical value for explicitly removing a binding
       warn("Invalid value for dynamic directive argument (expected string or null): " + key, this);
     }
@@ -3187,7 +3187,7 @@ function cloneAndMarkFunctionalResult(vnode, data, contextVm, options, renderCon
   clone.fnContext = contextVm;
   clone.fnOptions = options;
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     (clone.devtoolsMeta = clone.devtoolsMeta || {}).renderContext = renderContext;
   }
 
@@ -3288,7 +3288,7 @@ function createComponent(Ctor, data, context, children, tag) {
 
 
   if (typeof Ctor !== 'function') {
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       warn("Invalid Component definition: " + String(Ctor), context);
     }
 
@@ -3444,7 +3444,7 @@ function createElement(context, tag, data, children, normalizationType, alwaysNo
 
 function _createElement(context, tag, data, children, normalizationType) {
   if (isDef(data) && isDef(data.__ob__)) {
-    "development" !== 'production' && warn("Avoid using observed data object as vnode data: " + JSON.stringify(data) + "\n" + 'Always create fresh vnode data objects in each render!', context);
+    "production" !== 'production' && warn("Avoid using observed data object as vnode data: " + JSON.stringify(data) + "\n" + 'Always create fresh vnode data objects in each render!', context);
     return createEmptyVNode();
   } // object syntax in v-bind
 
@@ -3459,7 +3459,7 @@ function _createElement(context, tag, data, children, normalizationType) {
   } // warn against non-primitive key
 
 
-  if ("development" !== 'production' && isDef(data) && isDef(data.key) && !isPrimitive(data.key)) {
+  if ("production" !== 'production' && isDef(data) && isDef(data.key) && !isPrimitive(data.key)) {
     {
       warn('Avoid using non-primitive value as key, ' + 'use string/number value instead.', context);
     }
@@ -3585,7 +3585,7 @@ function initRender(vm) {
   var parentData = parentVnode && parentVnode.data;
   /* istanbul ignore else */
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     defineReactive$$1(vm, '$attrs', parentData && parentData.attrs || emptyObject, function () {
       !isUpdatingChildComponent && warn("$attrs is readonly.", vm);
     }, true);
@@ -3636,7 +3636,7 @@ function renderMixin(Vue) {
 
       /* istanbul ignore else */
 
-      if ("development" !== 'production' && vm.$options.renderError) {
+      if ("production" !== 'production' && vm.$options.renderError) {
         try {
           vnode = vm.$options.renderError.call(vm._renderProxy, vm.$createElement, e);
         } catch (e) {
@@ -3657,7 +3657,7 @@ function renderMixin(Vue) {
 
 
     if (!(vnode instanceof VNode)) {
-      if ("development" !== 'production' && Array.isArray(vnode)) {
+      if ("production" !== 'production' && Array.isArray(vnode)) {
         warn('Multiple root nodes returned from render function. Render function ' + 'should return a single root node.', vm);
       }
 
@@ -3741,7 +3741,7 @@ function resolveAsyncComponent(factory, baseCtor) {
       }
     });
     var reject = once(function (reason) {
-      "development" !== 'production' && warn("Failed to resolve async component: " + String(factory) + (reason ? "\nReason: " + reason : ''));
+      "production" !== 'production' && warn("Failed to resolve async component: " + String(factory) + (reason ? "\nReason: " + reason : ''));
 
       if (isDef(factory.errorComp)) {
         factory.error = true;
@@ -3781,7 +3781,7 @@ function resolveAsyncComponent(factory, baseCtor) {
         if (isDef(res.timeout)) {
           setTimeout(function () {
             if (isUndef(factory.resolved)) {
-              reject("development" !== 'production' ? "timeout (" + res.timeout + "ms)" : null);
+              reject("production" !== 'production' ? "timeout (" + res.timeout + "ms)" : null);
             }
           }, res.timeout);
         }
@@ -3939,7 +3939,7 @@ function eventsMixin(Vue) {
   Vue.prototype.$emit = function (event) {
     var vm = this;
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       var lowerCaseEvent = event.toLowerCase();
 
       if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
@@ -4106,7 +4106,7 @@ function mountComponent(vm, el, hydrating) {
   if (!vm.$options.render) {
     vm.$options.render = createEmptyVNode;
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       /* istanbul ignore if */
       if (vm.$options.template && vm.$options.template.charAt(0) !== '#' || vm.$options.el || el) {
         warn('You are using the runtime-only build of Vue where the template ' + 'compiler is not available. Either pre-compile the templates into ' + 'render functions, or use the compiler-included build.', vm);
@@ -4120,7 +4120,7 @@ function mountComponent(vm, el, hydrating) {
   var updateComponent;
   /* istanbul ignore if */
 
-  if ("development" !== 'production' && config.performance && mark) {
+  if ("production" !== 'production' && config.performance && mark) {
     updateComponent = function () {
       var name = vm._name;
       var id = vm._uid;
@@ -4169,7 +4169,7 @@ function mountComponent(vm, el, hydrating) {
 }
 
 function updateChildComponent(vm, propsData, listeners, parentVnode, renderChildren) {
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     isUpdatingChildComponent = true;
   } // determine whether component has slot children
   // we need to do this before overwriting $options._renderChildren.
@@ -4230,7 +4230,7 @@ function updateChildComponent(vm, propsData, listeners, parentVnode, renderChild
     vm.$forceUpdate();
   }
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     isUpdatingChildComponent = false;
   }
 }
@@ -4324,7 +4324,7 @@ function resetSchedulerState() {
   index = queue.length = activatedChildren.length = 0;
   has = {};
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     circular = {};
   }
 
@@ -4384,7 +4384,7 @@ function flushSchedulerQueue() {
     has[id] = null;
     watcher.run(); // in dev build, check and stop circular updates.
 
-    if ("development" !== 'production' && has[id] != null) {
+    if ("production" !== 'production' && has[id] != null) {
       circular[id] = (circular[id] || 0) + 1;
 
       if (circular[id] > MAX_UPDATE_COUNT) {
@@ -4473,7 +4473,7 @@ function queueWatcher(watcher) {
     if (!waiting) {
       waiting = true;
 
-      if ("development" !== 'production' && !config.async) {
+      if ("production" !== 'production' && !config.async) {
         flushSchedulerQueue();
         return;
       }
@@ -4522,7 +4522,7 @@ var Watcher = function Watcher(vm, expOrFn, cb, options, isRenderWatcher) {
   this.newDeps = [];
   this.depIds = new _Set();
   this.newDepIds = new _Set();
-  this.expression = "development" !== 'production' ? expOrFn.toString() : ''; // parse expression for getter
+  this.expression = "production" !== 'production' ? expOrFn.toString() : ''; // parse expression for getter
 
   if (typeof expOrFn === 'function') {
     this.getter = expOrFn;
@@ -4531,7 +4531,7 @@ var Watcher = function Watcher(vm, expOrFn, cb, options, isRenderWatcher) {
 
     if (!this.getter) {
       this.getter = noop;
-      "development" !== 'production' && warn("Failed watching path: \"" + expOrFn + "\" " + 'Watcher only accepts simple dot-delimited paths. ' + 'For full control, use a function instead.', vm);
+      "production" !== 'production' && warn("Failed watching path: \"" + expOrFn + "\" " + 'Watcher only accepts simple dot-delimited paths. ' + 'For full control, use a function instead.', vm);
     }
   }
 
@@ -4769,7 +4769,7 @@ function initProps(vm, propsOptions) {
     var value = validateProp(key, propsOptions, propsData, vm);
     /* istanbul ignore else */
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       var hyphenatedKey = hyphenate(key);
 
       if (isReservedAttribute(hyphenatedKey) || config.isReservedAttr(hyphenatedKey)) {
@@ -4804,7 +4804,7 @@ function initData(vm) {
 
   if (!isPlainObject(data)) {
     data = {};
-    "development" !== 'production' && warn('data functions should return an object:\n' + 'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function', vm);
+    "production" !== 'production' && warn('data functions should return an object:\n' + 'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function', vm);
   } // proxy data on instance
 
 
@@ -4816,14 +4816,14 @@ function initData(vm) {
   while (i--) {
     var key = keys[i];
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       if (methods && hasOwn(methods, key)) {
         warn("Method \"" + key + "\" has already been defined as a data property.", vm);
       }
     }
 
     if (props && hasOwn(props, key)) {
-      "development" !== 'production' && warn("The data property \"" + key + "\" is already declared as a prop. " + "Use prop default value instead.", vm);
+      "production" !== 'production' && warn("The data property \"" + key + "\" is already declared as a prop. " + "Use prop default value instead.", vm);
     } else if (!isReserved(key)) {
       proxy(vm, "_data", key);
     }
@@ -4863,7 +4863,7 @@ function initComputed(vm, computed) {
     var userDef = computed[key];
     var getter = typeof userDef === 'function' ? userDef : userDef.get;
 
-    if ("development" !== 'production' && getter == null) {
+    if ("production" !== 'production' && getter == null) {
       warn("Getter is missing for computed property \"" + key + "\".", vm);
     }
 
@@ -4877,7 +4877,7 @@ function initComputed(vm, computed) {
 
     if (!(key in vm)) {
       defineComputed(vm, key, userDef);
-    } else if ("development" !== 'production') {
+    } else if ("production" !== 'production') {
       if (key in vm.$data) {
         warn("The computed property \"" + key + "\" is already defined in data.", vm);
       } else if (vm.$options.props && key in vm.$options.props) {
@@ -4898,7 +4898,7 @@ function defineComputed(target, key, userDef) {
     sharedPropertyDefinition.set = userDef.set || noop;
   }
 
-  if ("development" !== 'production' && sharedPropertyDefinition.set === noop) {
+  if ("production" !== 'production' && sharedPropertyDefinition.set === noop) {
     sharedPropertyDefinition.set = function () {
       warn("Computed property \"" + key + "\" was assigned to but it has no setter.", this);
     };
@@ -4935,7 +4935,7 @@ function initMethods(vm, methods) {
   var props = vm.$options.props;
 
   for (var key in methods) {
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       if (typeof methods[key] !== 'function') {
         warn("Method \"" + key + "\" has type \"" + typeof methods[key] + "\" in the component definition. " + "Did you reference the function correctly?", vm);
       }
@@ -4996,7 +4996,7 @@ function stateMixin(Vue) {
     return this._props;
   };
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     dataDef.set = function () {
       warn('Avoid replacing instance root $data. ' + 'Use nested data properties instead.', this);
     };
@@ -5048,7 +5048,7 @@ function initMixin(Vue) {
     var startTag, endTag;
     /* istanbul ignore if */
 
-    if ("development" !== 'production' && config.performance && mark) {
+    if ("production" !== 'production' && config.performance && mark) {
       startTag = "vue-perf-start:" + vm._uid;
       endTag = "vue-perf-end:" + vm._uid;
       mark(startTag);
@@ -5068,7 +5068,7 @@ function initMixin(Vue) {
     /* istanbul ignore else */
 
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       initProxy(vm);
     } else {
       vm._renderProxy = vm;
@@ -5088,7 +5088,7 @@ function initMixin(Vue) {
     callHook(vm, 'created');
     /* istanbul ignore if */
 
-    if ("development" !== 'production' && config.performance && mark) {
+    if ("production" !== 'production' && config.performance && mark) {
       vm._name = formatComponentName(vm, false);
       mark(endTag);
       measure("vue " + vm._name + " init", startTag, endTag);
@@ -5166,7 +5166,7 @@ function resolveModifiedOptions(Ctor) {
 }
 
 function Vue(options) {
-  if ("development" !== 'production' && !(this instanceof Vue)) {
+  if ("production" !== 'production' && !(this instanceof Vue)) {
     warn('Vue is a constructor and should be called with the `new` keyword');
   }
 
@@ -5238,7 +5238,7 @@ function initExtend(Vue) {
 
     var name = extendOptions.name || Super.options.name;
 
-    if ("development" !== 'production' && name) {
+    if ("production" !== 'production' && name) {
       validateComponentName(name);
     }
 
@@ -5316,7 +5316,7 @@ function initAssetRegisters(Vue) {
         return this.options[type + 's'][id];
       } else {
         /* istanbul ignore if */
-        if ("development" !== 'production' && type === 'component') {
+        if ("production" !== 'production' && type === 'component') {
           validateComponentName(id);
         }
 
@@ -5477,7 +5477,7 @@ function initGlobalAPI(Vue) {
     return config;
   };
 
-  if ("development" !== 'production') {
+  if ("production" !== 'production') {
     configDef.set = function () {
       warn('Do not replace the Vue.config object, set individual fields instead.');
     };
@@ -5730,7 +5730,7 @@ function query(el) {
     var selected = document.querySelector(el);
 
     if (!selected) {
-      "development" !== 'production' && warn('Cannot find element: ' + el);
+      "production" !== 'production' && warn('Cannot find element: ' + el);
       return document.createElement('div');
     }
 
@@ -5978,7 +5978,7 @@ function createPatchFunction(backend) {
     var tag = vnode.tag;
 
     if (isDef(tag)) {
-      if ("development" !== 'production') {
+      if ("production" !== 'production') {
         if (data && data.pre) {
           creatingElmInVPre++;
         }
@@ -6002,7 +6002,7 @@ function createPatchFunction(backend) {
         insert(parentElm, vnode.elm, refElm);
       }
 
-      if ("development" !== 'production' && data && data.pre) {
+      if ("production" !== 'production' && data && data.pre) {
         creatingElmInVPre--;
       }
     } else if (isTrue(vnode.isComment)) {
@@ -6103,7 +6103,7 @@ function createPatchFunction(backend) {
 
   function createChildren(vnode, children, insertedVnodeQueue) {
     if (Array.isArray(children)) {
-      if ("development" !== 'production') {
+      if ("production" !== 'production') {
         checkDuplicateKeys(children);
       }
 
@@ -6258,7 +6258,7 @@ function createPatchFunction(backend) {
 
     var canMove = !removeOnly;
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       checkDuplicateKeys(newCh);
     }
 
@@ -6406,7 +6406,7 @@ function createPatchFunction(backend) {
           updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly);
         }
       } else if (isDef(ch)) {
-        if ("development" !== 'production') {
+        if ("production" !== 'production') {
           checkDuplicateKeys(ch);
         }
 
@@ -6464,7 +6464,7 @@ function createPatchFunction(backend) {
     } // assert node match
 
 
-    if ("development" !== 'production') {
+    if ("production" !== 'production') {
       if (!assertNodeMatch(elm, vnode, inVPre)) {
         return false;
       }
@@ -6494,7 +6494,7 @@ function createPatchFunction(backend) {
           if (isDef(i = data) && isDef(i = i.domProps) && isDef(i = i.innerHTML)) {
             if (i !== elm.innerHTML) {
               /* istanbul ignore if */
-              if ("development" !== 'production' && typeof console !== 'undefined' && !hydrationBailed) {
+              if ("production" !== 'production' && typeof console !== 'undefined' && !hydrationBailed) {
                 hydrationBailed = true;
                 console.warn('Parent: ', elm);
                 console.warn('server innerHTML: ', i);
@@ -6521,7 +6521,7 @@ function createPatchFunction(backend) {
 
             if (!childrenMatch || childNode) {
               /* istanbul ignore if */
-              if ("development" !== 'production' && typeof console !== 'undefined' && !hydrationBailed) {
+              if ("production" !== 'production' && typeof console !== 'undefined' && !hydrationBailed) {
                 hydrationBailed = true;
                 console.warn('Parent: ', elm);
                 console.warn('Mismatching childNodes vs. VNodes: ', elm.childNodes, children);
@@ -6600,7 +6600,7 @@ function createPatchFunction(backend) {
             if (hydrate(oldVnode, vnode, insertedVnodeQueue)) {
               invokeInsertHook(vnode, insertedVnodeQueue, true);
               return oldVnode;
-            } else if ("development" !== 'production') {
+            } else if ("production" !== 'production') {
               warn('The client-side rendered virtual DOM tree is not matching ' + 'server-rendered content. This is likely caused by incorrect ' + 'HTML markup, for example nesting block-level elements inside ' + '<p>, or missing <tbody>. Bailing hydration and performing ' + 'full client-side render.');
             }
           } // either not server-rendered, or hydration failed.
@@ -7645,7 +7645,7 @@ function enter(vnode, toggleDisplay) {
   var enterCancelledHook = isAppear ? appearCancelled || enterCancelled : enterCancelled;
   var explicitEnterDuration = toNumber(isObject(duration) ? duration.enter : duration);
 
-  if ("development" !== 'production' && explicitEnterDuration != null) {
+  if ("production" !== 'production' && explicitEnterDuration != null) {
     checkDuration(explicitEnterDuration, 'enter', vnode);
   }
 
@@ -7753,7 +7753,7 @@ function leave(vnode, rm) {
   var userWantsControl = getHookArgumentsLength(leave);
   var explicitLeaveDuration = toNumber(isObject(duration) ? duration.leave : duration);
 
-  if ("development" !== 'production' && isDef(explicitLeaveDuration)) {
+  if ("production" !== 'production' && isDef(explicitLeaveDuration)) {
     checkDuration(explicitLeaveDuration, 'leave', vnode);
   }
 
@@ -7984,7 +7984,7 @@ function actuallySetSelected(el, binding, vm) {
   var isMultiple = el.multiple;
 
   if (isMultiple && !Array.isArray(value)) {
-    "development" !== 'production' && warn("<select multiple v-model=\"" + binding.expression + "\"> " + "expects an Array value for its binding, but got " + Object.prototype.toString.call(value).slice(8, -1), vm);
+    "production" !== 'production' && warn("<select multiple v-model=\"" + binding.expression + "\"> " + "expects an Array value for its binding, but got " + Object.prototype.toString.call(value).slice(8, -1), vm);
     return;
   }
 
@@ -8205,13 +8205,13 @@ var Transition = {
     } // warn multiple elements
 
 
-    if ("development" !== 'production' && children.length > 1) {
+    if ("production" !== 'production' && children.length > 1) {
       warn('<transition> can only be used on a single element. Use ' + '<transition-group> for lists.', this.$parent);
     }
 
     var mode = this.mode; // warn invalid mode
 
-    if ("development" !== 'production' && mode && mode !== 'in-out' && mode !== 'out-in') {
+    if ("production" !== 'production' && mode && mode !== 'in-out' && mode !== 'out-in') {
       warn('invalid <transition> mode: ' + mode, this.$parent);
     }
 
@@ -8326,7 +8326,7 @@ var TransitionGroup = {
           children.push(c);
           map[c.key] = c;
           (c.data || (c.data = {})).transition = transitionData;
-        } else if ("development" !== 'production') {
+        } else if ("production" !== 'production') {
           var opts = c.componentOptions;
           var name = opts ? opts.Ctor.options.name || opts.tag || '' : c.tag;
           warn("<transition-group> children must be keyed: <" + name + ">");
@@ -8491,12 +8491,12 @@ if (inBrowser) {
     if (config.devtools) {
       if (devtools) {
         devtools.emit('init', Vue);
-      } else if ("development" !== 'production' && "development" !== 'test') {
+      } else if ("production" !== 'production' && "production" !== 'test') {
         console[console.info ? 'info' : 'log']('Download the Vue Devtools extension for a better development experience:\n' + 'https://github.com/vuejs/vue-devtools');
       }
     }
 
-    if ("development" !== 'production' && "development" !== 'test' && config.productionTip !== false && typeof console !== 'undefined') {
+    if ("production" !== 'production' && "production" !== 'test' && config.productionTip !== false && typeof console !== 'undefined') {
       console[console.info ? 'info' : 'log']("You are running Vue in development mode.\n" + "Make sure to turn on production mode when deploying for production.\n" + "See more tips at https://vuejs.org/guide/deployment.html");
     }
   }, 0);
@@ -8506,7 +8506,7 @@ if (inBrowser) {
 
 var _default = Vue;
 exports.default = _default;
-},{}],"Composer/Utils.js":[function(require,module,exports) {
+},{}],"Ah8Q":[function(require,module,exports) {
 // Utils.js
 // Linear mapping from range <a1, a2> to range <b1, b2>
 var mapLinear = function mapLinear(x, a1, a2, b1, b2) {
@@ -8527,7 +8527,7 @@ module.exports = {
   lerp: lerp,
   clamp: clamp
 };
-},{}],"Composer/eases.js":[function(require,module,exports) {
+},{}],"kKuJ":[function(require,module,exports) {
 module.exports = {
   zero: function zero() {
     return 0;
@@ -8721,7 +8721,7 @@ module.exports = {
     return this.BounceOut(k * 2 - 1) * 0.5 + 0.5;
   }
 };
-},{}],"Composer/Curve.js":[function(require,module,exports) {
+},{}],"z1Ec":[function(require,module,exports) {
 "use strict";
 
 var _Utils = require("./Utils");
@@ -8854,347 +8854,7 @@ function () {
 }();
 
 module.exports = Curve;
-},{"./Utils":"Composer/Utils.js","./eases":"Composer/eases.js"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
-
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-
-  newLink.onload = function () {
-    link.remove();
-  };
-
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
-
-    cssTimeout = null;
-  }, 50);
-}
-
-module.exports = reloadCSS;
-},{"./bundle-url":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/vue-hot-reload-api/dist/index.js":[function(require,module,exports) {
-var Vue // late bind
-var version
-var map = Object.create(null)
-if (typeof window !== 'undefined') {
-  window.__VUE_HOT_MAP__ = map
-}
-var installed = false
-var isBrowserify = false
-var initHookName = 'beforeCreate'
-
-exports.install = function (vue, browserify) {
-  if (installed) { return }
-  installed = true
-
-  Vue = vue.__esModule ? vue.default : vue
-  version = Vue.version.split('.').map(Number)
-  isBrowserify = browserify
-
-  // compat with < 2.0.0-alpha.7
-  if (Vue.config._lifecycleHooks.indexOf('init') > -1) {
-    initHookName = 'init'
-  }
-
-  exports.compatible = version[0] >= 2
-  if (!exports.compatible) {
-    console.warn(
-      '[HMR] You are using a version of vue-hot-reload-api that is ' +
-        'only compatible with Vue.js core ^2.0.0.'
-    )
-    return
-  }
-}
-
-/**
- * Create a record for a hot module, which keeps track of its constructor
- * and instances
- *
- * @param {String} id
- * @param {Object} options
- */
-
-exports.createRecord = function (id, options) {
-  if(map[id]) { return }
-
-  var Ctor = null
-  if (typeof options === 'function') {
-    Ctor = options
-    options = Ctor.options
-  }
-  makeOptionsHot(id, options)
-  map[id] = {
-    Ctor: Ctor,
-    options: options,
-    instances: []
-  }
-}
-
-/**
- * Check if module is recorded
- *
- * @param {String} id
- */
-
-exports.isRecorded = function (id) {
-  return typeof map[id] !== 'undefined'
-}
-
-/**
- * Make a Component options object hot.
- *
- * @param {String} id
- * @param {Object} options
- */
-
-function makeOptionsHot(id, options) {
-  if (options.functional) {
-    var render = options.render
-    options.render = function (h, ctx) {
-      var instances = map[id].instances
-      if (ctx && instances.indexOf(ctx.parent) < 0) {
-        instances.push(ctx.parent)
-      }
-      return render(h, ctx)
-    }
-  } else {
-    injectHook(options, initHookName, function() {
-      var record = map[id]
-      if (!record.Ctor) {
-        record.Ctor = this.constructor
-      }
-      record.instances.push(this)
-    })
-    injectHook(options, 'beforeDestroy', function() {
-      var instances = map[id].instances
-      instances.splice(instances.indexOf(this), 1)
-    })
-  }
-}
-
-/**
- * Inject a hook to a hot reloadable component so that
- * we can keep track of it.
- *
- * @param {Object} options
- * @param {String} name
- * @param {Function} hook
- */
-
-function injectHook(options, name, hook) {
-  var existing = options[name]
-  options[name] = existing
-    ? Array.isArray(existing) ? existing.concat(hook) : [existing, hook]
-    : [hook]
-}
-
-function tryWrap(fn) {
-  return function (id, arg) {
-    try {
-      fn(id, arg)
-    } catch (e) {
-      console.error(e)
-      console.warn(
-        'Something went wrong during Vue component hot-reload. Full reload required.'
-      )
-    }
-  }
-}
-
-function updateOptions (oldOptions, newOptions) {
-  for (var key in oldOptions) {
-    if (!(key in newOptions)) {
-      delete oldOptions[key]
-    }
-  }
-  for (var key$1 in newOptions) {
-    oldOptions[key$1] = newOptions[key$1]
-  }
-}
-
-exports.rerender = tryWrap(function (id, options) {
-  var record = map[id]
-  if (!options) {
-    record.instances.slice().forEach(function (instance) {
-      instance.$forceUpdate()
-    })
-    return
-  }
-  if (typeof options === 'function') {
-    options = options.options
-  }
-  if (record.Ctor) {
-    record.Ctor.options.render = options.render
-    record.Ctor.options.staticRenderFns = options.staticRenderFns
-    record.instances.slice().forEach(function (instance) {
-      instance.$options.render = options.render
-      instance.$options.staticRenderFns = options.staticRenderFns
-      // reset static trees
-      // pre 2.5, all static trees are cached together on the instance
-      if (instance._staticTrees) {
-        instance._staticTrees = []
-      }
-      // 2.5.0
-      if (Array.isArray(record.Ctor.options.cached)) {
-        record.Ctor.options.cached = []
-      }
-      // 2.5.3
-      if (Array.isArray(instance.$options.cached)) {
-        instance.$options.cached = []
-      }
-
-      // post 2.5.4: v-once trees are cached on instance._staticTrees.
-      // Pure static trees are cached on the staticRenderFns array
-      // (both already reset above)
-
-      // 2.6: temporarily mark rendered scoped slots as unstable so that
-      // child components can be forced to update
-      var restore = patchScopedSlots(instance)
-      instance.$forceUpdate()
-      instance.$nextTick(restore)
-    })
-  } else {
-    // functional or no instance created yet
-    record.options.render = options.render
-    record.options.staticRenderFns = options.staticRenderFns
-
-    // handle functional component re-render
-    if (record.options.functional) {
-      // rerender with full options
-      if (Object.keys(options).length > 2) {
-        updateOptions(record.options, options)
-      } else {
-        // template-only rerender.
-        // need to inject the style injection code for CSS modules
-        // to work properly.
-        var injectStyles = record.options._injectStyles
-        if (injectStyles) {
-          var render = options.render
-          record.options.render = function (h, ctx) {
-            injectStyles.call(ctx)
-            return render(h, ctx)
-          }
-        }
-      }
-      record.options._Ctor = null
-      // 2.5.3
-      if (Array.isArray(record.options.cached)) {
-        record.options.cached = []
-      }
-      record.instances.slice().forEach(function (instance) {
-        instance.$forceUpdate()
-      })
-    }
-  }
-})
-
-exports.reload = tryWrap(function (id, options) {
-  var record = map[id]
-  if (options) {
-    if (typeof options === 'function') {
-      options = options.options
-    }
-    makeOptionsHot(id, options)
-    if (record.Ctor) {
-      if (version[1] < 2) {
-        // preserve pre 2.2 behavior for global mixin handling
-        record.Ctor.extendOptions = options
-      }
-      var newCtor = record.Ctor.super.extend(options)
-      record.Ctor.options = newCtor.options
-      record.Ctor.cid = newCtor.cid
-      record.Ctor.prototype = newCtor.prototype
-      if (newCtor.release) {
-        // temporary global mixin strategy used in < 2.0.0-alpha.6
-        newCtor.release()
-      }
-    } else {
-      updateOptions(record.options, options)
-    }
-  }
-  record.instances.slice().forEach(function (instance) {
-    if (instance.$vnode && instance.$vnode.context) {
-      instance.$vnode.context.$forceUpdate()
-    } else {
-      console.warn(
-        'Root or manually mounted instance modified. Full reload required.'
-      )
-    }
-  })
-})
-
-// 2.6 optimizes template-compiled scoped slots and skips updates if child
-// only uses scoped slots. We need to patch the scoped slots resolving helper
-// to temporarily mark all scoped slots as unstable in order to force child
-// updates.
-function patchScopedSlots (instance) {
-  if (!instance._u) { return }
-  // https://github.com/vuejs/vue/blob/dev/src/core/instance/render-helpers/resolve-scoped-slots.js
-  var original = instance._u
-  instance._u = function (slots) {
-    try {
-      // 2.6.4 ~ 2.6.6
-      return original(slots, true)
-    } catch (e) {
-      // 2.5 / >= 2.6.7
-      return original(slots, null, true)
-    }
-  }
-  return function () {
-    instance._u = original
-  }
-}
-
-},{}],"CurveEditor.vue":[function(require,module,exports) {
+},{"./Utils":"Ah8Q","./eases":"kKuJ"}],"SXj0":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9688,454 +9348,14 @@ exports.default = _default;
     
         /* template */
         Object.assign($739f47, (function () {
-          var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    {
-      staticStyle: {
-        position: "relative",
-        width: "calc(100%-4)",
-        "border-bottom": "#ffffffaa solid 0.5px"
-      }
-    },
-    [
-      _c(
-        "div",
-        {
-          staticStyle: {
-            position: "relative",
-            "min-height": "20px",
-            width: "100%",
-            background: "#00000044"
-          }
-        },
-        [
-          _c(
-            "svg",
-            {
-              staticStyle: {
-                position: "absolute",
-                right: "3",
-                top: "3",
-                width: "14px",
-                height: "14px",
-                stroke: "white",
-                "stroke-width": "1",
-                fill: "#00000055"
-              },
-              on: { click: _vm.onToggle }
-            },
-            [
-              _c("circle", {
-                attrs: {
-                  r: "6",
-                  cx: "7",
-                  cy: "7",
-                  stroke: "white",
-                  fill: "inherit"
-                }
-              }),
-              _vm._v(" "),
-              _c("line", {
-                staticStyle: {
-                  fill: "none",
-                  stroke: "#ffffff99",
-                  "stroke-width": "1",
-                  "vector-effect": "non-scaling-stroke"
-                },
-                attrs: { x1: "3", y1: "7", x2: "11", y2: "7" }
-              }),
-              _vm._v(" "),
-              !_vm.isShown
-                ? _c("line", {
-                    staticStyle: {
-                      fill: "none",
-                      stroke: "#ffffff99",
-                      "stroke-width": "1",
-                      "vector-effect": "non-scaling-stroke"
-                    },
-                    attrs: { y1: "3", x1: "7", y2: "11", x2: "7" }
-                  })
-                : _vm._e()
-            ]
-          ),
-          _vm._v(" "),
-          _vm.isShown
-            ? _c(
-                "div",
-                {
-                  staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
-                  }
-                },
-                [
-                  _c(
-                    "div",
-                    { staticStyle: { width: "100%", "font-size": "0.75em" } },
-                    [
-                      _vm._v(
-                        "\n        " +
-                          _vm._s(_vm.curve.name) +
-                          " " +
-                          _vm._s(
-                            _vm.bUpdateCrosshairs
-                              ? Number(_vm.curve.currentSample.toFixed(3))
-                              : ""
-                          ) +
-                          "\n      "
-                      )
-                    ]
-                  ),
-                  _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
-                    _vm._v("hi:")
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticStyle: {
-                      color: "cyan",
-                      width: "5em",
-                      "margin-right": "10px",
-                      background: "#00000099",
-                      border: "none"
-                    },
-                    attrs: { type: "number", name: "hi", step: "0.001" },
-                    domProps: { value: _vm.max },
-                    on: {
-                      change: _vm.onRangeChange,
-                      focus: _vm.onInputFocus,
-                      blur: _vm.onInputBlur
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
-                    _vm._v("low:")
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticStyle: {
-                      color: "cyan",
-                      width: "5em",
-                      "margin-right": "10px",
-                      background: "#00000099",
-                      border: "none"
-                    },
-                    attrs: { type: "number", name: "low", step: "0.001" },
-                    domProps: { value: _vm.min },
-                    on: {
-                      change: _vm.onRangeChange,
-                      focus: _vm.onInputFocus,
-                      blur: _vm.onInputBlur
-                    }
-                  }),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c(
-                        "select",
-                        {
-                          staticStyle: {
-                            color: "magenta",
-                            width: "5em",
-                            "margin-right": "10px",
-                            background: "#00000099",
-                            border: "none"
-                          },
-                          attrs: { name: "eases", value: "smooth" },
-                          on: { change: _vm.onPointChange }
-                        },
-                        _vm._l(_vm.easeTypes, function(e) {
-                          return _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: e,
-                                selected:
-                                  _vm.activePoint && _vm.activePoint[2] === e
-                              }
-                            },
-                            [_vm._v(_vm._s(e))]
-                          )
-                        }),
-                        0
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "magenta",
-                          width: "5em",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: {
-                          type: "number",
-                          name: "position",
-                          step: "0.001"
-                        },
-                        domProps: { value: Number(_vm.activePoint[1]) },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("v:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "magenta",
-                          width: "5em",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: { type: "number", name: "value", step: "0.001" },
-                        domProps: { value: Number(_vm.activePoint[0]) },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
-                    : _vm._e()
-                ]
-              )
-            : _c(
-                "label",
-                {
-                  staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
-                  }
-                },
-                [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
-              )
-        ]
-      ),
-      _vm._v(" "),
-      _vm.isShown
-        ? _c(
-            "div",
-            {
-              staticStyle: {
-                position: "relative",
-                height: "100px",
-                width: "100%",
-                background: "#00000055"
-              },
-              attrs: { tabindex: "1", name: "workspace" },
-              on: {
-                keyup: function($event) {
-                  if (
-                    !$event.type.indexOf("key") &&
-                    _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
-                      "Backspace",
-                      "Delete",
-                      "Del"
-                    ])
-                  ) {
-                    return null
-                  }
-                  return _vm.onDelete($event)
-                },
-                mouseleave: _vm.onMouseLeave
-              }
-            },
-            [
-              _c(
-                "svg",
-                {
-                  staticStyle: {
-                    position: "absolute",
-                    left: "0",
-                    top: "0",
-                    width: "100%",
-                    height: "100%",
-                    background: "#00000044",
-                    fill: "none",
-                    stroke: "white",
-                    "stroke-width": "1"
-                  },
-                  attrs: {
-                    viewBox: _vm.getViewBox(),
-                    preserveAspectRatio: "none",
-                    xmlns: "http://www.w3.org/2000/svg"
-                  },
-                  on: {
-                    mouseup: _vm.onMouseUp,
-                    mousedown: _vm.onMouseDown,
-                    mousemove: _vm.onMouseMove,
-                    click: _vm.handleClick
-                  }
-                },
-                [
-                  _c(
-                    "g",
-                    { attrs: { transform: _vm.getTransform() } },
-                    [
-                      _vm.isMouseOver
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff66",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.mouse.x,
-                              y1: _vm.min,
-                              x2: _vm.mouse.x,
-                              y2: _vm.max
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.isMouseOver
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff66",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: 0,
-                              y1: _vm.mouse.y,
-                              x2: 1,
-                              y2: _vm.mouse.y
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.bUpdateCrosshairs
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#99999933",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.curve.currentPosition,
-                              y1: _vm.min,
-                              x2: _vm.curve.currentPosition,
-                              y2: _vm.max
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.bUpdateCrosshairs
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff33",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: 0,
-                              y1: _vm.curve.currentSample,
-                              x2: 1,
-                              y2: _vm.curve.currentSample
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm._l(_vm.curve.points, function(p, index) {
-                        return _c("line", {
-                          style: {
-                            "vector-effect": "non-scaling-stroke",
-                            "stroke-width": "5",
-                            "stroke-linecap": "round",
-                            "vector-effect": "non-scaling-stroke",
-                            stroke:
-                              p === _vm.activePoint ? "magenta" : "#ffffffaa"
-                          },
-                          attrs: {
-                            onmouseover: "this.style.strokeWidth=7;",
-                            onmouseout: "this.style.strokeWidth=5;",
-                            "data-index": index,
-                            x1: p[1],
-                            y1: p[0],
-                            x2: p[1],
-                            y2: p[0],
-                            fill: "red"
-                          }
-                        })
-                      }),
-                      _vm._v(" "),
-                      _c("path", {
-                        staticStyle: {
-                          fill: "none",
-                          stroke: "#ffffff99",
-                          "stroke-width": "1",
-                          "vector-effect": "non-scaling-stroke",
-                          "pointer-events": "none"
-                        },
-                        attrs: { d: _vm.path }
-                      })
-                    ],
-                    2
-                  )
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "cyan",
-                    position: "absolute",
-                    top: "1",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "cyan",
-                    position: "absolute",
-                    bottom: "0",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
-              )
-            ]
-          )
-        : _vm._e()
-    ]
-  )
-}
+          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"position":"relative","width":"calc(100%-4)","border-bottom":"#ffffffaa solid 0.5px"}},[_c('div',{staticStyle:{"position":"relative","min-height":"20px","width":"100%","background":"#00000044"}},[_c('svg',{staticStyle:{"position":"absolute","right":"3","top":"3","width":"14px","height":"14px","stroke":"white","stroke-width":"1","fill":"#00000055"},on:{"click":_vm.onToggle}},[_c('circle',{attrs:{"r":"6","cx":"7","cy":"7","stroke":"white","fill":"inherit"}}),_vm._v(" "),_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"x1":"3","y1":"7","x2":"11","y2":"7"}}),_vm._v(" "),(!_vm.isShown)?_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"y1":"3","x1":"7","y2":"11","x2":"7"}}):_vm._e()]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_c('div',{staticStyle:{"width":"100%","font-size":"0.75em"}},[_vm._v("\n        "+_vm._s(_vm.curve.name)+" "+_vm._s(_vm.bUpdateCrosshairs ? Number(_vm.curve.currentSample.toFixed(3)) : '')+"\n      ")]),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("hi:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"cyan","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"hi","step":"0.001"},domProps:{"value":_vm.max},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("low:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"cyan","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"low","step":"0.001"},domProps:{"value":_vm.min},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("pt:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('select',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"name":"eases","value":"smooth"},on:{"change":_vm.onPointChange}},_vm._l((_vm.easeTypes),function(e){return _c('option',{domProps:{"value":e,"selected":_vm.activePoint && _vm.activePoint[2] === e}},[_vm._v(_vm._s(e))])}),0):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("u:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"position","step":"0.001"},domProps:{"value":Number(_vm.activePoint[1])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("v:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"value","step":"0.001"},domProps:{"value":Number(_vm.activePoint[0])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e()]):_c('label',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_vm._v(" "+_vm._s(_vm.curve.name)+" ")])]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"position":"relative","height":"100px","width":"100%","background":"#00000055"},attrs:{"tabindex":"1","name":"workspace"},on:{"keyup":function($event){if(!$event.type.indexOf('key')&&_vm._k($event.keyCode,"delete",[8,46],$event.key,["Backspace","Delete","Del"])){ return null; }return _vm.onDelete($event)},"mouseleave":_vm.onMouseLeave}},[_c('svg',{staticStyle:{"position":"absolute","left":"0","top":"0","width":"100%","height":"100%","background":"#00000044","fill":"none","stroke":"white","stroke-width":"1"},attrs:{"viewBox":_vm.getViewBox(),"preserveAspectRatio":'none',"xmlns":"http://www.w3.org/2000/svg"},on:{"mouseup":_vm.onMouseUp,"mousedown":_vm.onMouseDown,"mousemove":_vm.onMouseMove,"click":_vm.handleClick}},[_c('g',{attrs:{"transform":_vm.getTransform()}},[(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.mouse.x,"y1":_vm.min,"x2":_vm.mouse.x,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":0,"y1":_vm.mouse.y,"x2":1,"y2":_vm.mouse.y}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#99999933","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.curve.currentPosition,"y1":_vm.min,"x2":_vm.curve.currentPosition,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#ffffff33","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":0,"y1":_vm.curve.currentSample,"x2":1,"y2":_vm.curve.currentSample}}):_vm._e(),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('line',{style:({
+            'vector-effect': 'non-scaling-stroke',
+            'stroke-width': '5',
+            'stroke-linecap': 'round',
+            'vector-effect': 'non-scaling-stroke',
+            'stroke': (p === _vm.activePoint) ? 'magenta' : '#ffffffaa'
+          }),attrs:{"onmouseover":"this.style.strokeWidth=7;","onmouseout":"this.style.strokeWidth=5;","data-index":index,"x1":p[1],"y1":p[0],"x2":p[1],"y2":p[0],"fill":"red"}})}),_vm._v(" "),_c('path',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"d":_vm.path}})],2)]),_vm._v(" "),_c('div',{staticStyle:{"color":"cyan","position":"absolute","top":"1","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.max)+"\n    ")]),_vm._v(" "),_c('div',{staticStyle:{"color":"cyan","position":"absolute","bottom":"0","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.min)+"\n    ")])]):_vm._e()])}
 var staticRenderFns = []
-render._withStripped = true
 
           return {
             render: render,
@@ -10146,24 +9366,7 @@ render._withStripped = true
           };
         })());
       
-    /* hot reload */
-    (function () {
-      if (module.hot) {
-        var api = require('vue-hot-reload-api');
-        api.install(require('vue'));
-        if (api.compatible) {
-          module.hot.accept();
-          if (!module.hot.data) {
-            api.createRecord('$739f47', $739f47);
-          } else {
-            api.reload('$739f47', $739f47);
-          }
-        }
-
-        
-      }
-    })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
+},{"./Composer/Utils":"Ah8Q","./Composer/Curve":"z1Ec","./Composer/eases":"kKuJ"}],"5xYi":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10428,7 +9631,7 @@ var saveAs = exports.saveAs = window.saveAs || function (view) {
 // with an attribute `content` that corresponds to the window
 
 exports.default = saveAs;
-},{}],"App.vue":[function(require,module,exports) {
+},{}],"Js2s":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -10577,91 +9780,8 @@ exports.default = _default;
     
         /* template */
         Object.assign($a8ed0c, (function () {
-          var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    {
-      staticStyle: {
-        "font-family":
-          '"Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace',
-        position: "fixed",
-        left: "0",
-        top: "0",
-        width: "100%",
-        height: "100%",
-        background: "#111112",
-        color: "white",
-        overflow: "scroll"
-      }
-    },
-    [
-      _c("div", { staticStyle: { height: "24px" } }, [
-        _vm._v("\n\n    " + _vm._s(_vm.title) + "\n\n    "),
-        _c(
-          "label",
-          {
-            staticStyle: {
-              "margin-right": "10px",
-              background: "#00000099",
-              color: "white",
-              border: "white solid 1px",
-              "border-radius": "5px",
-              "font-size": "0.75em",
-              padding: "0 4px"
-            },
-            attrs: { for: "saveInput" }
-          },
-          [_vm._v("save")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            attrs: { id: "saveInput", hidden: "", type: "file" },
-            on: { click: _vm.save }
-          },
-          [_vm._v("save")]
-        ),
-        _vm._v(" "),
-        _c(
-          "label",
-          {
-            staticStyle: {
-              "margin-right": "10px",
-              background: "#00000099",
-              color: "white",
-              border: "white solid 1px",
-              "border-radius": "5px",
-              "font-size": "0.75em",
-              padding: "0 4px"
-            },
-            attrs: { for: "loadInput" }
-          },
-          [_vm._v("load")]
-        ),
-        _vm._v(" "),
-        _c("input", {
-          attrs: { id: "loadInput", hidden: "", type: "file" },
-          on: { change: _vm.onLoad }
-        })
-      ]),
-      _vm._v(" "),
-      _vm._l(_vm.curves, function(c) {
-        return _c("CurveEditor", {
-          ref: "curves",
-          refInFor: true,
-          attrs: { curve: c }
-        })
-      })
-    ],
-    2
-  )
-}
+          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"font-family":"\"Courier New\", Courier, \"Lucida Sans Typewriter\", \"Lucida Typewriter\", monospace","position":"fixed","left":"0","top":"0","width":"100%","height":"100%","background":"#111112","color":"white","overflow":"scroll"}},[_c('div',{staticStyle:{"height":"24px"}},[_vm._v("\n\n    "+_vm._s(_vm.title)+"\n\n    "),_c('label',{staticStyle:{"margin-right":"10px","background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"saveInput"}},[_vm._v("save")]),_vm._v(" "),_c('button',{attrs:{"id":"saveInput","hidden":"","type":"file"},on:{"click":_vm.save}},[_vm._v("save")]),_vm._v(" "),_c('label',{staticStyle:{"margin-right":"10px","background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"loadInput"}},[_vm._v("load")]),_vm._v(" "),_c('input',{attrs:{"id":"loadInput","hidden":"","type":"file"},on:{"change":_vm.onLoad}})]),_vm._v(" "),_vm._l((_vm.curves),function(c){return _c('CurveEditor',{ref:"curves",refInFor:true,attrs:{"curve":c}})})],2)}
 var staticRenderFns = []
-render._withStripped = true
 
           return {
             render: render,
@@ -10672,24 +9792,7 @@ render._withStripped = true
           };
         })());
       
-    /* hot reload */
-    (function () {
-      if (module.hot) {
-        var api = require('vue-hot-reload-api');
-        api.install(require('vue'));
-        if (api.compatible) {
-          module.hot.accept();
-          if (!module.hot.data) {
-            api.createRecord('$a8ed0c', $a8ed0c);
-          } else {
-            api.reload('$a8ed0c', $a8ed0c);
-          }
-        }
-
-        
-      }
-    })();
-},{"./CurveEditor":"CurveEditor.vue","./Composer/Curve":"Composer/Curve.js","save-as":"../node_modules/save-as/lib/index.js","_css_loader":"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/css-loader.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"CurveComposer.js":[function(require,module,exports) {
+},{"./CurveEditor":"SXj0","./Composer/Curve":"z1Ec","save-as":"5xYi"}],"1qLB":[function(require,module,exports) {
 "use strict";
 
 var _vue = _interopRequireDefault(require("vue"));
@@ -10721,197 +9824,4 @@ function CurveCopmoser() {
 
 _vue.default.config.productionTip = false;
 module.exports = CurveCopmoser;
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js"}],"test.json":[function(require,module,exports) {
-module.exports = [{
-  "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.28, 0.0569, "smooth"], [-0.56, 0.22, "smooth"], [-1.1, 0.3135, "smooth"], [0, 0.5, "smooth"], [-0.88, 0.555, "smooth"], [-1, 1, "smooth"]]
-}, {
-  "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.88, 0.1922, "smooth"], [-1.5, 0.292, "smooth"], [-1.84, 0.2984, "smooth"], [-1.76, 0.4994, "smooth"], [0, 0.5, "smooth"], [-0.84, 0.737, "smooth"], [-1.42, 0.8217, "smooth"], [-0.7, 0.8622, "smooth"], [-1, 1, "smooth"]]
-}, {
-  "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.22, 0.1833, "smooth"], [-1.46, 0.3464, "smooth"], [0, 0.5, "smooth"], [-1.76, 0.5752, "smooth"], [-1, 1, "smooth"]]
-}];
-},{}],"main.js":[function(require,module,exports) {
-"use strict";
-
-var _CurveComposer = _interopRequireDefault(require("./CurveComposer"));
-
-var _test = _interopRequireDefault(require("./test.json"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// main.js
-var cc = (0, _CurveComposer.default)('#app');
-cc.loadCurves(_test.default);
-},{"./CurveComposer":"CurveComposer.js","./test.json":"test.json"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
-var global = arguments[3];
-var OVERLAY_ID = '__parcel__error__overlay__';
-var OldModule = module.bundle.Module;
-
-function Module(moduleName) {
-  OldModule.call(this, moduleName);
-  this.hot = {
-    data: module.bundle.hotData,
-    _acceptCallbacks: [],
-    _disposeCallbacks: [],
-    accept: function (fn) {
-      this._acceptCallbacks.push(fn || function () {});
-    },
-    dispose: function (fn) {
-      this._disposeCallbacks.push(fn);
-    }
-  };
-  module.bundle.hotData = null;
-}
-
-module.bundle.Module = Module;
-var parent = module.bundle.parent;
-
-if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = "" || location.hostname;
-  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50697" + '/');
-
-  ws.onmessage = function (event) {
-    var data = JSON.parse(event.data);
-
-    if (data.type === 'update') {
-      console.clear();
-      data.assets.forEach(function (asset) {
-        hmrApply(global.parcelRequire, asset);
-      });
-      data.assets.forEach(function (asset) {
-        if (!asset.isNew) {
-          hmrAccept(global.parcelRequire, asset.id);
-        }
-      });
-    }
-
-    if (data.type === 'reload') {
-      ws.close();
-
-      ws.onclose = function () {
-        location.reload();
-      };
-    }
-
-    if (data.type === 'error-resolved') {
-      console.log('[parcel] ✨ Error resolved');
-      removeErrorOverlay();
-    }
-
-    if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
-      removeErrorOverlay();
-      var overlay = createErrorOverlay(data);
-      document.body.appendChild(overlay);
-    }
-  };
-}
-
-function removeErrorOverlay() {
-  var overlay = document.getElementById(OVERLAY_ID);
-
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function createErrorOverlay(data) {
-  var overlay = document.createElement('div');
-  overlay.id = OVERLAY_ID; // html encode message and stack trace
-
-  var message = document.createElement('div');
-  var stackTrace = document.createElement('pre');
-  message.innerText = data.error.message;
-  stackTrace.innerText = data.error.stack;
-  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
-  return overlay;
-}
-
-function getParents(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return [];
-  }
-
-  var parents = [];
-  var k, d, dep;
-
-  for (k in modules) {
-    for (d in modules[k][1]) {
-      dep = modules[k][1][d];
-
-      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
-        parents.push(k);
-      }
-    }
-  }
-
-  if (bundle.parent) {
-    parents = parents.concat(getParents(bundle.parent, id));
-  }
-
-  return parents;
-}
-
-function hmrApply(bundle, asset) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (modules[asset.id] || !bundle.parent) {
-    var fn = new Function('require', 'module', 'exports', asset.generated.js);
-    asset.isNew = !modules[asset.id];
-    modules[asset.id] = [fn, asset.deps];
-  } else if (bundle.parent) {
-    hmrApply(bundle.parent, asset);
-  }
-}
-
-function hmrAccept(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (!modules[id] && bundle.parent) {
-    return hmrAccept(bundle.parent, id);
-  }
-
-  var cached = bundle.cache[id];
-  bundle.hotData = {};
-
-  if (cached) {
-    cached.hot.data = bundle.hotData;
-  }
-
-  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
-    cached.hot._disposeCallbacks.forEach(function (cb) {
-      cb(bundle.hotData);
-    });
-  }
-
-  delete bundle.cache[id];
-  bundle(id);
-  cached = bundle.cache[id];
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    cached.hot._acceptCallbacks.forEach(function (cb) {
-      cb();
-    });
-
-    return true;
-  }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAccept(global.parcelRequire, id);
-  });
-}
-},{}]},{},["../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.js"], null)
-//# sourceMappingURL=/main.1f19ae8e.map
+},{"vue":"QPfz","./App":"Js2s","./Composer/Curve":"z1Ec"}]},{},["1qLB"], null)

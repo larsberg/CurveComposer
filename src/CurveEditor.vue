@@ -1,32 +1,69 @@
 <template>
+  <!-- outer container -->
   <div
     style="
       position: relative;
       width: calc(100%-4);
       border-bottom: #ffffffaa solid 0.5px;">
 
-    <div class="input-container">
+    <!-- info bar -->
+    <div style="
+      position: relative;
+      min-height: 20px;
+      width: 100%;
+      background: #00000044;">
 
-      <!-- toggle expand -->
+      <!-- toggle expand button -->
       <svg
       @click="onToggle"
-      class="expandToggle">
+      style="
+        position: absolute;
+        right: 3;
+        top: 3;
+        width: 14px;
+        height: 14px;
+        stroke: white;
+        stroke-width: 1;
+        fill: #00000055">
 
         <circle r="6" cx="7" cy="7" stroke="white" fill="inherit"/>
 
-        <line x1="3" y1="7" x2="11" y2="7" style="stroke: inherit; stroke-width: inherit;" />
-        <line v-if="!isShown" y1="3" x1="7" y2="11" x2="7" style="stroke: inherit; stroke-width: inherit;" />
+        <line
+          style="
+            fill: none;
+            stroke: #ffffff99;
+            stroke-width: 1;
+            vector-effect: non-scaling-stroke;"
+          x1="3" y1="7" x2="11" y2="7" style="stroke: inherit; stroke-width: inherit;" />
+        <line
+          style="
+            fill: none;
+            stroke: #ffffff99;
+            stroke-width: 1;
+            vector-effect: non-scaling-stroke;"
+          v-if="!isShown" y1="3" x1="7" y2="11" x2="7" style="stroke: inherit; stroke-width: inherit;" />
 
       </svg>
 
-      <div class="info-bar" v-if="isShown">
+      <!-- curve name and inputs -->
+      <div
+        v-if="isShown"
+        style="
+          padding-top: 6px;
+          min-height: 22px;
+          border: solid 1px #ffffff44;">
         <div style="width: 100%; font-size: 0.75em;">
           {{curve.name}} {{ bUpdateCrosshairs ? Number(curve.currentSample.toFixed(3)) : ''}}
         </div>
 
         <label style="color: darkgrey;">hi:</label>
         <input
-          style="width: 5em; color: cyan;"
+          style="
+            color: cyan;
+            width: 5em;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
           type="number"
           name="hi"
           step="0.001"
@@ -36,7 +73,12 @@
           @blur="onInputBlur">
         <label style="color: darkgrey;">low:</label>
         <input
-          style="width: 5em; color: cyan;"
+          style="
+            color: cyan;
+            width: 5em;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
           type="number"
           name="low"
           step="0.001"
@@ -46,7 +88,17 @@
           @blur="onInputBlur">
 
         <label v-if="activePoint">pt:</label>
-        <select style="color: magenta;" v-if="activePoint" name="eases" value="smooth" @change="onPointChange">
+        <select
+          v-if="activePoint"
+          style="
+            color: magenta;
+            width: 5em;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
+          name="eases"
+          value="smooth"
+          @change="onPointChange">
           <option v-for="e in easeTypes"
             :value='e'
             :selected="activePoint && activePoint[2] === e">{{e}}</option>
@@ -54,7 +106,12 @@
         <label v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
-          style="width: 7em;color: magenta;"
+          style="
+            color: magenta;
+            width: 5em;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
           type="number"
           name="position"
           step="0.001"
@@ -65,7 +122,12 @@
         <label v-if="activePoint">v:</label>
         <input
           v-if="activePoint"
-          style="width: 7em;color: magenta;"
+          style="
+            color: magenta;
+            width: 5em;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
           type="number"
           name="value"
           step="0.001"
@@ -74,15 +136,25 @@
           @focus="onInputFocus"
           @blur="onInputBlur">
       </div>
-      <label class="info-bar" v-else> {{curve.name}} </label>
+      <label
+        v-else
+        style="
+          padding-top: 6px;
+          min-height: 22px;
+          border: solid 1px #ffffff44;"> {{curve.name}} </label>
     </div>
-      <!--  -->
+
     <div
       tabIndex=1
+      name="workspace"
       @keyup.delete="onDelete"
       @mouseleave="onMouseLeave"
       v-if="isShown"
-      class="curve-container">
+      style="
+        position: relative;
+        height: 100px;
+        width: 100%;
+        background: #00000055;">
 
       <svg
         @mouseup="onMouseUp"
@@ -92,29 +164,53 @@
         :view-box.camel="getViewBox()"
         :preserve-aspect-ratio.camel="'none'"
         xmlns="http://www.w3.org/2000/svg"
-        class="work-space">
+        style="
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background: #00000044;
+          fill: none;
+          stroke: white;
+          stroke-width: 1;">
 
         <g :transform="getTransform()">
 
           <!-- mouse position cross hairs -->
-          <line v-if="isMouseOver" class="no-pointer" style="stroke: #ffffff66;"
+          <line v-if="isMouseOver"
+            style="
+              stroke: #ffffff66;
+              fill: none;
+              stroke-width: 1;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
             :x1="mouse.x"
             :y1="min"
             :x2="mouse.x"
             :y2="max" />
 
-          <line v-if="isMouseOver" class="no-pointer" style="stroke: #ffffff66;"
+          <line v-if="isMouseOver"
+            style="
+              stroke: #ffffff66;
+              fill: none;
+              stroke-width: 1;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
             :x1="0"
             :y1="mouse.y"
             :x2="1"
             :y2="mouse.y"/>
 
-
-
           <!-- current sample crosshairs -->
           <line
             v-if="bUpdateCrosshairs"
-            class="no-pointer" style="stroke: #99999933;"
+            style="
+              stroke: #99999933;
+              fill: none;
+              stroke-width: 1;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
             :x1="curve.currentPosition"
             :y1="min"
             :x2="curve.currentPosition"
@@ -122,7 +218,12 @@
 
           <line
             v-if="bUpdateCrosshairs"
-            class="no-pointer" style="stroke: #ffffff33;"
+            style="
+              stroke: #ffffff33;
+              fill: none;
+              stroke-width: 1;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
             :x1="0"
             :y1="curve.currentSample"
             :x2="1"
@@ -131,11 +232,15 @@
           <!-- curve points rendered as rounded lines with no length -->
           <line
             v-for="(p, index) in curve.points"
-            :class="[
-              'non-scale',
-              'point',
-              p === activePoint ? 'selected-point' : '',
-              dragged ? 'no-pointer' : '' ]"
+            :style="{
+              'vector-effect': 'non-scaling-stroke',
+              'stroke-width': '5',
+              'stroke-linecap': 'round',
+              'vector-effect': 'non-scaling-stroke',
+              'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
+            }"
+            onMouseOver="this.style.strokeWidth=7;"
+            onMouseOut="this.style.strokeWidth=5;"
             :data-index="index"
             :x1="p[1]"
             :y1="p[0]"
@@ -144,16 +249,34 @@
             fill="red"/>
 
           <!-- the animation curve -->
-          <path :d="path"/>
+          <path :d="path" style="
+            fill: none;
+            stroke: #ffffff99;
+            stroke-width: 1;
+            vector-effect: non-scaling-stroke;
+            pointer-events: none;"/>
 
         </g>
 
       </svg>
 
-      <div style="color: cyan;position: absolute; top: 0; right: 0; font-size: 0.75em;">
+      <!-- min and max values at the top and bottom of the workspace -->
+      <div style="
+        color: cyan;
+        position: absolute;
+        top: 1;
+        right: 0;
+        font-size: 0.75em;
+        user-select: none;">
         {{max}}
       </div>
-      <div style="color: cyan;position: absolute; bottom: 0; right: 0; font-size: 0.75em;">
+      <div style="
+        color: cyan;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 0.75em;
+        user-select: none;">
         {{min}}
       </div>
     </div>
@@ -292,7 +415,7 @@ export default {
     },
 
     onRangeChange(e) {
-      // console.log( e.target.name );
+
       if(e.target.name === 'low') {
         this.min = Number(e.target.value)
       } else {
@@ -315,7 +438,7 @@ export default {
     },
 
     getEventPosition(e) {
-      var el = this.$el.querySelector('.work-space')
+      var el = this.$el.querySelector('[name=workspace]')
       var bb = el.getBoundingClientRect()
       var x = e.offsetX
       var y = e.offsetY
@@ -407,95 +530,3 @@ export default {
 
 };
 </script>
-
-<style scoped>
-
-input, select {
-  margin-right: 10px;
-  background: #00000099;
-  color: white;
-  border: none;
-}
-path, line {
-  fill: none;
-  stroke: #ffffff99;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-path {
-  pointer-events: none;
-}
-
-.point {
-  stroke-width: 5;
-  stroke: white;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-.point:hover {
-  stroke: #ff00ff;
-}
-
-.selected-point {
-  stroke: magenta;
-  stroke-width: 8;
-  /*pointer-events: none;*/
-}
-
-.no-pointer {
-  pointer-events: none;
-}
-
-.non-scale {
-  vector-effect: non-scaling-stroke
-}
-
-.input-container {
-  position: relative;
-  min-height: 20px;
-  width: 100%;
-  background: #00000044;
-}
-
-.curve-container{
-  position: relative;
-  height: 100px;
-  width: 100%;
-  background: #00000055;
-}
-
-.work-space{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: #00000044;
-  fill: none;
-  stroke: white;
-  stroke-weight: 1;
-}
-
-.info-bar{
-  padding-top: 6px;
-  min-height: 22px;
-  border: solid 1px #ffffff44;
-}
-
-label {
-  font-size: 0.75em;
-}
-
-.expandToggle{
-  position: absolute;
-  right: 3;
-  top: 3;
-  width: 14px;
-  height: 14px;
-  stroke: white;
-  stroke-width: 1;
-  fill: #00000055
-}
-
-</style>
