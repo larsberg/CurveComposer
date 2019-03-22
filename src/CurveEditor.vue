@@ -52,14 +52,24 @@
           padding-top: 6px;
           min-height: 22px;
           border: solid 1px #ffffff44;">
-        <div style="width: 100%; font-size: 0.75em;">
+        <!-- <div style="width: 100%; font-size: 0.75em;">
           {{curve.name}} {{ bUpdateCrosshairs ? Number(curve.currentSample.toFixed(3)) : ''}}
-        </div>
+        </div> -->
+
+        <input
+          type="text"
+          name="curveName"
+          style="
+            border: none;
+            background: #00000000;
+            color: white;"
+          :value="curve.name"
+          @change="onCurveTitleChange">
 
         <label style="color: darkgrey;">hi:</label>
         <input
           style="
-            color: cyan;
+            color: #ff00ff;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -74,7 +84,7 @@
         <label style="color: darkgrey;">low:</label>
         <input
           style="
-            color: cyan;
+            color: #ff00ff;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -91,7 +101,7 @@
         <select
           v-if="activePoint"
           style="
-            color: magenta;
+            color: #00ffff;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -107,7 +117,7 @@
         <input
           v-if="activePoint"
           style="
-            color: magenta;
+            color: #00ffff;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -123,7 +133,7 @@
         <input
           v-if="activePoint"
           style="
-            color: magenta;
+            color: #00ffff;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -237,7 +247,7 @@
               'stroke-width': '5',
               'stroke-linecap': 'round',
               'vector-effect': 'non-scaling-stroke',
-              'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
+              'stroke': (p === activePoint) ? '#00ffff' : '#ffffffaa'
             }"
             onMouseOver="this.style.strokeWidth=7;"
             onMouseOut="this.style.strokeWidth=5;"
@@ -262,7 +272,7 @@
 
       <!-- min and max values at the top and bottom of the workspace -->
       <div style="
-        color: cyan;
+        color: #ff00ff;
         position: absolute;
         top: 1;
         right: 0;
@@ -271,7 +281,7 @@
         {{max}}
       </div>
       <div style="
-        color: cyan;
+        color: #ff00ff;
         position: absolute;
         bottom: 0;
         right: 0;
@@ -446,6 +456,11 @@ export default {
     onMouseUp(e) {
       this.mouseDown = false
       this.dragged = false
+    },
+
+    onCurveTitleChange(e) {
+      console.log( e.target.value );
+      this.curve.name = e.target.value
     },
 
     getEventPosition(e) {

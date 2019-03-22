@@ -8457,6 +8457,16 @@ var easeTypes = Object.keys(_eases2.default); //
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var defaultCurve = function defaultCurve() {
   return new _Curve2.default();
@@ -8607,6 +8617,10 @@ exports.default = {
       this.mouseDown = false;
       this.dragged = false;
     },
+    onCurveTitleChange: function onCurveTitleChange(e) {
+      console.log(e.target.value);
+      this.curve.name = e.target.value;
+    },
     getEventPosition: function getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]');
       var bb = el.getBoundingClientRect();
@@ -8698,13 +8712,13 @@ exports.default = {
     
         /* template */
         Object.assign($739f47, (function () {
-          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"position":"relative","width":"calc(100%-4)","border-bottom":"#ffffffaa solid 0.5px"}},[_c('div',{staticStyle:{"position":"relative","min-height":"20px","width":"100%","background":"#00000044"}},[_c('svg',{staticStyle:{"position":"absolute","right":"3","top":"3","width":"14px","height":"14px","stroke":"white","stroke-width":"1","fill":"#00000055"},on:{"click":_vm.onToggle}},[_c('circle',{attrs:{"r":"6","cx":"7","cy":"7","stroke":"white","fill":"inherit"}}),_vm._v(" "),_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"x1":"3","y1":"7","x2":"11","y2":"7"}}),_vm._v(" "),(!_vm.isShown)?_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"y1":"3","x1":"7","y2":"11","x2":"7"}}):_vm._e()]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_c('div',{staticStyle:{"width":"100%","font-size":"0.75em"}},[_vm._v("\n        "+_vm._s(_vm.curve.name)+" "+_vm._s(_vm.bUpdateCrosshairs ? Number(_vm.curve.currentSample.toFixed(3)) : '')+"\n      ")]),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("hi:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"cyan","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"hi","step":"0.001"},domProps:{"value":_vm.max},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("low:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"cyan","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"low","step":"0.001"},domProps:{"value":_vm.min},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("pt:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('select',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"name":"eases","value":"smooth"},on:{"change":_vm.onPointChange}},_vm._l((_vm.easeTypes),function(e){return _c('option',{domProps:{"value":e,"selected":_vm.activePoint && _vm.activePoint[2] === e}},[_vm._v(_vm._s(e))])}),0):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("u:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"position","step":"0.001"},domProps:{"value":Number(_vm.activePoint[1])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("v:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"value","step":"0.001"},domProps:{"value":Number(_vm.activePoint[0])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e()]):_c('label',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_vm._v(" "+_vm._s(_vm.curve.name)+" ")])]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"position":"relative","height":"100px","width":"100%","background":"#00000055"},attrs:{"tabIndex":"1","name":"workspace"},on:{"keyup":function($event){if(!$event.type.indexOf('key')&&_vm._k($event.keyCode,"delete",[8,46],$event.key,["Backspace","Delete","Del"])){ return null; }return _vm.onDelete($event)},"mouseleave":_vm.onMouseLeave}},[_c('svg',{staticStyle:{"position":"absolute","left":"0","top":"0","width":"100%","height":"100%","background":"#00000044","fill":"none","stroke":"white","stroke-width":"1"},attrs:{"viewBox":_vm.getViewBox(),"preserveAspectRatio":'none',"xmlns":"http://www.w3.org/2000/svg"},on:{"mouseup":_vm.onMouseUp,"mousedown":_vm.onMouseDown,"mousemove":_vm.onMouseMove,"click":_vm.handleClick}},[_c('g',{attrs:{"transform":_vm.getTransform()}},[(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.mouse.x,"y1":_vm.min,"x2":_vm.mouse.x,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.start,"y1":_vm.mouse.y,"x2":_vm.end,"y2":_vm.mouse.y}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#99999933","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.curve.currentPosition,"y1":_vm.min,"x2":_vm.curve.currentPosition,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#ffffff33","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.start,"y1":_vm.curve.currentSample,"x2":_vm.end,"y2":_vm.curve.currentSample}}):_vm._e(),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('line',{style:({
+          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"position":"relative","width":"calc(100%-4)","border-bottom":"#ffffffaa solid 0.5px"}},[_c('div',{staticStyle:{"position":"relative","min-height":"20px","width":"100%","background":"#00000044"}},[_c('svg',{staticStyle:{"position":"absolute","right":"3","top":"3","width":"14px","height":"14px","stroke":"white","stroke-width":"1","fill":"#00000055"},on:{"click":_vm.onToggle}},[_c('circle',{attrs:{"r":"6","cx":"7","cy":"7","stroke":"white","fill":"inherit"}}),_vm._v(" "),_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"x1":"3","y1":"7","x2":"11","y2":"7"}}),_vm._v(" "),(!_vm.isShown)?_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"y1":"3","x1":"7","y2":"11","x2":"7"}}):_vm._e()]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_c('input',{staticStyle:{"border":"none","background":"#00000000","color":"white"},attrs:{"type":"text","name":"curveName"},domProps:{"value":_vm.curve.name},on:{"change":_vm.onCurveTitleChange}}),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("hi:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"#ff00ff","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"hi","step":"0.001"},domProps:{"value":_vm.max},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),_c('label',{staticStyle:{"color":"darkgrey"}},[_vm._v("low:")]),_vm._v(" "),_c('input',{staticStyle:{"color":"#ff00ff","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"low","step":"0.001"},domProps:{"value":_vm.min},on:{"change":_vm.onRangeChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("pt:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('select',{staticStyle:{"color":"#00ffff","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"name":"eases","value":"smooth"},on:{"change":_vm.onPointChange}},_vm._l((_vm.easeTypes),function(e){return _c('option',{domProps:{"value":e,"selected":_vm.activePoint && _vm.activePoint[2] === e}},[_vm._v(_vm._s(e))])}),0):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("u:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"#00ffff","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"position","step":"0.001"},domProps:{"value":Number(_vm.activePoint[1])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("v:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"#00ffff","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"value","step":"0.001"},domProps:{"value":Number(_vm.activePoint[0])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e()]):_c('label',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_vm._v(" "+_vm._s(_vm.curve.name)+" ")])]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"position":"relative","height":"100px","width":"100%","background":"#00000055"},attrs:{"tabIndex":"1","name":"workspace"},on:{"keyup":function($event){if(!$event.type.indexOf('key')&&_vm._k($event.keyCode,"delete",[8,46],$event.key,["Backspace","Delete","Del"])){ return null; }return _vm.onDelete($event)},"mouseleave":_vm.onMouseLeave}},[_c('svg',{staticStyle:{"position":"absolute","left":"0","top":"0","width":"100%","height":"100%","background":"#00000044","fill":"none","stroke":"white","stroke-width":"1"},attrs:{"viewBox":_vm.getViewBox(),"preserveAspectRatio":'none',"xmlns":"http://www.w3.org/2000/svg"},on:{"mouseup":_vm.onMouseUp,"mousedown":_vm.onMouseDown,"mousemove":_vm.onMouseMove,"click":_vm.handleClick}},[_c('g',{attrs:{"transform":_vm.getTransform()}},[(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.mouse.x,"y1":_vm.min,"x2":_vm.mouse.x,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.isMouseOver)?_c('line',{staticStyle:{"stroke":"#ffffff66","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.start,"y1":_vm.mouse.y,"x2":_vm.end,"y2":_vm.mouse.y}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#99999933","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.curve.currentPosition,"y1":_vm.min,"x2":_vm.curve.currentPosition,"y2":_vm.max}}):_vm._e(),_vm._v(" "),(_vm.bUpdateCrosshairs)?_c('line',{staticStyle:{"stroke":"#ffffff33","fill":"none","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"x1":_vm.start,"y1":_vm.curve.currentSample,"x2":_vm.end,"y2":_vm.curve.currentSample}}):_vm._e(),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('line',{style:({
             'vector-effect': 'non-scaling-stroke',
             'stroke-width': '5',
             'stroke-linecap': 'round',
             'vector-effect': 'non-scaling-stroke',
-            'stroke': (p === _vm.activePoint) ? 'magenta' : '#ffffffaa'
-          }),attrs:{"onMouseOver":"this.style.strokeWidth=7;","onMouseOut":"this.style.strokeWidth=5;","data-index":index,"x1":p[1],"y1":p[0],"x2":p[1],"y2":p[0],"fill":"red"}})}),_vm._v(" "),_c('path',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"d":_vm.path}})],2)]),_vm._v(" "),_c('div',{staticStyle:{"color":"cyan","position":"absolute","top":"1","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.max)+"\n    ")]),_vm._v(" "),_c('div',{staticStyle:{"color":"cyan","position":"absolute","bottom":"0","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.min)+"\n    ")])]):_vm._e()])}
+            'stroke': (p === _vm.activePoint) ? '#00ffff' : '#ffffffaa'
+          }),attrs:{"onMouseOver":"this.style.strokeWidth=7;","onMouseOut":"this.style.strokeWidth=5;","data-index":index,"x1":p[1],"y1":p[0],"x2":p[1],"y2":p[0],"fill":"red"}})}),_vm._v(" "),_c('path',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke","pointer-events":"none"},attrs:{"d":_vm.path}})],2)]),_vm._v(" "),_c('div',{staticStyle:{"color":"#ff00ff","position":"absolute","top":"1","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.max)+"\n    ")]),_vm._v(" "),_c('div',{staticStyle:{"color":"#ff00ff","position":"absolute","bottom":"0","right":"0","font-size":"0.75em","user-select":"none"}},[_vm._v("\n      "+_vm._s(_vm.min)+"\n    ")])]):_vm._e()])}
 var staticRenderFns = []
 
           return {
@@ -8806,6 +8820,16 @@ var _eases2 = _interopRequireDefault(_eases);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -9248,6 +9272,10 @@ exports.default = {
         this.updatePath();
       }
     },
+    onCurveTitleChange: function onCurveTitleChange(e) {
+      console.log(e.target.value);
+      this.curve.name = e.target.value;
+    },
     handleClick: function handleClick(e) {
 
       var el = e.target;
@@ -9277,16 +9305,16 @@ exports.default = {
     
         /* template */
         Object.assign($691820, (function () {
-          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"position":"relative","width":"calc(100%-4)","border-bottom":"#ffffffaa solid 0.5px"}},[_c('div',{staticStyle:{"position":"relative","min-height":"20px","width":"100%","background":"#00000044"}},[_c('svg',{staticStyle:{"position":"absolute","right":"3","top":"3","width":"14px","height":"14px","stroke":"white","stroke-width":"1","fill":"#00000055"},on:{"click":_vm.onToggle}},[_c('circle',{attrs:{"r":"6","cx":"7","cy":"7","stroke":"white","fill":"inherit"}}),_vm._v(" "),_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"x1":"3","y1":"7","x2":"11","y2":"7"}}),_vm._v(" "),(!_vm.isShown)?_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"y1":"3","x1":"7","y2":"11","x2":"7"}}):_vm._e()]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_c('div',{staticStyle:{"width":"100%","font-size":"0.75em"}},[_vm._v("\n        "+_vm._s(_vm.curve.name)+" "+_vm._s(_vm.curve.currentSample)+"\n      ")]),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("value")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"text","name":"value"},domProps:{"value":_vm.activePoint[0]},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("u:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"magenta","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"position","step":"0.001"},domProps:{"value":Number(_vm.activePoint[1])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e()]):_c('label',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_vm._v(" "+_vm._s(_vm.curve.name)+" ")])]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"position":"relative","height":"100px","width":"100%","background":"#00000055"},attrs:{"tabIndex":"1","name":"workspace"},on:{"keyup":function($event){if(!$event.type.indexOf('key')&&_vm._k($event.keyCode,"delete",[8,46],$event.key,["Backspace","Delete","Del"])){ return null; }return _vm.onDelete($event)},"mouseleave":_vm.onMouseLeave}},[_c('svg',{staticStyle:{"position":"absolute","left":"0","top":"0","width":"100%","height":"100%","background":"#00000044","fill":"none","stroke":"white","stroke-width":"1"},attrs:{"viewBox":_vm.getViewBox(),"preserveAspectRatio":'none',"xmlns":"http://www.w3.org/2000/svg"},on:{"mouseup":_vm.onMouseUp,"mousedown":_vm.onMouseDown,"mousemove":_vm.onMouseMove,"click":_vm.handleClick}},[_c('defs',[_c('linearGradient',{attrs:{"id":"Gradient","x1":"0","x2":"1","y1":"0","y2":"0","gradientUnits":"objectBoundingBox"}},[_c('stop',{attrs:{"offset":"10%","stop-color":"#00000044"}}),_vm._v(" "),_c('stop',{attrs:{"offset":"95%","stop-color":"#ffffff44"}})],1)],1),_vm._v(" "),_c('g',{attrs:{"transform":_vm.getTransform()}},[(_vm.curve.points.length)?_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"#00000044"},attrs:{"x":_vm.start,"y":"0","width":Math.max(0, _vm.curve.points[0][1] - this.start),"height":"1"}}):_vm._e(),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('g',[(index < (_vm.curve.points.length - 1))?_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"url(#Gradient)"},attrs:{"x":p[1],"y":"0","width":_vm.curve.points[index+1][1] - p[1],"height":"1"}}):_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"#ffffff44"},attrs:{"x":p[1],"y":"0","width":_vm.end - p[1],"height":"1"}})])}),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('line',{style:({
+          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"position":"relative","width":"calc(100%-4)","border-bottom":"#ffffffaa solid 0.5px"}},[_c('div',{staticStyle:{"position":"relative","min-height":"20px","width":"100%","background":"#00000044"}},[_c('svg',{staticStyle:{"position":"absolute","right":"3","top":"3","width":"14px","height":"14px","stroke":"white","stroke-width":"1","fill":"#00000055"},on:{"click":_vm.onToggle}},[_c('circle',{attrs:{"r":"6","cx":"7","cy":"7","stroke":"white","fill":"inherit"}}),_vm._v(" "),_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"x1":"3","y1":"7","x2":"11","y2":"7"}}),_vm._v(" "),(!_vm.isShown)?_c('line',{staticStyle:{"fill":"none","stroke":"#ffffff99","stroke-width":"1","vector-effect":"non-scaling-stroke"},attrs:{"y1":"3","x1":"7","y2":"11","x2":"7"}}):_vm._e()]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_c('input',{staticStyle:{"border":"none","background":"#00000000","color":"white"},attrs:{"type":"text","name":"curveName"},domProps:{"value":_vm.curve.name},on:{"change":_vm.onCurveTitleChange}}),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("value")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"cyan","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"text","name":"value"},domProps:{"value":_vm.activePoint[0]},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('label',[_vm._v("u:")]):_vm._e(),_vm._v(" "),(_vm.activePoint)?_c('input',{staticStyle:{"color":"cyan","width":"5em","margin-right":"10px","background":"#00000099","border":"none"},attrs:{"type":"number","name":"position","step":"0.001"},domProps:{"value":Number(_vm.activePoint[1])},on:{"change":_vm.onPointChange,"focus":_vm.onInputFocus,"blur":_vm.onInputBlur}}):_vm._e()]):_c('label',{staticStyle:{"padding-top":"6px","min-height":"22px","border":"solid 1px #ffffff44"}},[_vm._v(" "+_vm._s(_vm.curve.name)+" ")])]),_vm._v(" "),(_vm.isShown)?_c('div',{staticStyle:{"position":"relative","height":"100px","width":"100%","background":"#00000055"},attrs:{"tabIndex":"1","name":"workspace"},on:{"keyup":function($event){if(!$event.type.indexOf('key')&&_vm._k($event.keyCode,"delete",[8,46],$event.key,["Backspace","Delete","Del"])){ return null; }return _vm.onDelete($event)},"mouseleave":_vm.onMouseLeave}},[_c('svg',{staticStyle:{"position":"absolute","left":"0","top":"0","width":"100%","height":"100%","background":"#00000044","fill":"none","stroke":"white","stroke-width":"1"},attrs:{"viewBox":_vm.getViewBox(),"preserveAspectRatio":'none',"xmlns":"http://www.w3.org/2000/svg"},on:{"mouseup":_vm.onMouseUp,"mousedown":_vm.onMouseDown,"mousemove":_vm.onMouseMove,"click":_vm.handleClick}},[_c('defs',[_c('linearGradient',{attrs:{"id":"Gradient","x1":"0","x2":"1","y1":"0","y2":"0","gradientUnits":"objectBoundingBox"}},[_c('stop',{attrs:{"offset":"10%","stop-color":"#00000044"}}),_vm._v(" "),_c('stop',{attrs:{"offset":"95%","stop-color":"#ffffff44"}})],1)],1),_vm._v(" "),_c('g',{attrs:{"transform":_vm.getTransform()}},[(_vm.curve.points.length)?_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"#00000044"},attrs:{"x":_vm.start,"y":"0","width":Math.max(0, _vm.curve.points[0][1] - this.start),"height":"1"}}):_vm._e(),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('g',[(index < (_vm.curve.points.length - 1))?_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"url(#Gradient)"},attrs:{"x":p[1],"y":"0","width":_vm.curve.points[index+1][1] - p[1],"height":"1"}}):_c('rect',{staticStyle:{"pointer-events":"none","stroke":"none","fill":"#ffffff44"},attrs:{"x":p[1],"y":"0","width":_vm.end - p[1],"height":"1"}})])}),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('line',{style:({
             'vector-effect': 'non-scaling-stroke',
             'stroke-width': '3',
             'stroke-linecap': 'round',
             'vector-effect': 'non-scaling-stroke',
-            'stroke': (p === _vm.activePoint) ? 'magenta' : '#ffffffaa'
+            'stroke': (p === _vm.activePoint) ? 'cyan' : '#ffffffaa'
           }),attrs:{"onMouseOver":"this.style.strokeWidth=7;","onMouseOut":"this.style.strokeWidth=5;","data-index":index,"x1":p[1],"y1":1,"x2":p[1],"y2":0,"fill":"red"}})}),_vm._v(" "),_vm._l((_vm.curve.points),function(p,index){return _c('g',{attrs:{"transform":_vm.getTextTransform(p)}},[(_vm.isMounted)?_c('text',{style:({
               'user-select': 'none',
               'pointer-events': 'none',
-              'stroke': (p === _vm.activePoint) ? 'magenta' : '#ffffffaa'
+              'stroke': (p === _vm.activePoint) ? 'cyan' : '#ffffffaa'
             })},[_vm._v("\n            "+_vm._s(p[0])+"\n          ")]):_vm._e()])})],2)])]):_vm._e()])}
 var staticRenderFns = []
 
@@ -9671,6 +9699,33 @@ function loadFile(file, callback) {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 ;
 
@@ -9706,7 +9761,12 @@ exports.default = {
       this.addCurve(new _StringCurve2.default(options));
     },
     addCurve: function addCurve(curve) {
+
+      console.log('addCurve');
+
       this.curves.push(curve);
+
+      this.$forceUpdate();
     },
     loadCurves: function loadCurves(json) {
 
@@ -9768,7 +9828,7 @@ exports.default = {
     
         /* template */
         Object.assign($a8ed0c, (function () {
-          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"font-family":"\"Courier New\", Courier, \"Lucida Sans Typewriter\", \"Lucida Typewriter\", monospace","background":"#00000099","width":"100%","height":"100%","overflow":"scroll","color":"white"},attrs:{"id":"CurveComposer"}},[_c('div',{staticStyle:{"height":"24px"}},[_vm._v("\n\n    "+_vm._s(_vm.title)+"\n\n    "),_c('label',{staticStyle:{"margin-right":"10px","background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"saveInput"}},[_vm._v("save")]),_vm._v(" "),_c('button',{attrs:{"id":"saveInput","hidden":"","type":"file"},on:{"click":_vm.save}},[_vm._v("save")]),_vm._v(" "),_c('label',{staticStyle:{"margin-right":"10px","background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"loadInput"}},[_vm._v("load")]),_vm._v(" "),_c('input',{attrs:{"id":"loadInput","hidden":"","type":"file"},on:{"change":_vm.onLoad}})]),_vm._v(" "),_vm._l((_vm.curves),function(c){return _c('div',[(c.type === 'number')?_c('CurveEditor',{ref:"curves",refInFor:true,attrs:{"curve":c,"start":_vm.start,"end":_vm.end}}):(c.type === 'string')?_c('StringCurveEditor',{ref:"curves",refInFor:true,attrs:{"textScale":_vm.stringCurveTextSize,"curve":c,"start":_vm.start,"end":_vm.end}}):_vm._e()],1)})],2)}
+          var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"font-family":"\"Courier New\", Courier, \"Lucida Sans Typewriter\", \"Lucida Typewriter\", monospace","background":"#00000099","width":"100%","height":"100%","overflow":"scroll","color":"white"},attrs:{"id":"CurveComposer"}},[_c('div',{staticStyle:{"height":"24px"}},[_vm._v("\n\n    "+_vm._s(_vm.title)+"\n\n    "),_c('label',{staticStyle:{"margin-left":"10px","background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"saveInput"}},[_vm._v("save")]),_vm._v(" "),_c('button',{attrs:{"id":"saveInput","hidden":"","type":"file"},on:{"click":_vm.save}},[_vm._v("save")]),_vm._v(" "),_c('label',{staticStyle:{"background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"loadInput"}},[_vm._v("load")]),_vm._v(" "),_c('input',{attrs:{"id":"loadInput","hidden":"","type":"file"},on:{"change":_vm.onLoad}}),_vm._v(" "),_c('label',{staticStyle:{"background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"createCurveInput"}},[_vm._v("new curve")]),_vm._v(" "),_c('button',{attrs:{"id":"createCurveInput","hidden":""},on:{"click":_vm.createCurve}}),_vm._v(" "),_c('label',{staticStyle:{"background":"#00000099","color":"white","border":"white solid 1px","border-radius":"5px","font-size":"0.75em","padding":"0 4px"},attrs:{"for":"createCurveInput"}},[_vm._v("new string curve")]),_vm._v(" "),_c('button',{attrs:{"id":"createCurveInput","hidden":""},on:{"click":_vm.createStringCurve}})]),_vm._v(" "),_vm._l((_vm.curves),function(c){return _c('div',[(c.type === 'number')?_c('CurveEditor',{ref:"curves",refInFor:true,attrs:{"curve":c,"start":_vm.start,"end":_vm.end}}):(c.type === 'string')?_c('StringCurveEditor',{ref:"curves",refInFor:true,attrs:{"textScale":_vm.stringCurveTextSize,"curve":c,"start":_vm.start,"end":_vm.end}}):_vm._e()],1)})],2)}
 var staticRenderFns = []
 
           return {

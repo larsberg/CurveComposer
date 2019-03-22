@@ -8730,6 +8730,16 @@ var easeTypes = Object.keys(_eases2.default); //
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var defaultCurve = function defaultCurve() {
   return new _Curve2.default();
@@ -8879,6 +8889,10 @@ exports.default = {
     onMouseUp: function onMouseUp(e) {
       this.mouseDown = false;
       this.dragged = false;
+    },
+    onCurveTitleChange: function onCurveTitleChange(e) {
+      console.log(e.target.value);
+      this.curve.name = e.target.value;
     },
     getEventPosition: function getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]');
@@ -9057,23 +9071,16 @@ exports.default = {
                   }
                 },
                 [
-                  _c(
-                    "div",
-                    { staticStyle: { width: "100%", "font-size": "0.75em" } },
-                    [
-                      _vm._v(
-                        "\n        " +
-                          _vm._s(_vm.curve.name) +
-                          " " +
-                          _vm._s(
-                            _vm.bUpdateCrosshairs
-                              ? Number(_vm.curve.currentSample.toFixed(3))
-                              : ""
-                          ) +
-                          "\n      "
-                      )
-                    ]
-                  ),
+                  _c("input", {
+                    staticStyle: {
+                      border: "none",
+                      background: "#00000000",
+                      color: "white"
+                    },
+                    attrs: { type: "text", name: "curveName" },
+                    domProps: { value: _vm.curve.name },
+                    on: { change: _vm.onCurveTitleChange }
+                  }),
                   _vm._v(" "),
                   _c("label", { staticStyle: { color: "darkgrey" } }, [
                     _vm._v("hi:")
@@ -9081,7 +9088,7 @@ exports.default = {
                   _vm._v(" "),
                   _c("input", {
                     staticStyle: {
-                      color: "cyan",
+                      color: "#ff00ff",
                       width: "5em",
                       "margin-right": "10px",
                       background: "#00000099",
@@ -9102,7 +9109,7 @@ exports.default = {
                   _vm._v(" "),
                   _c("input", {
                     staticStyle: {
-                      color: "cyan",
+                      color: "#ff00ff",
                       width: "5em",
                       "margin-right": "10px",
                       background: "#00000099",
@@ -9124,7 +9131,7 @@ exports.default = {
                         "select",
                         {
                           staticStyle: {
-                            color: "magenta",
+                            color: "#00ffff",
                             width: "5em",
                             "margin-right": "10px",
                             background: "#00000099",
@@ -9155,7 +9162,7 @@ exports.default = {
                   _vm.activePoint
                     ? _c("input", {
                         staticStyle: {
-                          color: "magenta",
+                          color: "#00ffff",
                           width: "5em",
                           "margin-right": "10px",
                           background: "#00000099",
@@ -9180,7 +9187,7 @@ exports.default = {
                   _vm.activePoint
                     ? _c("input", {
                         staticStyle: {
-                          color: "magenta",
+                          color: "#00ffff",
                           width: "5em",
                           "margin-right": "10px",
                           background: "#00000099",
@@ -9351,7 +9358,7 @@ exports.default = {
                             "stroke-linecap": "round",
                             "vector-effect": "non-scaling-stroke",
                             stroke:
-                              p === _vm.activePoint ? "magenta" : "#ffffffaa"
+                              p === _vm.activePoint ? "#00ffff" : "#ffffffaa"
                           },
                           attrs: {
                             onMouseOver: "this.style.strokeWidth=7;",
@@ -9386,7 +9393,7 @@ exports.default = {
                 "div",
                 {
                   staticStyle: {
-                    color: "cyan",
+                    color: "#ff00ff",
                     position: "absolute",
                     top: "1",
                     right: "0",
@@ -9401,7 +9408,7 @@ exports.default = {
                 "div",
                 {
                   staticStyle: {
-                    color: "cyan",
+                    color: "#ff00ff",
                     position: "absolute",
                     bottom: "0",
                     right: "0",
@@ -9536,6 +9543,16 @@ var _eases2 = _interopRequireDefault(_eases);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -9978,6 +9995,10 @@ exports.default = {
         this.updatePath();
       }
     },
+    onCurveTitleChange: function onCurveTitleChange(e) {
+      console.log(e.target.value);
+      this.curve.name = e.target.value;
+    },
     handleClick: function handleClick(e) {
 
       var el = e.target;
@@ -10093,26 +10114,23 @@ exports.default = {
                   }
                 },
                 [
-                  _c(
-                    "div",
-                    { staticStyle: { width: "100%", "font-size": "0.75em" } },
-                    [
-                      _vm._v(
-                        "\n        " +
-                          _vm._s(_vm.curve.name) +
-                          " " +
-                          _vm._s(_vm.curve.currentSample) +
-                          "\n      "
-                      )
-                    ]
-                  ),
+                  _c("input", {
+                    staticStyle: {
+                      border: "none",
+                      background: "#00000000",
+                      color: "white"
+                    },
+                    attrs: { type: "text", name: "curveName" },
+                    domProps: { value: _vm.curve.name },
+                    on: { change: _vm.onCurveTitleChange }
+                  }),
                   _vm._v(" "),
                   _vm.activePoint ? _c("label", [_vm._v("value")]) : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint
                     ? _c("input", {
                         staticStyle: {
-                          color: "magenta",
+                          color: "cyan",
                           "margin-right": "10px",
                           background: "#00000099",
                           border: "none"
@@ -10132,7 +10150,7 @@ exports.default = {
                   _vm.activePoint
                     ? _c("input", {
                         staticStyle: {
-                          color: "magenta",
+                          color: "cyan",
                           width: "5em",
                           "margin-right": "10px",
                           background: "#00000099",
@@ -10315,8 +10333,7 @@ exports.default = {
                             "stroke-width": "3",
                             "stroke-linecap": "round",
                             "vector-effect": "non-scaling-stroke",
-                            stroke:
-                              p === _vm.activePoint ? "magenta" : "#ffffffaa"
+                            stroke: p === _vm.activePoint ? "cyan" : "#ffffffaa"
                           },
                           attrs: {
                             onMouseOver: "this.style.strokeWidth=7;",
@@ -10345,7 +10362,7 @@ exports.default = {
                                       "pointer-events": "none",
                                       stroke:
                                         p === _vm.activePoint
-                                          ? "magenta"
+                                          ? "cyan"
                                           : "#ffffffaa"
                                     }
                                   },
@@ -10773,6 +10790,33 @@ function loadFile(file, callback) {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 ;
 
@@ -10808,7 +10852,12 @@ exports.default = {
       this.addCurve(new _StringCurve2.default(options));
     },
     addCurve: function addCurve(curve) {
+
+      console.log('addCurve');
+
       this.curves.push(curve);
+
+      this.$forceUpdate();
     },
     loadCurves: function loadCurves(json) {
 
@@ -10895,7 +10944,7 @@ exports.default = {
           "label",
           {
             staticStyle: {
-              "margin-right": "10px",
+              "margin-left": "10px",
               background: "#00000099",
               color: "white",
               border: "white solid 1px",
@@ -10921,7 +10970,6 @@ exports.default = {
           "label",
           {
             staticStyle: {
-              "margin-right": "10px",
               background: "#00000099",
               color: "white",
               border: "white solid 1px",
@@ -10937,6 +10985,48 @@ exports.default = {
         _c("input", {
           attrs: { id: "loadInput", hidden: "", type: "file" },
           on: { change: _vm.onLoad }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          {
+            staticStyle: {
+              background: "#00000099",
+              color: "white",
+              border: "white solid 1px",
+              "border-radius": "5px",
+              "font-size": "0.75em",
+              padding: "0 4px"
+            },
+            attrs: { for: "createCurveInput" }
+          },
+          [_vm._v("new curve")]
+        ),
+        _vm._v(" "),
+        _c("button", {
+          attrs: { id: "createCurveInput", hidden: "" },
+          on: { click: _vm.createCurve }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          {
+            staticStyle: {
+              background: "#00000099",
+              color: "white",
+              border: "white solid 1px",
+              "border-radius": "5px",
+              "font-size": "0.75em",
+              padding: "0 4px"
+            },
+            attrs: { for: "createCurveInput" }
+          },
+          [_vm._v("new string curve")]
+        ),
+        _vm._v(" "),
+        _c("button", {
+          attrs: { id: "createCurveInput", hidden: "" },
+          on: { click: _vm.createStringCurve }
         })
       ]),
       _vm._v(" "),
@@ -11057,17 +11147,25 @@ module.exports = {
 };
 },{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}],"test.json":[function(require,module,exports) {
 module.exports = [{
-  "name": "CURVE",
-  "points": [[-2, 0, "smooth"], [-0.56, 0.22, "smooth"], [0, 0.5, "smooth"], [-1, 1, "smooth"]],
+  "name": "Animation Curve",
+  "points": [[-0.8, -0.2252, "smooth"], [-0.9, 0.1436, "smooth"], [-0.36, 0.3209, "smooth"], [-1, 1, "smooth"]],
   "type": "number"
 }, {
-  "name": "curve_name",
+  "name": "string curve A",
   "points": [["one", 0, "smooth"], ["two", 0.2455, "smooth"], ["ten", 0.66, "smooth"], ["string_name", 1.1078, "smooth"]],
   "type": "string"
 }, {
-  "name": "curve_name",
+  "name": "string curve B",
   "points": [["one", 0, "smooth"], ["two", 0.33, "smooth"], ["three", 0.66, "smooth"], ["four", 1.2167, "smooth"], ["five", 1.643, "smooth"]],
   "type": "string"
+}, {
+  "name": "Number Curve A",
+  "points": [[0.41, -0.1225, "smooth"], [0.48, 0.4983, "smooth"], [0.68, 0.8484, "smooth"]],
+  "type": "number"
+}, {
+  "name": "Number Curve B",
+  "points": [[0.44, -0.2298, "smooth"], [0.44, 0.4376, "smooth"], [0.77, 0.6663, "smooth"]],
+  "type": "number"
 }];
 },{}],"main.js":[function(require,module,exports) {
 'use strict';
@@ -11089,10 +11187,9 @@ cc.loadCurves(_test2.default);
 cc.start = -1;
 cc.end = 2;
 
-// setTimeout( function () {
-//   cc.setRange(-1, 10)
-// }, 1000)
-
+setTimeout(function () {
+  cc.createCurve();
+}, 1000);
 
 console.log(cc);
 
@@ -11131,7 +11228,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '58781' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '56692' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 

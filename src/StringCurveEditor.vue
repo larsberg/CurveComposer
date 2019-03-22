@@ -52,15 +52,25 @@
           padding-top: 6px;
           min-height: 22px;
           border: solid 1px #ffffff44;">
-        <div style="width: 100%; font-size: 0.75em;">
+
+          <input
+            type="text"
+            name="curveName"
+            style="
+              border: none;
+              background: #00000000;
+              color: white;"
+            :value="curve.name"
+            @change="onCurveTitleChange">
+        <!-- <div style="width: 100%; font-size: 0.75em;">
           {{curve.name}} {{ curve.currentSample }}
-        </div>
+        </div> -->
 
         <label v-if="activePoint">value</label>
         <input
           v-if="activePoint"
           style="
-            color: magenta;
+            color: cyan;
             margin-right: 10px;
             background: #00000099;
             border: none;"
@@ -75,7 +85,7 @@
         <input
           v-if="activePoint"
           style="
-            color: magenta;
+            color: cyan;
             width: 5em;
             margin-right: 10px;
             background: #00000099;
@@ -178,7 +188,7 @@
               'stroke-width': '3',
               'stroke-linecap': 'round',
               'vector-effect': 'non-scaling-stroke',
-              'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
+              'stroke': (p === activePoint) ? 'cyan' : '#ffffffaa'
             }"
             onMouseOver="this.style.strokeWidth=7;"
             onMouseOut="this.style.strokeWidth=5;"
@@ -196,7 +206,7 @@
               :style="{
                 'user-select': 'none',
                 'pointer-events': 'none',
-                'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
+                'stroke': (p === activePoint) ? 'cyan' : '#ffffffaa'
               }">
               {{p[0]}}
             </text>
@@ -459,6 +469,11 @@ export default {
 
         this.updatePath()
       }
+    },
+
+    onCurveTitleChange(e) {
+      console.log( e.target.value );
+      this.curve.name = e.target.value
     },
 
     handleClick(e) {

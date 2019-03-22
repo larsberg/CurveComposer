@@ -1,20 +1,20 @@
 [
   {
-    "name": "CURVE",
+    "name": "Animation Curve",
     "points": [
       [
-        -2,
-        0,
+        -0.8,
+        -0.2252,
         "smooth"
       ],
       [
-        -0.56,
-        0.22,
+        -0.9,
+        0.1436,
         "smooth"
       ],
       [
-        0,
-        0.5,
+        -0.36,
+        0.3209,
         "smooth"
       ],
       [
@@ -26,7 +26,7 @@
     "type": "number"
   },
   {
-    "name": "curve_name",
+    "name": "string curve A",
     "points": [
       [
         "one",
@@ -52,7 +52,7 @@
     "type": "string"
   },
   {
-    "name": "curve_name",
+    "name": "string curve B",
     "points": [
       [
         "one",
@@ -81,5 +81,47 @@
       ]
     ],
     "type": "string"
+  },
+  {
+    "name": "Number Curve A",
+    "points": [
+      [
+        0.41,
+        -0.1225,
+        "smooth"
+      ],
+      [
+        0.48,
+        0.4983,
+        "smooth"
+      ],
+      [
+        0.68,
+        0.8484,
+        "smooth"
+      ]
+    ],
+    "type": "number"
+  },
+  {
+    "name": "Number Curve B",
+    "points": [
+      [
+        0.44,
+        -0.2298,
+        "smooth"
+      ],
+      [
+        0.44,
+        0.4376,
+        "smooth"
+      ],
+      [
+        0.77,
+        0.6663,
+        "smooth"
+      ]
+    ],
+    "type": "number"
   }
 ]

@@ -14,7 +14,7 @@
       {{title}}
 
       <label style="
-        margin-right: 10px;
+        margin-left: 10px;
         background: #00000099;
         color: white;
         border: none;
@@ -29,7 +29,6 @@
         @click="save">save</button>
 
       <label style="
-        margin-right: 10px;
         background: #00000099;
         color: white;
         border: none;
@@ -42,6 +41,34 @@
         hidden
         type="file"
         @change="onLoad"/>
+
+
+
+      <label style="
+        background: #00000099;
+        color: white;
+        border: none;
+        border: white solid 1px;
+        border-radius: 5px;
+        font-size: 0.75em;
+        padding: 0 4px;" for="createCurveInput">new curve</label>
+      <button
+        id="createCurveInput"
+        hidden
+        @click="createCurve"></button>
+
+      <label style="
+        background: #00000099;
+        color: white;
+        border: none;
+        border: white solid 1px;
+        border-radius: 5px;
+        font-size: 0.75em;
+        padding: 0 4px;" for="createCurveInput">new string curve</label>
+      <button
+        id="createCurveInput"
+        hidden
+        @click="createStringCurve"></button>
 
     </div>
 
@@ -120,7 +147,12 @@ export default {
     },
 
     addCurve(curve) {
+
+      console.log( 'addCurve' );
+
       this.curves.push(curve)
+
+      this.$forceUpdate()
     },
 
     loadCurves(json){
