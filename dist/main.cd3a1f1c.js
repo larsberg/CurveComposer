@@ -9735,7 +9735,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-//
 
 var easeTypes = Object.keys(_eases2.default);
 
@@ -9762,12 +9761,17 @@ exports.default = {
     curve: {
       type: Object,
       default: defaultCurve
+    },
+    textScale: {
+      type: Number,
+      default: 1.25
     }
   },
 
   data: function data() {
     return {
       isShown: true,
+      isMounted: false,
       activePoint: null,
       mouseDown: false,
       dragged: false,
@@ -9785,6 +9789,7 @@ exports.default = {
     console.log("string curve editor mounted");
     this.min = 0;
     this.max = 1;
+    this.isMounted = true;
   },
 
 
@@ -9821,6 +9826,21 @@ exports.default = {
       var cy = 0.5;
 
       return 'matrix(' + sx + ', 0, 0, ' + sy + ', ' + (cx - sx * cx) + ', ' + (cy - sy * cy) + ')';
+    },
+    getTextTransform: function getTextTransform(p) {
+
+      if (this.isMounted) {
+        var el = this.$el.querySelector('[name=workspace]');
+        var bb = el.getBoundingClientRect();
+
+        var scl = 0.005 * this.textScale;
+        var xScl = scl * bb.height / bb.width;
+        var yScl = -scl;
+
+        return 'translate(' + (p[1] + scl) + ', ' + (1 - scl) + ') scale(' + xScl + ',' + yScl + ') rotate(90)';
+      } else {
+        return '';
+      }
     },
     onDelete: function onDelete(e) {
 
@@ -9944,7 +9964,7 @@ exports.default = {
 
           var pos = this.getEventPosition(e);
 
-          var p = this.curve.addPoint('value', pos.x);
+          var p = this.curve.addPoint('fancyString', pos.x);
 
           this.activePoint = p;
 
@@ -10054,14 +10074,34 @@ exports.default = {
                     { staticStyle: { width: "100%", "font-size": "0.75em" } },
                     [
                       _vm._v(
-                        "\n          " +
+                        "\n        " +
                           _vm._s(_vm.curve.name) +
                           " " +
                           _vm._s(_vm.curve.currentSample) +
-                          "\n        "
+                          "\n      "
                       )
                     ]
                   ),
+                  _vm._v(" "),
+                  _vm.activePoint ? _c("label", [_vm._v("value")]) : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c("input", {
+                        staticStyle: {
+                          color: "magenta",
+                          "margin-right": "10px",
+                          background: "#00000099",
+                          border: "none"
+                        },
+                        attrs: { type: "text", name: "value" },
+                        domProps: { value: _vm.activePoint[0] },
+                        on: {
+                          change: _vm.onPointChange,
+                          focus: _vm.onInputFocus,
+                          blur: _vm.onInputBlur
+                        }
+                      })
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
                   _vm._v(" "),
@@ -10080,27 +10120,6 @@ exports.default = {
                           step: "0.001"
                         },
                         domProps: { value: Number(_vm.activePoint[1]) },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("value")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "magenta",
-                          width: "5em",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: { type: "text", name: "value" },
-                        domProps: { value: _vm.activePoint[0] },
                         on: {
                           change: _vm.onPointChange,
                           focus: _vm.onInputFocus,
@@ -10181,31 +10200,142 @@ exports.default = {
                 },
                 [
                   _c(
+                    "defs",
+                    [
+                      _c(
+                        "linearGradient",
+                        {
+                          attrs: {
+                            id: "Gradient",
+                            x1: "0",
+                            x2: "1",
+                            y1: "0",
+                            y2: "0",
+                            gradientUnits: "objectBoundingBox"
+                          }
+                        },
+                        [
+                          _c("stop", {
+                            attrs: { offset: "10%", "stop-color": "#00000044" }
+                          }),
+                          _vm._v(" "),
+                          _c("stop", {
+                            attrs: { offset: "95%", "stop-color": "#ffffff44" }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
                     "g",
                     { attrs: { transform: _vm.getTransform() } },
-                    _vm._l(_vm.curve.points, function(p, index) {
-                      return _c("line", {
-                        style: {
-                          "vector-effect": "non-scaling-stroke",
-                          "stroke-width": "3",
-                          "stroke-linecap": "round",
-                          "vector-effect": "non-scaling-stroke",
-                          stroke:
-                            p === _vm.activePoint ? "magenta" : "#ffffffaa"
-                        },
-                        attrs: {
-                          onMouseOver: "this.style.strokeWidth=7;",
-                          onMouseOut: "this.style.strokeWidth=5;",
-                          "data-index": index,
-                          x1: p[1],
-                          y1: 1,
-                          x2: p[1],
-                          y2: 0,
-                          fill: "red"
-                        }
+                    [
+                      _vm.curve.points.length
+                        ? _c("rect", {
+                            staticStyle: {
+                              "pointer-events": "none",
+                              stroke: "none",
+                              fill: "#00000044"
+                            },
+                            attrs: {
+                              x: 0,
+                              y: "0",
+                              width: _vm.curve.points[0][1],
+                              height: "1"
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c("g", [
+                          index < _vm.curve.points.length - 1
+                            ? _c("rect", {
+                                staticStyle: {
+                                  "pointer-events": "none",
+                                  stroke: "none",
+                                  fill: "url(#Gradient)"
+                                },
+                                attrs: {
+                                  x: p[1],
+                                  y: "0",
+                                  width: _vm.curve.points[index + 1][1] - p[1],
+                                  height: "1"
+                                }
+                              })
+                            : _c("rect", {
+                                staticStyle: {
+                                  "pointer-events": "none",
+                                  stroke: "none",
+                                  fill: "#ffffff44"
+                                },
+                                attrs: {
+                                  x: p[1],
+                                  y: "0",
+                                  width: 1 - p[1],
+                                  height: "1"
+                                }
+                              })
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c("line", {
+                          style: {
+                            "vector-effect": "non-scaling-stroke",
+                            "stroke-width": "3",
+                            "stroke-linecap": "round",
+                            "vector-effect": "non-scaling-stroke",
+                            stroke:
+                              p === _vm.activePoint ? "magenta" : "#ffffffaa"
+                          },
+                          attrs: {
+                            onMouseOver: "this.style.strokeWidth=7;",
+                            onMouseOut: "this.style.strokeWidth=5;",
+                            "data-index": index,
+                            x1: p[1],
+                            y1: 1,
+                            x2: p[1],
+                            y2: 0,
+                            fill: "red"
+                          }
+                        })
+                      }),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c(
+                          "g",
+                          { attrs: { transform: _vm.getTextTransform(p) } },
+                          [
+                            _vm.isMounted
+                              ? _c(
+                                  "text",
+                                  {
+                                    style: {
+                                      "user-select": "none",
+                                      "pointer-events": "none",
+                                      stroke:
+                                        p === _vm.activePoint
+                                          ? "magenta"
+                                          : "#ffffffaa"
+                                    }
+                                  },
+                                  [
+                                    _vm._v(
+                                      "\n            " +
+                                        _vm._s(p[0]) +
+                                        "\n          "
+                                    )
+                                  ]
+                                )
+                              : _vm._e()
+                          ]
+                        )
                       })
-                    }),
-                    0
+                    ],
+                    2
                   )
                 ]
               )
@@ -10901,18 +11031,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // main.js
 var cc = _CurveComposer2.default.setup();
 cc.loadCurves(_testTwo2.default);
-
-var sc = new _CurveComposer2.default.stringCurve();
-
-sc.addPoint("one", 0);
-sc.addPoint("two", .33);
-sc.addPoint("three", .66);
-
-for (var i = 0; i < 1; i += 0.02) {
-  console.log(sc.sample(i));
-}
-
-cc.addCurve(sc);
 
 console.log(cc);
 

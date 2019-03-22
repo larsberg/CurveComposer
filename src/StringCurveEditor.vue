@@ -56,53 +56,21 @@
           {{curve.name}} {{ curve.currentSample }}
         </div>
 
-        <!-- <label style="color: darkgrey;">hi:</label>
+        <label v-if="activePoint">value</label>
         <input
-          :style="{
-            color: 'cyan',
-            width: '5em',
-            marginRight: '10px',
-            background: '#00000099',
-            border: 'none'}"
-          type="number"
-          name="hi"
-          step="0.001"
-          :value="max"
-          @change="onRangeChange"
-          @focus="onInputFocus"
-          @blur="onInputBlur">
-        <label style="color: darkgrey;">low:</label>
-        <input
-          style="
-            color: cyan;
-            width: 5em;
-            margin-right: 10px;
-            background: #00000099;
-            border: none;"
-          type="number"
-          name="low"
-          step="0.001"
-          :value="min"
-          @change="onRangeChange"
-          @focus="onInputFocus"
-          @blur="onInputBlur"> -->
-
-<!--         <label v-if="activePoint">pt:</label>
-        <select
           v-if="activePoint"
           style="
             color: magenta;
-            width: 5em;
             margin-right: 10px;
             background: #00000099;
             border: none;"
-          name="eases"
-          value="smooth"
-          @change="onPointChange">
-          <option v-for="e in easeTypes"
-            :value='e'
-            :selected="activePoint && activePoint[2] === e">{{e}}</option>
-        </select> -->
+          type="text"
+          name="value"
+          :value="activePoint[0]"
+          @change="onPointChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
+
         <label v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
@@ -116,21 +84,6 @@
           name="position"
           step="0.001"
           :value="Number(activePoint[1])"
-          @change="onPointChange"
-          @focus="onInputFocus"
-          @blur="onInputBlur">
-        <label v-if="activePoint">value</label>
-        <input
-          v-if="activePoint"
-          style="
-            color: magenta;
-            width: 5em;
-            margin-right: 10px;
-            background: #00000099;
-            border: none;"
-          type="text"
-          name="value"
-          :value="activePoint[0]"
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
@@ -174,7 +127,49 @@
           stroke: white;
           stroke-width: 1;">
 
+          <defs>
+            <linearGradient
+              id="Gradient"
+              x1="0"
+              x2="1"
+              y1="0"
+              y2="0"
+              gradientUnits="objectBoundingBox">
+              <stop offset="10%" stop-color="#00000044"/>
+              <stop offset="95%" stop-color="#ffffff44"/>
+            </linearGradient>
+          </defs>
+
         <g :transform="getTransform()">
+
+          <!-- the filler at the low end of the curve -->
+          <rect v-if="curve.points.length"
+            :x="0"
+            y="0"
+            :width="curve.points[0][1]"
+            height="1"
+            style="pointer-events: none; stroke: none; fill: #00000044"
+            />
+          <!-- gradients for each curve -->
+          <g v-for='(p, index) in curve.points'>
+
+            <rect v-if='index < (curve.points.length - 1)'
+              :x="p[1]"
+              y="0"
+              :width="curve.points[index+1][1] - p[1]"
+              height="1"
+              style="pointer-events: none; stroke: none; fill: url(#Gradient)"
+              />
+            <!-- the filler at the high end of the curve -->
+            <rect v-else
+              :x="p[1]"
+              y="0"
+              :width="1 - p[1]"
+              height="1"
+              style="pointer-events: none; stroke: none; fill: #ffffff44"
+              />
+
+          </g>
 
           <line
             v-for="(p, index) in curve.points"
@@ -194,14 +189,18 @@
             :y2="0"
             fill="red"/>
 
-          <!-- the animation curve -->
-          <!-- <path :d="path" style="
-            fill: none;
-            stroke: #ffffff99;
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;
-            pointer-events: none;"/> -->
-
+          <g v-for="(p, index) in curve.points"
+            :transform="getTextTransform(p)">
+            <text
+              v-if="isMounted"
+              :style="{
+                'user-select': 'none',
+                'pointer-events': 'none',
+                'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
+              }">
+              {{p[0]}}
+            </text>
+          </g>
         </g>
 
       </svg>
@@ -239,12 +238,17 @@ export default {
     curve: {
       type: Object,
       default: defaultCurve
+    },
+    textScale: {
+      type: Number,
+      default: 1.25
     }
   },
 
   data() {
     return {
       isShown: true,
+      isMounted: false,
       activePoint: null,
       mouseDown: false,
       dragged: false,
@@ -263,6 +267,7 @@ export default {
     console.log( "string curve editor mounted" );
     this.min = 0
     this.max = 1
+    this.isMounted = true
   },
 
   methods: {
@@ -300,6 +305,24 @@ export default {
       var cy = 0.5
 
       return `matrix(${sx}, 0, 0, ${sy}, ${cx-sx*cx}, ${cy-sy*cy})`
+    },
+
+    getTextTransform(p){
+
+      if(this.isMounted) {
+        var el = this.$el.querySelector('[name=workspace]')
+        var bb = el.getBoundingClientRect()
+
+        var scl = 0.005 * this.textScale
+        var xScl = scl * bb.height / bb.width
+        var yScl = -scl
+
+        return `translate(${p[1] + scl}, ${1 - scl}) scale(${xScl},${yScl}) rotate(90)`
+      } else {
+        return ''
+      }
+
+
     },
 
     onDelete(e) {
@@ -439,7 +462,7 @@ export default {
 
           var pos = this.getEventPosition(e)
 
-          var p = this.curve.addPoint('value', pos.x)
+          var p = this.curve.addPoint('fancyString', pos.x)
 
           this.activePoint = p
 
