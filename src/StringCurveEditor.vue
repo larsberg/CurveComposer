@@ -144,9 +144,9 @@
 
           <!-- the filler at the low end of the curve -->
           <rect v-if="curve.points.length"
-            :x="0"
+            :x="start"
             y="0"
-            :width="curve.points[0][1]"
+            :width="Math.max(0, curve.points[0][1] - this.start)"
             height="1"
             style="pointer-events: none; stroke: none; fill: #00000044"
             />
@@ -164,7 +164,7 @@
             <rect v-else
               :x="p[1]"
               y="0"
-              :width="1 - p[1]"
+              :width="end - p[1]"
               height="1"
               style="pointer-events: none; stroke: none; fill: #ffffff44"
               />
@@ -239,9 +239,20 @@ export default {
       type: Object,
       default: defaultCurve
     },
+
     textScale: {
       type: Number,
-      default: 1.25
+      default: 1
+    },
+
+    start: {
+      type: Number,
+      default: 0
+    },
+
+    end: {
+      type: Number,
+      default: 1
     }
   },
 
@@ -263,8 +274,6 @@ export default {
   },
 
   mounted () {
-
-    console.log( "string curve editor mounted" );
     this.min = 0
     this.max = 1
     this.isMounted = true
@@ -291,7 +300,8 @@ export default {
     },
 
     getViewBox() {
-      return `0 0 1 1`
+      // min-x min-y width height
+      return `${this.start} 0 ${Math.abs(this.end - this.start)} 1`
     },
 
     getTransform() {
@@ -314,7 +324,7 @@ export default {
         var bb = el.getBoundingClientRect()
 
         var scl = 0.005 * this.textScale
-        var xScl = scl * bb.height / bb.width
+        var xScl = (this.end - this.start) * scl * bb.height / bb.width
         var yScl = -scl
 
         return `translate(${p[1] + scl}, ${1 - scl}) scale(${xScl},${yScl}) rotate(90)`
@@ -361,15 +371,15 @@ export default {
 
     },
 
-    onRangeChange(e) {
+    // onRangeChange(e) {
 
-      // if(e.target.name === 'low') {
-      //   this.min = Number(e.target.value)
-      // } else {
-      //   this.max = Number(e.target.value)
-      // }
-      this.$forceUpdate()
-    },
+    //   // if(e.target.name === 'low') {
+    //   //   this.min = Number(e.target.value)
+    //   // } else {
+    //   //   this.max = Number(e.target.value)
+    //   // }
+    //   this.$forceUpdate()
+    // },
 
     onInputFocus(e) {
       this.bUpdateCrosshairs = false
@@ -387,10 +397,10 @@ export default {
     getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]')
       var bb = el.getBoundingClientRect()
-      var x = e.offsetX // e.clientX - bb.x //
-      var y = e.offsetY // e.clientY - bb.y //
-      var u = mapLinear(x, 0, bb.width, 0, 1)
-      var v = 0.5 //  mapLinear(y, 0, bb.height, this.max, this.min)
+      var x = e.offsetX
+      var y = e.offsetY
+      var u = mapLinear(x, 0, bb.width, this.start, this.end)
+      var v = 0.5
 
       return {
         x: Number(u.toFixed(4)),
@@ -444,7 +454,6 @@ export default {
         var pos = this.getEventPosition(e)
 
         this.activePoint[1] = pos.x
-        // this.activePoint[0] = pos.y
 
         this.curve.sortPoints()
 
@@ -462,7 +471,7 @@ export default {
 
           var pos = this.getEventPosition(e)
 
-          var p = this.curve.addPoint('fancyString', pos.x)
+          var p = this.curve.addPoint('string_name', pos.x)
 
           this.activePoint = p
 

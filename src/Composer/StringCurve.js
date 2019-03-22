@@ -5,15 +5,12 @@ class StringCurve extends Curve {
 
   constructor( options ) {
 
-
     super(Object.assign({
       type: 'string',
       name: 'string_curve',
       currentSample: ''
     }, options || {}));
 
-
-    // this.type = 'string' // string
   }
 
   sample(u) {

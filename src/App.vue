@@ -47,8 +47,18 @@
 
     <div v-for="c in curves" >
 
-      <CurveEditor v-if="c.type === 'number'" ref="curves":curve="c"></CurveEditor>
-      <StringCurveEditor v-else-if="c.type === 'string'" ref="curves":curve="c"></StringCurveEditor>
+      <CurveEditor v-if="c.type === 'number'"
+        ref="curves"
+        :curve="c"
+        :start="start"
+        :end="end"></CurveEditor>
+
+      <StringCurveEditor v-else-if="c.type === 'string'"
+        ref="curves"
+        :textScale="stringCurveTextSize"
+        :curve="c"
+        :start="start"
+        :end="end"></StringCurveEditor>
 
     </div>
 
@@ -91,6 +101,14 @@ export default {
     StringCurveEditor
   },
 
+  data: function(){
+    return {
+      start: 0,
+      end: 1,
+      stringCurveTextSize: 1.5
+    }
+  },
+
   methods: {
 
     createCurve(options) {
@@ -102,7 +120,6 @@ export default {
     },
 
     addCurve(curve) {
-      console.log( curve.type );
       this.curves.push(curve)
     },
 
@@ -151,6 +168,12 @@ export default {
 
       let blob = new Blob( [JSON.stringify(data, null, 2 )], {type : 'application/json' })
       saveAs( blob, 'curves.json' )
+    },
+
+    setRange(start, end){
+      this.start = start
+      this.end = end
+      this.$forceUpdate()
     }
   }
 

@@ -8754,6 +8754,16 @@ exports.default = {
     curve: {
       type: Object,
       default: defaultCurve
+    },
+
+    start: {
+      type: Number,
+      default: 0
+    },
+
+    end: {
+      type: Number,
+      default: 1
     }
   },
 
@@ -8775,6 +8785,7 @@ exports.default = {
   mounted: function mounted() {
     this.min = this.curve.getMinValue();
     this.max = this.curve.getMaxValue();
+    console.log(this.start, this.end);
   },
 
 
@@ -8787,8 +8798,9 @@ exports.default = {
       var w = this.w;
       var p = 'M';
 
-      for (var i = 0; i <= w; i += 1) {
-        p += i / w + ' ' + this.curve.sample(i / w, false) + ' ';
+      for (var i = 0, u = 0; i <= w; i += 1) {
+        u = (0, _Utils.mapLinear)(i, 0, w, this.start, this.end);
+        p += u + ' ' + this.curve.sample(u, false) + ' ';
       }
 
       return p;
@@ -8798,7 +8810,8 @@ exports.default = {
       this.path = this.getPath();
     },
     getViewBox: function getViewBox() {
-      return '0 ' + this.min + ' 1 ' + Math.abs(this.max - this.min);
+      // min-x min-y width height
+      return this.start + ' ' + this.min + ' ' + Math.abs(this.end - this.start) + ' ' + Math.abs(this.max - this.min);
     },
     getTransform: function getTransform() {
 
@@ -8872,7 +8885,8 @@ exports.default = {
       var bb = el.getBoundingClientRect();
       var x = e.offsetX; // e.clientX - bb.x //
       var y = e.offsetY; // e.clientY - bb.y //
-      var u = (0, _Utils.mapLinear)(x, 0, bb.width, 0, 1);
+
+      var u = (0, _Utils.mapLinear)(x, 0, bb.width, this.start, this.end);
       var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
 
       return {
@@ -9285,9 +9299,9 @@ exports.default = {
                               "pointer-events": "none"
                             },
                             attrs: {
-                              x1: 0,
+                              x1: _vm.start,
                               y1: _vm.mouse.y,
-                              x2: 1,
+                              x2: _vm.end,
                               y2: _vm.mouse.y
                             }
                           })
@@ -9321,9 +9335,9 @@ exports.default = {
                               "pointer-events": "none"
                             },
                             attrs: {
-                              x1: 0,
+                              x1: _vm.start,
                               y1: _vm.curve.currentSample,
-                              x2: 1,
+                              x2: _vm.end,
                               y2: _vm.curve.currentSample
                             }
                           })
@@ -9461,8 +9475,6 @@ var StringCurve = function (_Curve) {
       name: 'string_curve',
       currentSample: ''
     }, options || {})));
-
-    // this.type = 'string' // string
   }
 
   _createClass(StringCurve, [{
@@ -9762,9 +9774,20 @@ exports.default = {
       type: Object,
       default: defaultCurve
     },
+
     textScale: {
       type: Number,
-      default: 1.25
+      default: 1
+    },
+
+    start: {
+      type: Number,
+      default: 0
+    },
+
+    end: {
+      type: Number,
+      default: 1
     }
   },
 
@@ -9785,8 +9808,6 @@ exports.default = {
     };
   },
   mounted: function mounted() {
-
-    console.log("string curve editor mounted");
     this.min = 0;
     this.max = 1;
     this.isMounted = true;
@@ -9813,7 +9834,8 @@ exports.default = {
       this.path = this.getPath();
     },
     getViewBox: function getViewBox() {
-      return '0 0 1 1';
+      // min-x min-y width height
+      return this.start + ' 0 ' + Math.abs(this.end - this.start) + ' 1';
     },
     getTransform: function getTransform() {
 
@@ -9834,7 +9856,7 @@ exports.default = {
         var bb = el.getBoundingClientRect();
 
         var scl = 0.005 * this.textScale;
-        var xScl = scl * bb.height / bb.width;
+        var xScl = (this.end - this.start) * scl * bb.height / bb.width;
         var yScl = -scl;
 
         return 'translate(' + (p[1] + scl) + ', ' + (1 - scl) + ') scale(' + xScl + ',' + yScl + ') rotate(90)';
@@ -9874,15 +9896,18 @@ exports.default = {
         this.updatePath();
       }
     },
-    onRangeChange: function onRangeChange(e) {
 
-      // if(e.target.name === 'low') {
-      //   this.min = Number(e.target.value)
-      // } else {
-      //   this.max = Number(e.target.value)
-      // }
-      this.$forceUpdate();
-    },
+
+    // onRangeChange(e) {
+
+    //   // if(e.target.name === 'low') {
+    //   //   this.min = Number(e.target.value)
+    //   // } else {
+    //   //   this.max = Number(e.target.value)
+    //   // }
+    //   this.$forceUpdate()
+    // },
+
     onInputFocus: function onInputFocus(e) {
       this.bUpdateCrosshairs = false;
     },
@@ -9896,10 +9921,10 @@ exports.default = {
     getEventPosition: function getEventPosition(e) {
       var el = this.$el.querySelector('[name=workspace]');
       var bb = el.getBoundingClientRect();
-      var x = e.offsetX; // e.clientX - bb.x //
-      var y = e.offsetY; // e.clientY - bb.y //
-      var u = (0, _Utils.mapLinear)(x, 0, bb.width, 0, 1);
-      var v = 0.5; //  mapLinear(y, 0, bb.height, this.max, this.min)
+      var x = e.offsetX;
+      var y = e.offsetY;
+      var u = (0, _Utils.mapLinear)(x, 0, bb.width, this.start, this.end);
+      var v = 0.5;
 
       return {
         x: Number(u.toFixed(4)),
@@ -9947,7 +9972,6 @@ exports.default = {
         var pos = this.getEventPosition(e);
 
         this.activePoint[1] = pos.x;
-        // this.activePoint[0] = pos.y
 
         this.curve.sortPoints();
 
@@ -9964,7 +9988,7 @@ exports.default = {
 
           var pos = this.getEventPosition(e);
 
-          var p = this.curve.addPoint('fancyString', pos.x);
+          var p = this.curve.addPoint('string_name', pos.x);
 
           this.activePoint = p;
 
@@ -10241,9 +10265,12 @@ exports.default = {
                               fill: "#00000044"
                             },
                             attrs: {
-                              x: 0,
+                              x: _vm.start,
                               y: "0",
-                              width: _vm.curve.points[0][1],
+                              width: Math.max(
+                                0,
+                                _vm.curve.points[0][1] - this.start
+                              ),
                               height: "1"
                             }
                           })
@@ -10274,7 +10301,7 @@ exports.default = {
                                 attrs: {
                                   x: p[1],
                                   y: "0",
-                                  width: 1 - p[1],
+                                  width: _vm.end - p[1],
                                   height: "1"
                                 }
                               })
@@ -10736,6 +10763,16 @@ function loadFile(file, callback) {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 ;
 
@@ -10755,6 +10792,14 @@ exports.default = {
     StringCurveEditor: _StringCurveEditor2.default
   },
 
+  data: function data() {
+    return {
+      start: 0,
+      end: 1,
+      stringCurveTextSize: 1.5
+    };
+  },
+
   methods: {
     createCurve: function createCurve(options) {
       this.addCurve(new _Curve2.default(options));
@@ -10763,7 +10808,6 @@ exports.default = {
       this.addCurve(new _StringCurve2.default(options));
     },
     addCurve: function addCurve(curve) {
-      console.log(curve.type);
       this.curves.push(curve);
     },
     loadCurves: function loadCurves(json) {
@@ -10809,6 +10853,11 @@ exports.default = {
 
       var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       (0, _saveAs2.default)(blob, 'curves.json');
+    },
+    setRange: function setRange(start, end) {
+      this.start = start;
+      this.end = end;
+      this.$forceUpdate();
     }
   }
 
@@ -10899,13 +10948,18 @@ exports.default = {
               ? _c("CurveEditor", {
                   ref: "curves",
                   refInFor: true,
-                  attrs: { curve: c }
+                  attrs: { curve: c, start: _vm.start, end: _vm.end }
                 })
               : c.type === "string"
               ? _c("StringCurveEditor", {
                   ref: "curves",
                   refInFor: true,
-                  attrs: { curve: c }
+                  attrs: {
+                    textScale: _vm.stringCurveTextSize,
+                    curve: c,
+                    start: _vm.start,
+                    end: _vm.end
+                  }
                 })
               : _vm._e()
           ],
@@ -11001,18 +11055,18 @@ module.exports = {
   stringCurve: _StringCurve2.default
 
 };
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}],"testTwo.json":[function(require,module,exports) {
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}],"test.json":[function(require,module,exports) {
 module.exports = [{
   "name": "CURVE",
   "points": [[-2, 0, "smooth"], [-0.56, 0.22, "smooth"], [0, 0.5, "smooth"], [-1, 1, "smooth"]],
   "type": "number"
 }, {
   "name": "curve_name",
-  "points": [["one", 0, "smooth"], ["two", 0.2455, "smooth"], ["ten", 0.66, "smooth"]],
+  "points": [["one", 0, "smooth"], ["two", 0.2455, "smooth"], ["ten", 0.66, "smooth"], ["string_name", 1.1078, "smooth"]],
   "type": "string"
 }, {
   "name": "curve_name",
-  "points": [["one", 0, "smooth"], ["two", 0.33, "smooth"], ["three", 0.66, "smooth"]],
+  "points": [["one", 0, "smooth"], ["two", 0.33, "smooth"], ["three", 0.66, "smooth"], ["four", 1.2167, "smooth"], ["five", 1.643, "smooth"]],
   "type": "string"
 }];
 },{}],"main.js":[function(require,module,exports) {
@@ -11022,15 +11076,23 @@ var _CurveComposer = require('./CurveComposer');
 
 var _CurveComposer2 = _interopRequireDefault(_CurveComposer);
 
-var _testTwo = require('./testTwo.json');
+var _test = require('./test.json');
 
-var _testTwo2 = _interopRequireDefault(_testTwo);
+var _test2 = _interopRequireDefault(_test);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // main.js
 var cc = _CurveComposer2.default.setup();
-cc.loadCurves(_testTwo2.default);
+cc.loadCurves(_test2.default);
+
+cc.start = -1;
+cc.end = 2;
+
+// setTimeout( function () {
+//   cc.setRange(-1, 10)
+// }, 1000)
+
 
 console.log(cc);
 
@@ -11040,7 +11102,7 @@ TODO:
     - [ ] collapse all the curves
     - [ ] background hex-color
  */
-},{"./CurveComposer":"CurveComposer.js","./testTwo.json":"testTwo.json"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./CurveComposer":"CurveComposer.js","./test.json":"test.json"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -11069,7 +11131,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '50205' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '58781' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 

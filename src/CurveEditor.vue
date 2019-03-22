@@ -197,9 +197,9 @@
               stroke-width: 1;
               vector-effect: non-scaling-stroke;
               pointer-events: none;"
-            :x1="0"
+            :x1="start"
             :y1="mouse.y"
-            :x2="1"
+            :x2="end"
             :y2="mouse.y"/>
 
           <!-- current sample crosshairs -->
@@ -224,9 +224,9 @@
               stroke-width: 1;
               vector-effect: non-scaling-stroke;
               pointer-events: none;"
-            :x1="0"
+            :x1="start"
             :y1="curve.currentSample"
-            :x2="1"
+            :x2="end"
             :y2="curve.currentSample"/>
 
           <!-- curve points rendered as rounded lines with no length -->
@@ -311,6 +311,16 @@ export default {
     curve: {
       type: Object,
       default: defaultCurve
+    },
+
+    start: {
+      type: Number,
+      default: 0
+    },
+
+    end: {
+      type: Number,
+      default: 1
     }
   },
 
@@ -333,6 +343,7 @@ export default {
   mounted () {
     this.min = this.curve.getMinValue()
     this.max = this.curve.getMaxValue()
+    console.log( this.start, this.end );
   },
 
   methods: {
@@ -344,8 +355,9 @@ export default {
       var w = this.w
       var p = 'M'
 
-      for(var i=0; i<=w; i+=1) {
-        p += `${i/w} ${this.curve.sample(i/w, false)} `
+      for(var i=0, u=0; i<=w; i+=1) {
+        u = mapLinear(i, 0, w, this.start, this.end)
+        p += `${u} ${this.curve.sample(u, false)} `
       }
 
       return p
@@ -356,7 +368,8 @@ export default {
     },
 
     getViewBox() {
-      return `0 ${this.min} 1 ${Math.abs(this.max - this.min)}`
+      // min-x min-y width height
+      return `${this.start} ${this.min} ${Math.abs(this.end - this.start)} ${Math.abs(this.max - this.min)}`
     },
 
     getTransform() {
@@ -440,7 +453,8 @@ export default {
       var bb = el.getBoundingClientRect()
       var x = e.offsetX // e.clientX - bb.x //
       var y = e.offsetY // e.clientY - bb.y //
-      var u = mapLinear(x, 0, bb.width, 0, 1)
+
+      var u = mapLinear(x, 0, bb.width, this.start, this.end)
       var v = mapLinear(y, 0, bb.height, this.max, this.min)
 
       return {

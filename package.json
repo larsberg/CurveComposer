@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "parcel src/index.html --open",
     "test": "parcel test/index.html --out-dir test/dist --open",
-    "bundle": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.js --target node --bundle-node-modules --no-source-maps --no-minify --experimental-scope-hoisting  --public-url ./",
-    "mini": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.min.js --target node --bundle-node-modules --no-source-maps --experimental-scope-hoisting  --public-url ./",
+    "bundle": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.js --no-source-maps --no-minify --public-url ./",
+    "mini": "parcel build src/CurveComposer.js --out-dir build/ --out-file CurveComposer.min.js --no-source-maps --public-url ./",
     "build": "npm run bundle && npm run mini"
   },
   "author": "lars berg",
@@ -16,10 +16,10 @@
     "save-as": "^0.1.8",
     "vue": "^2.6.8",
     "vue-hot-reload-api": "^2.3.1",
+    "@vue/component-compiler-utils": "^2.3.1",
     "vue-router": "^3.0.2"
   },
   "devDependencies": {
-    "@vue/component-compiler-utils": "^2.3.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",

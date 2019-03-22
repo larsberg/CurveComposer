@@ -1,9 +1,17 @@
 // main.js
 import CurveComposer from './CurveComposer'
-import testJSON from './testTwo.json'
+import testJSON from './test.json'
 
 var cc = CurveComposer.setup()
 cc.loadCurves(testJSON)
+
+cc.start = -1
+cc.end = 2
+
+// setTimeout( function () {
+//   cc.setRange(-1, 10)
+// }, 1000)
+
 
 console.log( cc );
 
