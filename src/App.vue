@@ -1,11 +1,13 @@
 <template>
-  <div style='
-    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
-    background: #00000099;
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
-    color: white;'>
+  <div
+    id='CurveComposer'
+    style='
+      font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+      background: #00000099;
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+      color: white;'>
 
     <div style="height: 24px;">
 
@@ -43,7 +45,12 @@
 
     </div>
 
-    <CurveEditor ref="curves" v-for="c in curves" :curve="c"></CurveEditor>
+    <div v-for="c in curves" >
+
+      <CurveEditor v-if="c.type === 'number'" ref="curves":curve="c"></CurveEditor>
+      <StringCurveEditor v-else-if="c.type === 'string'" ref="curves":curve="c"></StringCurveEditor>
+
+    </div>
 
   </div>
 
@@ -51,7 +58,9 @@
 
 <script>
 import CurveEditor from './CurveEditor'
+import StringCurveEditor from './StringCurveEditor'
 import Curve from './Composer/Curve'
+import StringCurve from './Composer/StringCurve'
 import saveAs from 'save-as'
 
 
@@ -78,7 +87,8 @@ export default {
   },
 
   components: {
-    CurveEditor
+    CurveEditor,
+    StringCurveEditor
   },
 
   methods: {
@@ -87,7 +97,12 @@ export default {
       this.addCurve( new Curve(options) )
     },
 
+    createStringCurve(options) {
+      this.addCurve( new StringCurve(options) )
+    },
+
     addCurve(curve) {
+      console.log( curve.type );
       this.curves.push(curve)
     },
 
@@ -98,7 +113,11 @@ export default {
 
       // add the json curves
       for(var i in json){
-        this.addCurve( new Curve(json[i]))
+        if(json[i].type === 'string') {
+          this.addCurve( new StringCurve(json[i]))
+        } else {
+          this.addCurve( new Curve(json[i]))
+        }
       }
 
       // update the paths for each curve
@@ -125,7 +144,8 @@ export default {
       var data = this.curves.map( c => {
         return {
           name: c.name,
-          points: c.points
+          points: c.points,
+          type: c.type
         }
       })
 

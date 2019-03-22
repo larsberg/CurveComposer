@@ -22,281 +22,49 @@
         1,
         "smooth"
       ]
-    ]
+    ],
+    "type": "number"
   },
   {
-    "name": "CURVE",
+    "name": "curve_name",
     "points": [
       [
-        -2,
+        "one",
         0,
         "smooth"
       ],
       [
-        -0.88,
-        0.1922,
+        "two",
+        0.2455,
         "smooth"
       ],
       [
-        -1.5,
-        0.6953,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
+        "ten",
+        0.66,
         "smooth"
       ]
-    ]
+    ],
+    "type": "string"
   },
   {
-    "name": "CURVE",
+    "name": "curve_name",
     "points": [
       [
-        -2,
+        "one",
         0,
         "smooth"
       ],
       [
-        -0.22,
-        0.1833,
+        "two",
+        0.33,
         "smooth"
       ],
       [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
+        "three",
+        0.66,
         "smooth"
       ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
-  },
-  {
-    "name": "CURVE",
-    "points": [
-      [
-        -2,
-        0,
-        "smooth"
-      ],
-      [
-        -0.22,
-        0.1833,
-        "smooth"
-      ],
-      [
-        -1.76,
-        0.5752,
-        "smooth"
-      ],
-      [
-        -1,
-        1,
-        "smooth"
-      ]
-    ]
+    ],
+    "type": "string"
   }
 ]

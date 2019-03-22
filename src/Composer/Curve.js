@@ -10,7 +10,8 @@ class Curve {
       name: "curve_name",
       points: [],
       currentPosition: 0,
-      currentSample: 0
+      currentSample: 0,
+      type: 'number'
     }, options || {})
   }
 

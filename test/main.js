@@ -2,5 +2,5 @@
 import CurveComposer from '../build/CurveComposer'
 import testJSON from '../src/test.json'
 
-var cc = CurveComposer('#app')
+var cc = CurveComposer.setup()
 cc.loadCurves(testJSON)

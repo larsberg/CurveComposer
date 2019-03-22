@@ -53,17 +53,17 @@
           min-height: 22px;
           border: solid 1px #ffffff44;">
         <div style="width: 100%; font-size: 0.75em;">
-          {{curve.name}} {{ bUpdateCrosshairs ? Number(curve.currentSample.toFixed(3)) : ''}}
+          {{curve.name}} {{ curve.currentSample }}
         </div>
 
-        <label style="color: darkgrey;">hi:</label>
+        <!-- <label style="color: darkgrey;">hi:</label>
         <input
-          style="
-            color: cyan;
-            width: 5em;
-            margin-right: 10px;
-            background: #00000099;
-            border: none;"
+          :style="{
+            color: 'cyan',
+            width: '5em',
+            marginRight: '10px',
+            background: '#00000099',
+            border: 'none'}"
           type="number"
           name="hi"
           step="0.001"
@@ -85,9 +85,9 @@
           :value="min"
           @change="onRangeChange"
           @focus="onInputFocus"
-          @blur="onInputBlur">
+          @blur="onInputBlur"> -->
 
-        <label v-if="activePoint">pt:</label>
+<!--         <label v-if="activePoint">pt:</label>
         <select
           v-if="activePoint"
           style="
@@ -102,7 +102,7 @@
           <option v-for="e in easeTypes"
             :value='e'
             :selected="activePoint && activePoint[2] === e">{{e}}</option>
-        </select>
+        </select> -->
         <label v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
@@ -119,7 +119,7 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
-        <label v-if="activePoint">v:</label>
+        <label v-if="activePoint">value</label>
         <input
           v-if="activePoint"
           style="
@@ -128,10 +128,9 @@
             margin-right: 10px;
             background: #00000099;
             border: none;"
-          type="number"
+          type="text"
           name="value"
-          step="0.001"
-          :value="Number(activePoint[0])"
+          :value="activePoint[0]"
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
@@ -177,64 +176,11 @@
 
         <g :transform="getTransform()">
 
-          <!-- mouse position cross hairs -->
-          <line v-if="isMouseOver"
-            style="
-              stroke: #ffffff66;
-              fill: none;
-              stroke-width: 1;
-              vector-effect: non-scaling-stroke;
-              pointer-events: none;"
-            :x1="mouse.x"
-            :y1="min"
-            :x2="mouse.x"
-            :y2="max" />
-
-          <line v-if="isMouseOver"
-            style="
-              stroke: #ffffff66;
-              fill: none;
-              stroke-width: 1;
-              vector-effect: non-scaling-stroke;
-              pointer-events: none;"
-            :x1="0"
-            :y1="mouse.y"
-            :x2="1"
-            :y2="mouse.y"/>
-
-          <!-- current sample crosshairs -->
-          <line
-            v-if="bUpdateCrosshairs"
-            style="
-              stroke: #99999933;
-              fill: none;
-              stroke-width: 1;
-              vector-effect: non-scaling-stroke;
-              pointer-events: none;"
-            :x1="curve.currentPosition"
-            :y1="min"
-            :x2="curve.currentPosition"
-            :y2="max" />
-
-          <line
-            v-if="bUpdateCrosshairs"
-            style="
-              stroke: #ffffff33;
-              fill: none;
-              stroke-width: 1;
-              vector-effect: non-scaling-stroke;
-              pointer-events: none;"
-            :x1="0"
-            :y1="curve.currentSample"
-            :x2="1"
-            :y2="curve.currentSample"/>
-
-          <!-- curve points rendered as rounded lines with no length -->
           <line
             v-for="(p, index) in curve.points"
             :style="{
               'vector-effect': 'non-scaling-stroke',
-              'stroke-width': '5',
+              'stroke-width': '3',
               'stroke-linecap': 'round',
               'vector-effect': 'non-scaling-stroke',
               'stroke': (p === activePoint) ? 'magenta' : '#ffffffaa'
@@ -243,42 +189,23 @@
             onMouseOut="this.style.strokeWidth=5;"
             :data-index="index"
             :x1="p[1]"
-            :y1="p[0]"
+            :y1="1"
             :x2="p[1]"
-            :y2="p[0]"
+            :y2="0"
             fill="red"/>
 
           <!-- the animation curve -->
-          <path :d="path" style="
+          <!-- <path :d="path" style="
             fill: none;
             stroke: #ffffff99;
             stroke-width: 1;
             vector-effect: non-scaling-stroke;
-            pointer-events: none;"/>
+            pointer-events: none;"/> -->
 
         </g>
 
       </svg>
 
-      <!-- min and max values at the top and bottom of the workspace -->
-      <div style="
-        color: cyan;
-        position: absolute;
-        top: 1;
-        right: 0;
-        font-size: 0.75em;
-        user-select: none;">
-        {{max}}
-      </div>
-      <div style="
-        color: cyan;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        font-size: 0.75em;
-        user-select: none;">
-        {{min}}
-      </div>
     </div>
   </div>
 </template>
@@ -286,6 +213,7 @@
 <script>
 import {mapLinear, lerp, clamp} from './Composer/Utils'
 import Curve from './Composer/Curve'
+import StringCurve from './Composer/StringCurve'
 import eases from './Composer/eases'
 
 const easeTypes = Object.keys(eases)
@@ -321,7 +249,7 @@ export default {
       mouseDown: false,
       dragged: false,
       easeTypes: easeTypes,
-      min: -1,
+      min: 0,
       max: 1,
       isMouseOver: false,
       mouse: {x: 0, y: 0},
@@ -331,8 +259,10 @@ export default {
   },
 
   mounted () {
-    this.min = this.curve.getMinValue()
-    this.max = this.curve.getMaxValue()
+
+    console.log( "string curve editor mounted" );
+    this.min = 0
+    this.max = 1
   },
 
   methods: {
@@ -345,7 +275,7 @@ export default {
       var p = 'M'
 
       for(var i=0; i<=w; i+=1) {
-        p += `${i/w} ${this.curve.sample(i/w, false)} `
+        p += `${i/w} 0.5 `
       }
 
       return p
@@ -356,7 +286,7 @@ export default {
     },
 
     getViewBox() {
-      return `0 ${this.min} 1 ${Math.abs(this.max - this.min)}`
+      return `0 0 1 1`
     },
 
     getTransform() {
@@ -367,7 +297,7 @@ export default {
 
       //center
       var cx = 0.5
-      var cy = (this.max + this.min) * 0.5
+      var cy = 0.5
 
       return `matrix(${sx}, 0, 0, ${sy}, ${cx-sx*cx}, ${cy-sy*cy})`
     },
@@ -391,12 +321,8 @@ export default {
 
         switch( e.target.name ) {
           case 'value':
-            var val = Number(e.target.value)
+            var val = String(e.target.value)
             this.activePoint[0] = val
-
-            this.min = Math.min(val, this.min)
-            this.max = Math.max(val, this.max)
-
             break;
           case 'position':
             this.activePoint[1] = Number(e.target.value)
@@ -414,11 +340,11 @@ export default {
 
     onRangeChange(e) {
 
-      if(e.target.name === 'low') {
-        this.min = Number(e.target.value)
-      } else {
-        this.max = Number(e.target.value)
-      }
+      // if(e.target.name === 'low') {
+      //   this.min = Number(e.target.value)
+      // } else {
+      //   this.max = Number(e.target.value)
+      // }
       this.$forceUpdate()
     },
 
@@ -441,7 +367,7 @@ export default {
       var x = e.offsetX // e.clientX - bb.x //
       var y = e.offsetY // e.clientY - bb.y //
       var u = mapLinear(x, 0, bb.width, 0, 1)
-      var v = mapLinear(y, 0, bb.height, this.max, this.min)
+      var v = 0.5 //  mapLinear(y, 0, bb.height, this.max, this.min)
 
       return {
         x: Number(u.toFixed(4)),
@@ -495,7 +421,7 @@ export default {
         var pos = this.getEventPosition(e)
 
         this.activePoint[1] = pos.x
-        this.activePoint[0] = pos.y
+        // this.activePoint[0] = pos.y
 
         this.curve.sortPoints()
 
@@ -513,7 +439,7 @@ export default {
 
           var pos = this.getEventPosition(e)
 
-          var p = this.curve.addPoint(pos.y, pos.x)
+          var p = this.curve.addPoint('value', pos.x)
 
           this.activePoint = p
 

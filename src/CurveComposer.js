@@ -6,6 +6,7 @@
 import Vue from 'vue';
 import App from './App';
 import Curve from './Composer/Curve'
+import StringCurve from './Composer/StringCurve'
 
 // import { readFileSync } from 'fs';
 // const rawStylz = readFileSync(__dirname + '/CurveComposer.css', 'utf-8');
@@ -32,6 +33,8 @@ module.exports = {
 
   setup: CurveComposer,
 
-  curve: Curve
+  curve: Curve,
+
+  stringCurve: StringCurve
 
 }
