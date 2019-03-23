@@ -13,45 +13,18 @@
       width: 100%;
       background: #00000044;">
 
-      <!-- toggle expand button -->
-      <svg
-      @click="onToggle"
-      style="
-        position: absolute;
-        right: 3;
-        top: 3;
-        width: 14px;
-        height: 14px;
-        stroke: white;
-        stroke-width: 1;
-        fill: #00000055">
-
-        <circle r="6" cx="7" cy="7" stroke="white" fill="inherit"/>
-
-        <line
-          style="
-            fill: none;
-            stroke: #ffffff99;
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;"
-          x1="3" y1="7" x2="11" y2="7" />
-        <line
-          style="
-            fill: none;
-            stroke: #ffffff99;
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;"
-          v-if="!isShown" y1="3" x1="7" y2="11" x2="7" />
-
-      </svg>
-
       <!-- curve name and inputs -->
-      <div
-        v-if="isShown"
-        style="
-          padding-top: 6px;
-          min-height: 22px;
-          border: solid 1px #ffffff44;">
+      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex;">
+
+        <EditorButton
+          :offSymbol="'−'"
+          :symbol="'+'"
+          :isToggled="isShown"
+          :onClick.stop='onToggle'></EditorButton>
+
+        <EditorButton
+          :onClick="deleteCurveDialogue"
+          :symbol="'×'"></EditorButton>
 
           <input
             type="text"
@@ -59,29 +32,12 @@
             style="
               border: none;
               background: #00000000;
-              color: white;"
+              color: white;
+              margin-left: 1em;"
             :value="curve.name"
             @change="onCurveTitleChange">
-        <!-- <div style="width: 100%; font-size: 0.75em;">
-          {{curve.name}} {{ curve.currentSample }}
-        </div> -->
 
-        <label v-if="activePoint">value</label>
-        <input
-          v-if="activePoint"
-          style="
-            color: cyan;
-            margin-right: 10px;
-            background: #00000099;
-            border: none;"
-          type="text"
-          name="value"
-          :value="activePoint[0]"
-          @change="onPointChange"
-          @focus="onInputFocus"
-          @blur="onInputBlur">
-
-        <label v-if="activePoint">u:</label>
+        <label style="font-size: 0.75em" v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
           style="
@@ -97,21 +53,46 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
+
+        <label style="font-size: 0.75em" v-if="activePoint">value:</label>
+        <input
+          v-if="activePoint"
+          style="
+            color: cyan;
+            margin-right: 10px;
+            background: #00000099;
+            border: none;"
+          type="text"
+          name="value"
+          :value="activePoint[0]"
+          @change="onPointChange"
+          @focus="onInputFocus"
+          @blur="onInputBlur">
+
       </div>
-      <label
-        v-else
-        style="
-          padding-top: 6px;
-          min-height: 22px;
-          border: solid 1px #ffffff44;"> {{curve.name}} </label>
+      <div v-else style="border: solid 1px #ffffff44; display: flex;">
+
+        <EditorButton
+          :offSymbol="'−'"
+          :symbol="'+'"
+          :isToggled="isShown"
+          :onClick='onToggle'></EditorButton>
+        <div style="
+          color: white;
+          margin-left: 1em;
+          font-size: 1em;">
+          {{curve.name}}
+        </div>
+      </div>
+
     </div>
 
     <div
+      v-if="isShown"
       tabIndex=1
       name="workspace"
       @keyup.delete="onDelete"
       @mouseleave="onMouseLeave"
-      v-if="isShown"
       style="
         position: relative;
         height: 100px;
@@ -174,12 +155,26 @@
             <rect v-else
               :x="p[1]"
               y="0"
-              :width="end - p[1]"
+              :width="Math.abs(end - p[1])"
               height="1"
               style="pointer-events: none; stroke: none; fill: #ffffff44"
               />
 
           </g>
+
+          <!-- current sample crosshairs -->
+          <line
+            v-if="bUpdateCrosshairs"
+            style="
+              stroke: #000000ff;
+              fill: none;
+              stroke-width: 1.5;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
+            :x1="curve.currentPosition"
+            :y1="0"
+            :x2="curve.currentPosition"
+            :y2="1" />
 
           <line
             v-for="(p, index) in curve.points"
@@ -202,10 +197,9 @@
           <g v-for="(p, index) in curve.points"
             :transform="getTextTransform(p)">
             <text
-              v-if="isMounted"
               :style="{
                 'user-select': 'none',
-                'pointer-events': 'none',
+                'pointerEvents': 'none',
                 'stroke': (p === activePoint) ? 'cyan' : '#ffffffaa'
               }">
               {{p[0]}}
@@ -221,11 +215,8 @@
 
 <script>
 import {mapLinear, lerp, clamp} from './Composer/Utils'
-import Curve from './Composer/Curve'
 import StringCurve from './Composer/StringCurve'
-import eases from './Composer/eases'
-
-const easeTypes = Object.keys(eases)
+import EditorButton from './EditorButton'
 
 const defaultCurve = () => (new Curve())
 
@@ -266,6 +257,10 @@ export default {
     }
   },
 
+  components: {
+    EditorButton
+  },
+
   data() {
     return {
       isShown: true,
@@ -273,13 +268,13 @@ export default {
       activePoint: null,
       mouseDown: false,
       dragged: false,
-      easeTypes: easeTypes,
       min: 0,
       max: 1,
       isMouseOver: false,
       mouse: {x: 0, y: 0},
       path: this.getPath(),
-      bUpdateCrosshairs: true
+      bUpdateCrosshairs: true,
+      boundbox: {x: 0, y: 0, width: 1, height: 1}
     }
   },
 
@@ -287,6 +282,11 @@ export default {
     this.min = 0
     this.max = 1
     this.isMounted = true
+
+
+    var wtf = this.$el.querySelector('[name="workspace"]')
+    this.boundbox = wtf.getBoundingClientRect()
+    console.log( this.boundbox, this.$el.querySelector('[name="workspace"]') );
   },
 
   methods: {
@@ -329,20 +329,12 @@ export default {
 
     getTextTransform(p){
 
-      if(this.isMounted) {
-        var el = this.$el.querySelector('[name=workspace]')
-        var bb = el.getBoundingClientRect()
+      var bb = this.boundbox
+      var scl = 0.005 * this.textScale
+      var xScl = (this.end - this.start) * scl * bb.height / bb.width
+      var yScl = -scl
 
-        var scl = 0.005 * this.textScale
-        var xScl = (this.end - this.start) * scl * bb.height / bb.width
-        var yScl = -scl
-
-        return `translate(${p[1] + scl}, ${1 - scl}) scale(${xScl},${yScl}) rotate(90)`
-      } else {
-        return ''
-      }
-
-
+      return `translate(${p[1] + xScl * 6}, ${1 + yScl * 3}) scale(${xScl},${yScl}) rotate(90)`
     },
 
     onDelete(e) {
@@ -370,9 +362,6 @@ export default {
           case 'position':
             this.activePoint[1] = Number(e.target.value)
             break
-          case 'eases':
-            this.activePoint[2] = e.target.value
-            break;
         }
 
         this.curve.sortPoints()
@@ -380,16 +369,6 @@ export default {
       }
 
     },
-
-    // onRangeChange(e) {
-
-    //   // if(e.target.name === 'low') {
-    //   //   this.min = Number(e.target.value)
-    //   // } else {
-    //   //   this.max = Number(e.target.value)
-    //   // }
-    //   this.$forceUpdate()
-    // },
 
     onInputFocus(e) {
       this.bUpdateCrosshairs = false
@@ -405,8 +384,13 @@ export default {
     },
 
     getEventPosition(e) {
-      var el = this.$el.querySelector('[name=workspace]')
-      var bb = el.getBoundingClientRect()
+
+      if(this.isMounted && this.$el) {
+        var el = this.$el.querySelector('[name="workspace"]')
+        this.boundbox = el.getBoundingClientRect()
+      }
+
+      var bb = this.boundbox
       var x = e.offsetX
       var y = e.offsetY
       var u = mapLinear(x, 0, bb.width, this.start, this.end)
@@ -476,6 +460,8 @@ export default {
       this.curve.name = e.target.value
     },
 
+
+
     handleClick(e) {
 
       var el = e.target
@@ -492,9 +478,16 @@ export default {
 
           this.updatePath()
         }
-
       }
+    },
 
+    deleteCurveDialogue(e) {
+
+      if (window.confirm("delete this curve?")) {
+        var crv = this.curve
+        var curves = this.$parent.curves
+        curves.splice(curves.indexOf(crv), 1)
+      }
     }
 
   }

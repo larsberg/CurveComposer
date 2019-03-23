@@ -7767,7 +7767,415 @@ if (inBrowser) {
 /*  */
 
 exports.default = Vue;
-},{}],"Composer/Utils.js":[function(require,module,exports) {
+},{}],"../node_modules/vue-hot-reload-api/dist/index.js":[function(require,module,exports) {
+var Vue // late bind
+var version
+var map = Object.create(null)
+if (typeof window !== 'undefined') {
+  window.__VUE_HOT_MAP__ = map
+}
+var installed = false
+var isBrowserify = false
+var initHookName = 'beforeCreate'
+
+exports.install = function (vue, browserify) {
+  if (installed) { return }
+  installed = true
+
+  Vue = vue.__esModule ? vue.default : vue
+  version = Vue.version.split('.').map(Number)
+  isBrowserify = browserify
+
+  // compat with < 2.0.0-alpha.7
+  if (Vue.config._lifecycleHooks.indexOf('init') > -1) {
+    initHookName = 'init'
+  }
+
+  exports.compatible = version[0] >= 2
+  if (!exports.compatible) {
+    console.warn(
+      '[HMR] You are using a version of vue-hot-reload-api that is ' +
+        'only compatible with Vue.js core ^2.0.0.'
+    )
+    return
+  }
+}
+
+/**
+ * Create a record for a hot module, which keeps track of its constructor
+ * and instances
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+exports.createRecord = function (id, options) {
+  if(map[id]) { return }
+
+  var Ctor = null
+  if (typeof options === 'function') {
+    Ctor = options
+    options = Ctor.options
+  }
+  makeOptionsHot(id, options)
+  map[id] = {
+    Ctor: Ctor,
+    options: options,
+    instances: []
+  }
+}
+
+/**
+ * Check if module is recorded
+ *
+ * @param {String} id
+ */
+
+exports.isRecorded = function (id) {
+  return typeof map[id] !== 'undefined'
+}
+
+/**
+ * Make a Component options object hot.
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+function makeOptionsHot(id, options) {
+  if (options.functional) {
+    var render = options.render
+    options.render = function (h, ctx) {
+      var instances = map[id].instances
+      if (ctx && instances.indexOf(ctx.parent) < 0) {
+        instances.push(ctx.parent)
+      }
+      return render(h, ctx)
+    }
+  } else {
+    injectHook(options, initHookName, function() {
+      var record = map[id]
+      if (!record.Ctor) {
+        record.Ctor = this.constructor
+      }
+      record.instances.push(this)
+    })
+    injectHook(options, 'beforeDestroy', function() {
+      var instances = map[id].instances
+      instances.splice(instances.indexOf(this), 1)
+    })
+  }
+}
+
+/**
+ * Inject a hook to a hot reloadable component so that
+ * we can keep track of it.
+ *
+ * @param {Object} options
+ * @param {String} name
+ * @param {Function} hook
+ */
+
+function injectHook(options, name, hook) {
+  var existing = options[name]
+  options[name] = existing
+    ? Array.isArray(existing) ? existing.concat(hook) : [existing, hook]
+    : [hook]
+}
+
+function tryWrap(fn) {
+  return function (id, arg) {
+    try {
+      fn(id, arg)
+    } catch (e) {
+      console.error(e)
+      console.warn(
+        'Something went wrong during Vue component hot-reload. Full reload required.'
+      )
+    }
+  }
+}
+
+function updateOptions (oldOptions, newOptions) {
+  for (var key in oldOptions) {
+    if (!(key in newOptions)) {
+      delete oldOptions[key]
+    }
+  }
+  for (var key$1 in newOptions) {
+    oldOptions[key$1] = newOptions[key$1]
+  }
+}
+
+exports.rerender = tryWrap(function (id, options) {
+  var record = map[id]
+  if (!options) {
+    record.instances.slice().forEach(function (instance) {
+      instance.$forceUpdate()
+    })
+    return
+  }
+  if (typeof options === 'function') {
+    options = options.options
+  }
+  if (record.Ctor) {
+    record.Ctor.options.render = options.render
+    record.Ctor.options.staticRenderFns = options.staticRenderFns
+    record.instances.slice().forEach(function (instance) {
+      instance.$options.render = options.render
+      instance.$options.staticRenderFns = options.staticRenderFns
+      // reset static trees
+      // pre 2.5, all static trees are cached together on the instance
+      if (instance._staticTrees) {
+        instance._staticTrees = []
+      }
+      // 2.5.0
+      if (Array.isArray(record.Ctor.options.cached)) {
+        record.Ctor.options.cached = []
+      }
+      // 2.5.3
+      if (Array.isArray(instance.$options.cached)) {
+        instance.$options.cached = []
+      }
+
+      // post 2.5.4: v-once trees are cached on instance._staticTrees.
+      // Pure static trees are cached on the staticRenderFns array
+      // (both already reset above)
+
+      // 2.6: temporarily mark rendered scoped slots as unstable so that
+      // child components can be forced to update
+      var restore = patchScopedSlots(instance)
+      instance.$forceUpdate()
+      instance.$nextTick(restore)
+    })
+  } else {
+    // functional or no instance created yet
+    record.options.render = options.render
+    record.options.staticRenderFns = options.staticRenderFns
+
+    // handle functional component re-render
+    if (record.options.functional) {
+      // rerender with full options
+      if (Object.keys(options).length > 2) {
+        updateOptions(record.options, options)
+      } else {
+        // template-only rerender.
+        // need to inject the style injection code for CSS modules
+        // to work properly.
+        var injectStyles = record.options._injectStyles
+        if (injectStyles) {
+          var render = options.render
+          record.options.render = function (h, ctx) {
+            injectStyles.call(ctx)
+            return render(h, ctx)
+          }
+        }
+      }
+      record.options._Ctor = null
+      // 2.5.3
+      if (Array.isArray(record.options.cached)) {
+        record.options.cached = []
+      }
+      record.instances.slice().forEach(function (instance) {
+        instance.$forceUpdate()
+      })
+    }
+  }
+})
+
+exports.reload = tryWrap(function (id, options) {
+  var record = map[id]
+  if (options) {
+    if (typeof options === 'function') {
+      options = options.options
+    }
+    makeOptionsHot(id, options)
+    if (record.Ctor) {
+      if (version[1] < 2) {
+        // preserve pre 2.2 behavior for global mixin handling
+        record.Ctor.extendOptions = options
+      }
+      var newCtor = record.Ctor.super.extend(options)
+      record.Ctor.options = newCtor.options
+      record.Ctor.cid = newCtor.cid
+      record.Ctor.prototype = newCtor.prototype
+      if (newCtor.release) {
+        // temporary global mixin strategy used in < 2.0.0-alpha.6
+        newCtor.release()
+      }
+    } else {
+      updateOptions(record.options, options)
+    }
+  }
+  record.instances.slice().forEach(function (instance) {
+    if (instance.$vnode && instance.$vnode.context) {
+      instance.$vnode.context.$forceUpdate()
+    } else {
+      console.warn(
+        'Root or manually mounted instance modified. Full reload required.'
+      )
+    }
+  })
+})
+
+// 2.6 optimizes template-compiled scoped slots and skips updates if child
+// only uses scoped slots. We need to patch the scoped slots resolving helper
+// to temporarily mark all scoped slots as unstable in order to force child
+// updates.
+function patchScopedSlots (instance) {
+  if (!instance._u) { return }
+  // https://github.com/vuejs/vue/blob/dev/src/core/instance/render-helpers/resolve-scoped-slots.js
+  var original = instance._u
+  instance._u = function (slots) {
+    try {
+      // 2.6.4 ~ 2.6.6
+      return original(slots, true)
+    } catch (e) {
+      // 2.5 / >= 2.6.7
+      return original(slots, null, true)
+    }
+  }
+  return function () {
+    instance._u = original
+  }
+}
+
+},{}],"EditorButton.vue":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+exports.default = {
+  props: {
+    symbol: {
+      type: String,
+      default: '×'
+    },
+    offSymbol: {
+      type: String,
+      default: '×'
+    },
+    isToggled: {
+      type: Boolean,
+      default: false
+    },
+    onClick: {
+      type: Function,
+      default: console.log
+    },
+    size: {
+      type: Number,
+      default: 11
+    }
+  }
+};
+        var $6d822f = exports.default || module.exports;
+      
+      if (typeof $6d822f === 'function') {
+        $6d822f = $6d822f.options;
+      }
+    
+        /* template */
+        Object.assign($6d822f, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    {
+      style: {
+        margin: "3px",
+        border: "white solid 1px",
+        borderRadius: "0%",
+        width: "16px",
+        height: "16px",
+        position: "relative",
+        userSelect: "none",
+        background: "grey"
+      },
+      on: {
+        click: function($event) {
+          $event.stopPropagation()
+          return _vm.onClick($event)
+        }
+      }
+    },
+    [
+      _c(
+        "div",
+        {
+          staticStyle: {
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)"
+          }
+        },
+        [_vm._v(_vm._s(_vm.isToggled ? _vm.offSymbol : _vm.symbol) + "\n  ")]
+      )
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$6d822f', $6d822f);
+          } else {
+            api.reload('$6d822f', $6d822f);
+          }
+        }
+
+        
+      }
+    })();
+},{"vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"Composer/Utils.js":[function(require,module,exports) {
 // Utils.js
 
 // Linear mapping from range <a1, a2> to range <b1, b2>
@@ -8153,285 +8561,16 @@ var Curve = function () {
 }();
 
 module.exports = Curve;
-},{"./Utils":"Composer/Utils.js","./eases":"Composer/eases.js"}],"../node_modules/vue-hot-reload-api/dist/index.js":[function(require,module,exports) {
-var Vue // late bind
-var version
-var map = Object.create(null)
-if (typeof window !== 'undefined') {
-  window.__VUE_HOT_MAP__ = map
-}
-var installed = false
-var isBrowserify = false
-var initHookName = 'beforeCreate'
-
-exports.install = function (vue, browserify) {
-  if (installed) { return }
-  installed = true
-
-  Vue = vue.__esModule ? vue.default : vue
-  version = Vue.version.split('.').map(Number)
-  isBrowserify = browserify
-
-  // compat with < 2.0.0-alpha.7
-  if (Vue.config._lifecycleHooks.indexOf('init') > -1) {
-    initHookName = 'init'
-  }
-
-  exports.compatible = version[0] >= 2
-  if (!exports.compatible) {
-    console.warn(
-      '[HMR] You are using a version of vue-hot-reload-api that is ' +
-        'only compatible with Vue.js core ^2.0.0.'
-    )
-    return
-  }
-}
-
-/**
- * Create a record for a hot module, which keeps track of its constructor
- * and instances
- *
- * @param {String} id
- * @param {Object} options
- */
-
-exports.createRecord = function (id, options) {
-  if(map[id]) { return }
-
-  var Ctor = null
-  if (typeof options === 'function') {
-    Ctor = options
-    options = Ctor.options
-  }
-  makeOptionsHot(id, options)
-  map[id] = {
-    Ctor: Ctor,
-    options: options,
-    instances: []
-  }
-}
-
-/**
- * Check if module is recorded
- *
- * @param {String} id
- */
-
-exports.isRecorded = function (id) {
-  return typeof map[id] !== 'undefined'
-}
-
-/**
- * Make a Component options object hot.
- *
- * @param {String} id
- * @param {Object} options
- */
-
-function makeOptionsHot(id, options) {
-  if (options.functional) {
-    var render = options.render
-    options.render = function (h, ctx) {
-      var instances = map[id].instances
-      if (ctx && instances.indexOf(ctx.parent) < 0) {
-        instances.push(ctx.parent)
-      }
-      return render(h, ctx)
-    }
-  } else {
-    injectHook(options, initHookName, function() {
-      var record = map[id]
-      if (!record.Ctor) {
-        record.Ctor = this.constructor
-      }
-      record.instances.push(this)
-    })
-    injectHook(options, 'beforeDestroy', function() {
-      var instances = map[id].instances
-      instances.splice(instances.indexOf(this), 1)
-    })
-  }
-}
-
-/**
- * Inject a hook to a hot reloadable component so that
- * we can keep track of it.
- *
- * @param {Object} options
- * @param {String} name
- * @param {Function} hook
- */
-
-function injectHook(options, name, hook) {
-  var existing = options[name]
-  options[name] = existing
-    ? Array.isArray(existing) ? existing.concat(hook) : [existing, hook]
-    : [hook]
-}
-
-function tryWrap(fn) {
-  return function (id, arg) {
-    try {
-      fn(id, arg)
-    } catch (e) {
-      console.error(e)
-      console.warn(
-        'Something went wrong during Vue component hot-reload. Full reload required.'
-      )
-    }
-  }
-}
-
-function updateOptions (oldOptions, newOptions) {
-  for (var key in oldOptions) {
-    if (!(key in newOptions)) {
-      delete oldOptions[key]
-    }
-  }
-  for (var key$1 in newOptions) {
-    oldOptions[key$1] = newOptions[key$1]
-  }
-}
-
-exports.rerender = tryWrap(function (id, options) {
-  var record = map[id]
-  if (!options) {
-    record.instances.slice().forEach(function (instance) {
-      instance.$forceUpdate()
-    })
-    return
-  }
-  if (typeof options === 'function') {
-    options = options.options
-  }
-  if (record.Ctor) {
-    record.Ctor.options.render = options.render
-    record.Ctor.options.staticRenderFns = options.staticRenderFns
-    record.instances.slice().forEach(function (instance) {
-      instance.$options.render = options.render
-      instance.$options.staticRenderFns = options.staticRenderFns
-      // reset static trees
-      // pre 2.5, all static trees are cached together on the instance
-      if (instance._staticTrees) {
-        instance._staticTrees = []
-      }
-      // 2.5.0
-      if (Array.isArray(record.Ctor.options.cached)) {
-        record.Ctor.options.cached = []
-      }
-      // 2.5.3
-      if (Array.isArray(instance.$options.cached)) {
-        instance.$options.cached = []
-      }
-
-      // post 2.5.4: v-once trees are cached on instance._staticTrees.
-      // Pure static trees are cached on the staticRenderFns array
-      // (both already reset above)
-
-      // 2.6: temporarily mark rendered scoped slots as unstable so that
-      // child components can be forced to update
-      var restore = patchScopedSlots(instance)
-      instance.$forceUpdate()
-      instance.$nextTick(restore)
-    })
-  } else {
-    // functional or no instance created yet
-    record.options.render = options.render
-    record.options.staticRenderFns = options.staticRenderFns
-
-    // handle functional component re-render
-    if (record.options.functional) {
-      // rerender with full options
-      if (Object.keys(options).length > 2) {
-        updateOptions(record.options, options)
-      } else {
-        // template-only rerender.
-        // need to inject the style injection code for CSS modules
-        // to work properly.
-        var injectStyles = record.options._injectStyles
-        if (injectStyles) {
-          var render = options.render
-          record.options.render = function (h, ctx) {
-            injectStyles.call(ctx)
-            return render(h, ctx)
-          }
-        }
-      }
-      record.options._Ctor = null
-      // 2.5.3
-      if (Array.isArray(record.options.cached)) {
-        record.options.cached = []
-      }
-      record.instances.slice().forEach(function (instance) {
-        instance.$forceUpdate()
-      })
-    }
-  }
-})
-
-exports.reload = tryWrap(function (id, options) {
-  var record = map[id]
-  if (options) {
-    if (typeof options === 'function') {
-      options = options.options
-    }
-    makeOptionsHot(id, options)
-    if (record.Ctor) {
-      if (version[1] < 2) {
-        // preserve pre 2.2 behavior for global mixin handling
-        record.Ctor.extendOptions = options
-      }
-      var newCtor = record.Ctor.super.extend(options)
-      record.Ctor.options = newCtor.options
-      record.Ctor.cid = newCtor.cid
-      record.Ctor.prototype = newCtor.prototype
-      if (newCtor.release) {
-        // temporary global mixin strategy used in < 2.0.0-alpha.6
-        newCtor.release()
-      }
-    } else {
-      updateOptions(record.options, options)
-    }
-  }
-  record.instances.slice().forEach(function (instance) {
-    if (instance.$vnode && instance.$vnode.context) {
-      instance.$vnode.context.$forceUpdate()
-    } else {
-      console.warn(
-        'Root or manually mounted instance modified. Full reload required.'
-      )
-    }
-  })
-})
-
-// 2.6 optimizes template-compiled scoped slots and skips updates if child
-// only uses scoped slots. We need to patch the scoped slots resolving helper
-// to temporarily mark all scoped slots as unstable in order to force child
-// updates.
-function patchScopedSlots (instance) {
-  if (!instance._u) { return }
-  // https://github.com/vuejs/vue/blob/dev/src/core/instance/render-helpers/resolve-scoped-slots.js
-  var original = instance._u
-  instance._u = function (slots) {
-    try {
-      // 2.6.4 ~ 2.6.6
-      return original(slots, true)
-    } catch (e) {
-      // 2.5 / >= 2.6.7
-      return original(slots, null, true)
-    }
-  }
-  return function () {
-    instance._u = original
-  }
-}
-
-},{}],"CurveEditor.vue":[function(require,module,exports) {
+},{"./Utils":"Composer/Utils.js","./eases":"Composer/eases.js"}],"CurveEditor.vue":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _EditorButton = require('./EditorButton');
+
+var _EditorButton2 = _interopRequireDefault(_EditorButton);
 
 var _Utils = require('./Composer/Utils');
 
@@ -8445,7 +8584,6 @@ var _eases2 = _interopRequireDefault(_eases);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var easeTypes = Object.keys(_eases2.default); //
 //
 //
 //
@@ -8527,1022 +8665,6 @@ var easeTypes = Object.keys(_eases2.default); //
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-var defaultCurve = function defaultCurve() {
-  return new _Curve2.default();
-};
-
-exports.default = {
-
-  name: 'curve',
-
-  props: {
-
-    w: {
-      type: Number,
-      default: window.innerWidth
-    },
-
-    h: {
-      type: Number,
-      default: 100
-    },
-
-    curve: {
-      type: Object,
-      default: defaultCurve
-    },
-
-    start: {
-      type: Number,
-      default: 0
-    },
-
-    end: {
-      type: Number,
-      default: 1
-    }
-  },
-
-  data: function data() {
-    return {
-      isShown: true,
-      activePoint: null,
-      mouseDown: false,
-      dragged: false,
-      easeTypes: easeTypes,
-      min: -1,
-      max: 1,
-      isMouseOver: false,
-      mouse: { x: 0, y: 0 },
-      path: this.getPath(),
-      bUpdateCrosshairs: true
-    };
-  },
-  mounted: function mounted() {
-    this.min = this.curve.getMinValue();
-    this.max = this.curve.getMaxValue();
-    console.log(this.start, this.end);
-  },
-
-
-  methods: {
-
-    mapLinear: _Utils.mapLinear,
-
-    getPath: function getPath() {
-
-      var w = this.w;
-      var p = 'M';
-
-      for (var i = 0, u = 0; i <= w; i += 1) {
-        u = (0, _Utils.mapLinear)(i, 0, w, this.start, this.end);
-        p += u + ' ' + this.curve.sample(u, false) + ' ';
-      }
-
-      return p;
-    },
-
-    updatePath: function updatePath() {
-      this.path = this.getPath();
-    },
-    getViewBox: function getViewBox() {
-      // min-x min-y width height
-      return this.start + ' ' + this.min + ' ' + Math.abs(this.end - this.start) + ' ' + Math.abs(this.max - this.min);
-    },
-    getTransform: function getTransform() {
-
-      // scale (we're flipping it vertically)
-      var sx = 1;
-      var sy = -1;
-
-      //center
-      var cx = 0.5;
-      var cy = (this.max + this.min) * 0.5;
-
-      return 'matrix(' + sx + ', 0, 0, ' + sy + ', ' + (cx - sx * cx) + ', ' + (cy - sy * cy) + ')';
-    },
-    onDelete: function onDelete(e) {
-
-      if (this.activePoint) {
-        this.curve.findAndRemove(this.activePoint);
-        this.activePoint = null;
-        this.updatePath();
-      }
-    },
-    onToggle: function onToggle(e) {
-      this.isShown = !this.isShown;
-    },
-    onPointChange: function onPointChange(e) {
-
-      if (this.activePoint) {
-
-        switch (e.target.name) {
-          case 'value':
-            var val = Number(e.target.value);
-            this.activePoint[0] = val;
-
-            this.min = Math.min(val, this.min);
-            this.max = Math.max(val, this.max);
-
-            break;
-          case 'position':
-            this.activePoint[1] = Number(e.target.value);
-            break;
-          case 'eases':
-            this.activePoint[2] = e.target.value;
-            break;
-        }
-
-        this.curve.sortPoints();
-        this.updatePath();
-      }
-    },
-    onRangeChange: function onRangeChange(e) {
-
-      if (e.target.name === 'low') {
-        this.min = Number(e.target.value);
-      } else {
-        this.max = Number(e.target.value);
-      }
-      this.$forceUpdate();
-    },
-    onInputFocus: function onInputFocus(e) {
-      this.bUpdateCrosshairs = false;
-    },
-    onInputBlur: function onInputBlur(e) {
-      this.bUpdateCrosshairs = true;
-    },
-    onMouseUp: function onMouseUp(e) {
-      this.mouseDown = false;
-      this.dragged = false;
-    },
-    onCurveTitleChange: function onCurveTitleChange(e) {
-      console.log(e.target.value);
-      this.curve.name = e.target.value;
-    },
-    getEventPosition: function getEventPosition(e) {
-      var el = this.$el.querySelector('[name=workspace]');
-      var bb = el.getBoundingClientRect();
-      var x = e.offsetX; // e.clientX - bb.x //
-      var y = e.offsetY; // e.clientY - bb.y //
-
-      var u = (0, _Utils.mapLinear)(x, 0, bb.width, this.start, this.end);
-      var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
-
-      return {
-        x: Number(u.toFixed(4)),
-        y: Number(v.toFixed(4))
-      };
-    },
-    onMouseDown: function onMouseDown(e) {
-
-      this.mouseDown = true;
-
-      if (e.target.tagName === "line") {
-
-        e.stopPropagation();
-
-        var index = Number(e.target.dataset.index);
-
-        this.activePoint = this.curve.points[index];
-
-        this.$forceUpdate();
-      } else {
-
-        this.activePoint = null;
-      }
-    },
-    onMouseLeave: function onMouseLeave(e) {
-      this.isMouseOver = false;
-    },
-    onMouseMove: function onMouseMove(e) {
-
-      this.isMouseOver = true;
-
-      var pos = this.getEventPosition(e);
-      this.mouse.x = pos.x;
-      this.mouse.y = pos.y;
-
-      if (this.mouseDown && !e.metaKey) {
-        this.dragged = true;
-        this.onDrag(e);
-      }
-    },
-    onDrag: function onDrag(e) {
-
-      if (this.activePoint) {
-
-        var pos = this.getEventPosition(e);
-
-        this.activePoint[1] = pos.x;
-        this.activePoint[0] = pos.y;
-
-        this.curve.sortPoints();
-
-        this.updatePath();
-      }
-    },
-    handleClick: function handleClick(e) {
-
-      var el = e.target;
-
-      if (el.tagName === 'svg') {
-
-        if (!this.dragged && e.metaKey) {
-
-          var pos = this.getEventPosition(e);
-
-          var p = this.curve.addPoint(pos.y, pos.x);
-
-          this.activePoint = p;
-
-          this.updatePath();
-        }
-      }
-    }
-  }
-
-};
-        var $739f47 = exports.default || module.exports;
-      
-      if (typeof $739f47 === 'function') {
-        $739f47 = $739f47.options;
-      }
-    
-        /* template */
-        Object.assign($739f47, (function () {
-          var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    {
-      staticStyle: {
-        position: "relative",
-        width: "calc(100%-4)",
-        "border-bottom": "#ffffffaa solid 0.5px"
-      }
-    },
-    [
-      _c(
-        "div",
-        {
-          staticStyle: {
-            position: "relative",
-            "min-height": "20px",
-            width: "100%",
-            background: "#00000044"
-          }
-        },
-        [
-          _c(
-            "svg",
-            {
-              staticStyle: {
-                position: "absolute",
-                right: "3",
-                top: "3",
-                width: "14px",
-                height: "14px",
-                stroke: "white",
-                "stroke-width": "1",
-                fill: "#00000055"
-              },
-              on: { click: _vm.onToggle }
-            },
-            [
-              _c("circle", {
-                attrs: {
-                  r: "6",
-                  cx: "7",
-                  cy: "7",
-                  stroke: "white",
-                  fill: "inherit"
-                }
-              }),
-              _vm._v(" "),
-              _c("line", {
-                staticStyle: {
-                  fill: "none",
-                  stroke: "#ffffff99",
-                  "stroke-width": "1",
-                  "vector-effect": "non-scaling-stroke"
-                },
-                attrs: { x1: "3", y1: "7", x2: "11", y2: "7" }
-              }),
-              _vm._v(" "),
-              !_vm.isShown
-                ? _c("line", {
-                    staticStyle: {
-                      fill: "none",
-                      stroke: "#ffffff99",
-                      "stroke-width": "1",
-                      "vector-effect": "non-scaling-stroke"
-                    },
-                    attrs: { y1: "3", x1: "7", y2: "11", x2: "7" }
-                  })
-                : _vm._e()
-            ]
-          ),
-          _vm._v(" "),
-          _vm.isShown
-            ? _c(
-                "div",
-                {
-                  staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
-                  }
-                },
-                [
-                  _c("input", {
-                    staticStyle: {
-                      border: "none",
-                      background: "#00000000",
-                      color: "white"
-                    },
-                    attrs: { type: "text", name: "curveName" },
-                    domProps: { value: _vm.curve.name },
-                    on: { change: _vm.onCurveTitleChange }
-                  }),
-                  _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
-                    _vm._v("hi:")
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticStyle: {
-                      color: "#ff00ff",
-                      width: "5em",
-                      "margin-right": "10px",
-                      background: "#00000099",
-                      border: "none"
-                    },
-                    attrs: { type: "number", name: "hi", step: "0.001" },
-                    domProps: { value: _vm.max },
-                    on: {
-                      change: _vm.onRangeChange,
-                      focus: _vm.onInputFocus,
-                      blur: _vm.onInputBlur
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
-                    _vm._v("low:")
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticStyle: {
-                      color: "#ff00ff",
-                      width: "5em",
-                      "margin-right": "10px",
-                      background: "#00000099",
-                      border: "none"
-                    },
-                    attrs: { type: "number", name: "low", step: "0.001" },
-                    domProps: { value: _vm.min },
-                    on: {
-                      change: _vm.onRangeChange,
-                      focus: _vm.onInputFocus,
-                      blur: _vm.onInputBlur
-                    }
-                  }),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c(
-                        "select",
-                        {
-                          staticStyle: {
-                            color: "#00ffff",
-                            width: "5em",
-                            "margin-right": "10px",
-                            background: "#00000099",
-                            border: "none"
-                          },
-                          attrs: { name: "eases", value: "smooth" },
-                          on: { change: _vm.onPointChange }
-                        },
-                        _vm._l(_vm.easeTypes, function(e) {
-                          return _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: e,
-                                selected:
-                                  _vm.activePoint && _vm.activePoint[2] === e
-                              }
-                            },
-                            [_vm._v(_vm._s(e))]
-                          )
-                        }),
-                        0
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "#00ffff",
-                          width: "5em",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: {
-                          type: "number",
-                          name: "position",
-                          step: "0.001"
-                        },
-                        domProps: { value: Number(_vm.activePoint[1]) },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("v:")]) : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "#00ffff",
-                          width: "5em",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: { type: "number", name: "value", step: "0.001" },
-                        domProps: { value: Number(_vm.activePoint[0]) },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
-                    : _vm._e()
-                ]
-              )
-            : _c(
-                "label",
-                {
-                  staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
-                  }
-                },
-                [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
-              )
-        ]
-      ),
-      _vm._v(" "),
-      _vm.isShown
-        ? _c(
-            "div",
-            {
-              staticStyle: {
-                position: "relative",
-                height: "100px",
-                width: "100%",
-                background: "#00000055"
-              },
-              attrs: { tabIndex: "1", name: "workspace" },
-              on: {
-                keyup: function($event) {
-                  if (
-                    !$event.type.indexOf("key") &&
-                    _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
-                      "Backspace",
-                      "Delete",
-                      "Del"
-                    ])
-                  ) {
-                    return null
-                  }
-                  return _vm.onDelete($event)
-                },
-                mouseleave: _vm.onMouseLeave
-              }
-            },
-            [
-              _c(
-                "svg",
-                {
-                  staticStyle: {
-                    position: "absolute",
-                    left: "0",
-                    top: "0",
-                    width: "100%",
-                    height: "100%",
-                    background: "#00000044",
-                    fill: "none",
-                    stroke: "white",
-                    "stroke-width": "1"
-                  },
-                  attrs: {
-                    viewBox: _vm.getViewBox(),
-                    preserveAspectRatio: "none",
-                    xmlns: "http://www.w3.org/2000/svg"
-                  },
-                  on: {
-                    mouseup: _vm.onMouseUp,
-                    mousedown: _vm.onMouseDown,
-                    mousemove: _vm.onMouseMove,
-                    click: _vm.handleClick
-                  }
-                },
-                [
-                  _c(
-                    "g",
-                    { attrs: { transform: _vm.getTransform() } },
-                    [
-                      _vm.isMouseOver
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff66",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.mouse.x,
-                              y1: _vm.min,
-                              x2: _vm.mouse.x,
-                              y2: _vm.max
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.isMouseOver
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff66",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.start,
-                              y1: _vm.mouse.y,
-                              x2: _vm.end,
-                              y2: _vm.mouse.y
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.bUpdateCrosshairs
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#99999933",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.curve.currentPosition,
-                              y1: _vm.min,
-                              x2: _vm.curve.currentPosition,
-                              y2: _vm.max
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.bUpdateCrosshairs
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#ffffff33",
-                              fill: "none",
-                              "stroke-width": "1",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.start,
-                              y1: _vm.curve.currentSample,
-                              x2: _vm.end,
-                              y2: _vm.curve.currentSample
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm._l(_vm.curve.points, function(p, index) {
-                        return _c("line", {
-                          style: {
-                            "vector-effect": "non-scaling-stroke",
-                            "stroke-width": "5",
-                            "stroke-linecap": "round",
-                            "vector-effect": "non-scaling-stroke",
-                            stroke:
-                              p === _vm.activePoint ? "#00ffff" : "#ffffffaa"
-                          },
-                          attrs: {
-                            onMouseOver: "this.style.strokeWidth=7;",
-                            onMouseOut: "this.style.strokeWidth=5;",
-                            "data-index": index,
-                            x1: p[1],
-                            y1: p[0],
-                            x2: p[1],
-                            y2: p[0],
-                            fill: "red"
-                          }
-                        })
-                      }),
-                      _vm._v(" "),
-                      _c("path", {
-                        staticStyle: {
-                          fill: "none",
-                          stroke: "#ffffff99",
-                          "stroke-width": "1",
-                          "vector-effect": "non-scaling-stroke",
-                          "pointer-events": "none"
-                        },
-                        attrs: { d: _vm.path }
-                      })
-                    ],
-                    2
-                  )
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "#ff00ff",
-                    position: "absolute",
-                    top: "1",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "#ff00ff",
-                    position: "absolute",
-                    bottom: "0",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
-              )
-            ]
-          )
-        : _vm._e()
-    ]
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-
-          return {
-            render: render,
-            staticRenderFns: staticRenderFns,
-            _compiled: true,
-            _scopeId: null,
-            functional: undefined
-          };
-        })());
-      
-    /* hot reload */
-    (function () {
-      if (module.hot) {
-        var api = require('vue-hot-reload-api');
-        api.install(require('vue'));
-        if (api.compatible) {
-          module.hot.accept();
-          if (!module.hot.data) {
-            api.createRecord('$739f47', $739f47);
-          } else {
-            api.reload('$739f47', $739f47);
-          }
-        }
-
-        
-      }
-    })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"Composer/StringCurve.js":[function(require,module,exports) {
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Curve2 = require('./Curve');
-
-var _Curve3 = _interopRequireDefault(_Curve2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // StringCurve.js
-
-
-var StringCurve = function (_Curve) {
-  _inherits(StringCurve, _Curve);
-
-  function StringCurve(options) {
-    _classCallCheck(this, StringCurve);
-
-    return _possibleConstructorReturn(this, (StringCurve.__proto__ || Object.getPrototypeOf(StringCurve)).call(this, Object.assign({
-      type: 'string',
-      name: 'string_curve',
-      currentSample: ''
-    }, options || {})));
-  }
-
-  _createClass(StringCurve, [{
-    key: 'sample',
-    value: function sample(u) {
-
-      // curvePoint = [value, u, ease]
-      if (!this.points.length) return undefined;
-
-      var sample,
-          cp = this.points;
-
-      if (cp[cp.length - 1][1] <= u) {
-        // return first or last values when on the edges.
-        // I think this makes things faster but never tested it...
-        sample = cp[cp.length - 1][0];
-      } else if (cp[0][1] > u) {
-        sample = cp[0][0];
-      } else {
-
-        // find high and low indices
-        var hiIndex = cp.findIndex(function (p) {
-          return p[1] > u;
-        });
-        var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex;
-
-        // always return the ower index value
-        sample = cp[loIndex][0];
-      }
-
-      return sample;
-    }
-  }]);
-
-  return StringCurve;
-}(_Curve3.default);
-
-module.exports = StringCurve;
-},{"./Curve":"Composer/Curve.js"}],"StringCurveEditor.vue":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _Utils = require('./Composer/Utils');
-
-var _Curve = require('./Composer/Curve');
-
-var _Curve2 = _interopRequireDefault(_Curve);
-
-var _StringCurve = require('./Composer/StringCurve');
-
-var _StringCurve2 = _interopRequireDefault(_StringCurve);
-
-var _eases = require('./Composer/eases');
-
-var _eases2 = _interopRequireDefault(_eases);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 //
 //
 //
@@ -9792,6 +8914,1008 @@ exports.default = {
       default: defaultCurve
     },
 
+    start: {
+      type: Number,
+      default: 0
+    },
+
+    end: {
+      type: Number,
+      default: 1
+    }
+  },
+
+  data: function data() {
+    return {
+      isShown: true,
+      activePoint: null,
+      mouseDown: false,
+      dragged: false,
+      easeTypes: easeTypes,
+      min: -1,
+      max: 1,
+      isMouseOver: false,
+      mouse: { x: 0, y: 0 },
+      path: this.getPath(),
+      bUpdateCrosshairs: true
+    };
+  },
+
+
+  components: {
+    EditorButton: _EditorButton2.default
+  },
+
+  mounted: function mounted() {
+    this.min = this.curve.getMinValue();
+    this.max = this.curve.getMaxValue();
+    console.log(this.start, this.end);
+  },
+
+
+  methods: {
+
+    mapLinear: _Utils.mapLinear,
+
+    getPath: function getPath() {
+
+      var w = this.w;
+      var p = 'M';
+
+      for (var i = 0, u = 0; i <= w; i += 1) {
+        u = (0, _Utils.mapLinear)(i, 0, w, this.start, this.end);
+        p += u + ' ' + this.curve.sample(u, false) + ' ';
+      }
+
+      return p;
+    },
+
+    updatePath: function updatePath() {
+      this.path = this.getPath();
+    },
+    getViewBox: function getViewBox() {
+      // min-x min-y width height
+      return this.start + ' ' + this.min + ' ' + Math.abs(this.end - this.start) + ' ' + Math.abs(this.max - this.min);
+    },
+    getTransform: function getTransform() {
+
+      // scale (we're flipping it vertically)
+      var sx = 1;
+      var sy = -1;
+
+      //center
+      var cx = 0.5;
+      var cy = (this.max + this.min) * 0.5;
+
+      return 'matrix(' + sx + ', 0, 0, ' + sy + ', ' + (cx - sx * cx) + ', ' + (cy - sy * cy) + ')';
+    },
+    onDelete: function onDelete(e) {
+
+      if (this.activePoint) {
+        this.curve.findAndRemove(this.activePoint);
+        this.activePoint = null;
+        this.updatePath();
+      }
+    },
+    onToggle: function onToggle(e) {
+      this.isShown = !this.isShown;
+    },
+    onPointChange: function onPointChange(e) {
+
+      if (this.activePoint) {
+
+        switch (e.target.name) {
+          case 'value':
+            var val = Number(e.target.value);
+            this.activePoint[0] = val;
+
+            this.min = Math.min(val, this.min);
+            this.max = Math.max(val, this.max);
+
+            break;
+          case 'position':
+            this.activePoint[1] = Number(e.target.value);
+            break;
+          case 'eases':
+            this.activePoint[2] = e.target.value;
+            break;
+        }
+
+        this.curve.sortPoints();
+        this.updatePath();
+      }
+    },
+    onRangeChange: function onRangeChange(e) {
+
+      if (e.target.name === 'low') {
+        this.min = Number(e.target.value);
+      } else {
+        this.max = Number(e.target.value);
+      }
+      this.$forceUpdate();
+    },
+    onInputFocus: function onInputFocus(e) {
+      this.bUpdateCrosshairs = false;
+    },
+    onInputBlur: function onInputBlur(e) {
+      this.bUpdateCrosshairs = true;
+    },
+    onMouseUp: function onMouseUp(e) {
+      this.mouseDown = false;
+      this.dragged = false;
+    },
+    onCurveTitleChange: function onCurveTitleChange(e) {
+      console.log(e.target.value);
+      this.curve.name = e.target.value;
+    },
+    getEventPosition: function getEventPosition(e) {
+      var el = this.$el.querySelector('[name=workspace]');
+      var bb = el.getBoundingClientRect();
+      var x = e.offsetX; // e.clientX - bb.x //
+      var y = e.offsetY; // e.clientY - bb.y //
+
+      var u = (0, _Utils.mapLinear)(x, 0, bb.width, this.start, this.end);
+      var v = (0, _Utils.mapLinear)(y, 0, bb.height, this.max, this.min);
+
+      return {
+        x: Number(u.toFixed(4)),
+        y: Number(v.toFixed(4))
+      };
+    },
+    onMouseDown: function onMouseDown(e) {
+
+      this.mouseDown = true;
+
+      if (e.target.tagName === "line") {
+
+        e.stopPropagation();
+
+        var index = Number(e.target.dataset.index);
+
+        this.activePoint = this.curve.points[index];
+
+        this.$forceUpdate();
+      } else {
+
+        this.activePoint = null;
+      }
+    },
+    onMouseLeave: function onMouseLeave(e) {
+      this.isMouseOver = false;
+    },
+    onMouseMove: function onMouseMove(e) {
+
+      this.isMouseOver = true;
+
+      var pos = this.getEventPosition(e);
+      this.mouse.x = pos.x;
+      this.mouse.y = pos.y;
+
+      if (e.buttons && this.mouseDown && !e.metaKey) {
+        this.dragged = true;
+        this.onDrag(e);
+      }
+    },
+    onDrag: function onDrag(e) {
+
+      if (this.activePoint) {
+
+        var pos = this.getEventPosition(e);
+
+        this.activePoint[1] = pos.x;
+        this.activePoint[0] = pos.y;
+
+        this.curve.sortPoints();
+
+        this.updatePath();
+      }
+    },
+    handleClick: function handleClick(e) {
+
+      var el = e.target;
+
+      if (el.tagName === 'svg') {
+
+        if (!this.dragged && e.metaKey) {
+
+          var pos = this.getEventPosition(e);
+
+          var p = this.curve.addPoint(pos.y, pos.x);
+
+          this.activePoint = p;
+
+          this.updatePath();
+        }
+      }
+    },
+    deleteCurveDialogue: function deleteCurveDialogue(e) {
+
+      if (window.confirm("delete this curve?")) {
+        var crv = this.curve;
+        var curves = this.$parent.curves;
+        curves.splice(curves.indexOf(crv), 1);
+      }
+    }
+  }
+
+};
+        var $739f47 = exports.default || module.exports;
+      
+      if (typeof $739f47 === 'function') {
+        $739f47 = $739f47.options;
+      }
+    
+        /* template */
+        Object.assign($739f47, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    {
+      staticStyle: {
+        position: "relative",
+        width: "calc(100%-4)",
+        "border-bottom": "#ffffffaa solid 0.5px"
+      }
+    },
+    [
+      _c(
+        "div",
+        {
+          staticStyle: {
+            position: "relative",
+            "min-height": "16px",
+            width: "100%",
+            background: "#00000044"
+          }
+        },
+        [
+          _vm.isShown
+            ? _c(
+                "div",
+                {
+                  staticStyle: {
+                    border: "solid 1px #ffffff44",
+                    display: "flex"
+                  }
+                },
+                [
+                  _c("EditorButton", {
+                    attrs: {
+                      offSymbol: "−",
+                      symbol: "+",
+                      isToggled: _vm.isShown,
+                      onClick: _vm.onToggle
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("EditorButton", {
+                    attrs: { onClick: _vm.deleteCurveDialogue, symbol: "×" }
+                  }),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticStyle: {
+                      border: "none",
+                      background: "#00000000",
+                      color: "white",
+                      "margin-left": "1em"
+                    },
+                    attrs: { type: "text", name: "curveName" },
+                    domProps: { value: _vm.curve.name },
+                    on: { change: _vm.onCurveTitleChange }
+                  }),
+                  _vm._v(" "),
+                  _c("label", { staticStyle: { color: "darkgrey" } }, [
+                    _vm._v("hi:")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticStyle: {
+                      color: "#ff00ff",
+                      width: "5em",
+                      "margin-right": "10px",
+                      background: "#00000099",
+                      border: "none"
+                    },
+                    attrs: { type: "number", name: "hi", step: "0.001" },
+                    domProps: { value: _vm.max },
+                    on: {
+                      change: _vm.onRangeChange,
+                      focus: _vm.onInputFocus,
+                      blur: _vm.onInputBlur
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("label", { staticStyle: { color: "darkgrey" } }, [
+                    _vm._v("low:")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticStyle: {
+                      color: "#ff00ff",
+                      width: "5em",
+                      "margin-right": "10px",
+                      background: "#00000099",
+                      border: "none"
+                    },
+                    attrs: { type: "number", name: "low", step: "0.001" },
+                    domProps: { value: _vm.min },
+                    on: {
+                      change: _vm.onRangeChange,
+                      focus: _vm.onInputFocus,
+                      blur: _vm.onInputBlur
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c(
+                        "select",
+                        {
+                          staticStyle: {
+                            color: "#00ffff",
+                            "margin-right": "10px",
+                            background: "#00000099",
+                            border: "none"
+                          },
+                          attrs: { name: "eases", value: "smooth" },
+                          on: { change: _vm.onPointChange }
+                        },
+                        _vm._l(_vm.easeTypes, function(e) {
+                          return _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: e,
+                                selected:
+                                  _vm.activePoint && _vm.activePoint[2] === e
+                              }
+                            },
+                            [_vm._v(_vm._s(e))]
+                          )
+                        }),
+                        0
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c("input", {
+                        staticStyle: {
+                          color: "#00ffff",
+                          width: "5em",
+                          "margin-right": "10px",
+                          background: "#00000099",
+                          border: "none"
+                        },
+                        attrs: {
+                          type: "number",
+                          name: "position",
+                          step: "0.001"
+                        },
+                        domProps: { value: Number(_vm.activePoint[1]) },
+                        on: {
+                          change: _vm.onPointChange,
+                          focus: _vm.onInputFocus,
+                          blur: _vm.onInputBlur
+                        }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint ? _c("label", [_vm._v("v:")]) : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c("input", {
+                        staticStyle: {
+                          color: "#00ffff",
+                          width: "5em",
+                          "margin-right": "10px",
+                          background: "#00000099",
+                          border: "none"
+                        },
+                        attrs: { type: "number", name: "value", step: "0.001" },
+                        domProps: { value: Number(_vm.activePoint[0]) },
+                        on: {
+                          change: _vm.onPointChange,
+                          focus: _vm.onInputFocus,
+                          blur: _vm.onInputBlur
+                        }
+                      })
+                    : _vm._e()
+                ],
+                1
+              )
+            : _c(
+                "div",
+                [
+                  _c("EditorButton", {
+                    attrs: {
+                      offSymbol: "−",
+                      symbol: "+",
+                      isToggled: _vm.isShown,
+                      onClick: _vm.onToggle
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticStyle: {
+                        "padding-top": "6px",
+                        border: "solid 1px #ffffff44"
+                      }
+                    },
+                    [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
+                  )
+                ],
+                1
+              )
+        ]
+      ),
+      _vm._v(" "),
+      _vm.isShown
+        ? _c(
+            "div",
+            {
+              staticStyle: {
+                position: "relative",
+                height: "100px",
+                width: "100%",
+                background: "#00000055"
+              },
+              attrs: { tabIndex: "1", name: "workspace" },
+              on: {
+                keyup: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
+                      "Backspace",
+                      "Delete",
+                      "Del"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.onDelete($event)
+                },
+                mouseleave: _vm.onMouseLeave
+              }
+            },
+            [
+              _c(
+                "svg",
+                {
+                  staticStyle: {
+                    position: "absolute",
+                    left: "0",
+                    top: "0",
+                    width: "100%",
+                    height: "100%",
+                    background: "#00000044",
+                    fill: "none",
+                    stroke: "white",
+                    "stroke-width": "1"
+                  },
+                  attrs: {
+                    viewBox: _vm.getViewBox(),
+                    preserveAspectRatio: "none",
+                    xmlns: "http://www.w3.org/2000/svg"
+                  },
+                  on: {
+                    mouseup: _vm.onMouseUp,
+                    mousedown: _vm.onMouseDown,
+                    mousemove: _vm.onMouseMove,
+                    click: _vm.handleClick
+                  }
+                },
+                [
+                  _c(
+                    "g",
+                    { attrs: { transform: _vm.getTransform() } },
+                    [
+                      _vm.isMouseOver
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#ffffff66",
+                              fill: "none",
+                              "stroke-width": "1",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.mouse.x,
+                              y1: _vm.min,
+                              x2: _vm.mouse.x,
+                              y2: _vm.max
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.isMouseOver
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#ffffff66",
+                              fill: "none",
+                              "stroke-width": "1",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.start,
+                              y1: _vm.mouse.y,
+                              x2: _vm.end,
+                              y2: _vm.mouse.y
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#000000ff",
+                              fill: "none",
+                              "stroke-width": "1",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.curve.currentPosition,
+                              y1: _vm.min,
+                              x2: _vm.curve.currentPosition,
+                              y2: _vm.max
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#000000ff",
+                              fill: "none",
+                              "stroke-width": "1",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.start,
+                              y1: _vm.curve.currentSample,
+                              x2: _vm.end,
+                              y2: _vm.curve.currentSample
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm._l(_vm.curve.points, function(p, index) {
+                        return _c("line", {
+                          style: {
+                            "vector-effect": "non-scaling-stroke",
+                            "stroke-width": "5",
+                            "stroke-linecap": "round",
+                            "vector-effect": "non-scaling-stroke",
+                            stroke:
+                              p === _vm.activePoint ? "#00ffff" : "#ffffffaa"
+                          },
+                          attrs: {
+                            onMouseOver: "this.style.strokeWidth=7;",
+                            onMouseOut: "this.style.strokeWidth=5;",
+                            "data-index": index,
+                            x1: p[1],
+                            y1: p[0],
+                            x2: p[1],
+                            y2: p[0],
+                            fill: "red"
+                          }
+                        })
+                      }),
+                      _vm._v(" "),
+                      _c("path", {
+                        staticStyle: {
+                          fill: "none",
+                          stroke: "#ffffff99",
+                          "stroke-width": "1",
+                          "vector-effect": "non-scaling-stroke",
+                          "pointer-events": "none"
+                        },
+                        attrs: { d: _vm.path }
+                      })
+                    ],
+                    2
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "#ff00ff",
+                    position: "absolute",
+                    top: "1",
+                    right: "0",
+                    "font-size": "0.75em",
+                    "user-select": "none"
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "#ff00ff",
+                    position: "absolute",
+                    bottom: "0",
+                    right: "0",
+                    "font-size": "0.75em",
+                    "user-select": "none"
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
+              )
+            ]
+          )
+        : _vm._e()
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$739f47', $739f47);
+          } else {
+            api.reload('$739f47', $739f47);
+          }
+        }
+
+        
+      }
+    })();
+},{"./EditorButton":"EditorButton.vue","./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/eases":"Composer/eases.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"Composer/StringCurve.js":[function(require,module,exports) {
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Curve2 = require('./Curve');
+
+var _Curve3 = _interopRequireDefault(_Curve2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // StringCurve.js
+
+
+var StringCurve = function (_Curve) {
+  _inherits(StringCurve, _Curve);
+
+  function StringCurve(options) {
+    _classCallCheck(this, StringCurve);
+
+    return _possibleConstructorReturn(this, (StringCurve.__proto__ || Object.getPrototypeOf(StringCurve)).call(this, Object.assign({
+      type: 'string',
+      name: 'string_curve',
+      currentSample: ''
+    }, options || {})));
+  }
+
+  _createClass(StringCurve, [{
+    key: 'sample',
+    value: function sample(u) {
+
+      // curvePoint = [value, u, ease]
+      if (!this.points.length) return undefined;
+
+      var sample,
+          cp = this.points;
+
+      if (cp[cp.length - 1][1] <= u) {
+        // return first or last values when on the edges.
+        // I think this makes things faster but never tested it...
+        sample = cp[cp.length - 1][0];
+      } else if (cp[0][1] > u) {
+        sample = cp[0][0];
+      } else {
+
+        // find high and low indices
+        var hiIndex = cp.findIndex(function (p) {
+          return p[1] > u;
+        });
+        var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex;
+
+        // always return the ower index value
+        sample = cp[loIndex][0];
+      }
+
+      return sample;
+    }
+  }]);
+
+  return StringCurve;
+}(_Curve3.default);
+
+module.exports = StringCurve;
+},{"./Curve":"Composer/Curve.js"}],"StringCurveEditor.vue":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Utils = require('./Composer/Utils');
+
+var _StringCurve = require('./Composer/StringCurve');
+
+var _StringCurve2 = _interopRequireDefault(_StringCurve);
+
+var _EditorButton = require('./EditorButton');
+
+var _EditorButton2 = _interopRequireDefault(_EditorButton);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var defaultCurve = function defaultCurve() {
+  return new Curve();
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+
+  name: 'curve',
+
+  props: {
+
+    w: {
+      type: Number,
+      default: window.innerWidth
+    },
+
+    h: {
+      type: Number,
+      default: 100
+    },
+
+    curve: {
+      type: Object,
+      default: defaultCurve
+    },
+
     textScale: {
       type: Number,
       default: 1
@@ -9808,6 +9932,10 @@ exports.default = {
     }
   },
 
+  components: {
+    EditorButton: _EditorButton2.default
+  },
+
   data: function data() {
     return {
       isShown: true,
@@ -9815,19 +9943,23 @@ exports.default = {
       activePoint: null,
       mouseDown: false,
       dragged: false,
-      easeTypes: easeTypes,
       min: 0,
       max: 1,
       isMouseOver: false,
       mouse: { x: 0, y: 0 },
       path: this.getPath(),
-      bUpdateCrosshairs: true
+      bUpdateCrosshairs: true,
+      boundbox: { x: 0, y: 0, width: 1, height: 1 }
     };
   },
   mounted: function mounted() {
     this.min = 0;
     this.max = 1;
     this.isMounted = true;
+
+    var wtf = this.$el.querySelector('[name="workspace"]');
+    this.boundbox = wtf.getBoundingClientRect();
+    console.log(this.boundbox, this.$el.querySelector('[name="workspace"]'));
   },
 
 
@@ -9868,18 +10000,12 @@ exports.default = {
     },
     getTextTransform: function getTextTransform(p) {
 
-      if (this.isMounted) {
-        var el = this.$el.querySelector('[name=workspace]');
-        var bb = el.getBoundingClientRect();
+      var bb = this.boundbox;
+      var scl = 0.005 * this.textScale;
+      var xScl = (this.end - this.start) * scl * bb.height / bb.width;
+      var yScl = -scl;
 
-        var scl = 0.005 * this.textScale;
-        var xScl = (this.end - this.start) * scl * bb.height / bb.width;
-        var yScl = -scl;
-
-        return 'translate(' + (p[1] + scl) + ', ' + (1 - scl) + ') scale(' + xScl + ',' + yScl + ') rotate(90)';
-      } else {
-        return '';
-      }
+      return 'translate(' + (p[1] + xScl * 6) + ', ' + (1 + yScl * 3) + ') scale(' + xScl + ',' + yScl + ') rotate(90)';
     },
     onDelete: function onDelete(e) {
 
@@ -9904,27 +10030,12 @@ exports.default = {
           case 'position':
             this.activePoint[1] = Number(e.target.value);
             break;
-          case 'eases':
-            this.activePoint[2] = e.target.value;
-            break;
         }
 
         this.curve.sortPoints();
         this.updatePath();
       }
     },
-
-
-    // onRangeChange(e) {
-
-    //   // if(e.target.name === 'low') {
-    //   //   this.min = Number(e.target.value)
-    //   // } else {
-    //   //   this.max = Number(e.target.value)
-    //   // }
-    //   this.$forceUpdate()
-    // },
-
     onInputFocus: function onInputFocus(e) {
       this.bUpdateCrosshairs = false;
     },
@@ -9936,8 +10047,13 @@ exports.default = {
       this.dragged = false;
     },
     getEventPosition: function getEventPosition(e) {
-      var el = this.$el.querySelector('[name=workspace]');
-      var bb = el.getBoundingClientRect();
+
+      if (this.isMounted && this.$el) {
+        var el = this.$el.querySelector('[name="workspace"]');
+        this.boundbox = el.getBoundingClientRect();
+      }
+
+      var bb = this.boundbox;
       var x = e.offsetX;
       var y = e.offsetY;
       var u = (0, _Utils.mapLinear)(x, 0, bb.width, this.start, this.end);
@@ -10016,6 +10132,14 @@ exports.default = {
           this.updatePath();
         }
       }
+    },
+    deleteCurveDialogue: function deleteCurveDialogue(e) {
+
+      if (window.confirm("delete this curve?")) {
+        var crv = this.curve;
+        var curves = this.$parent.curves;
+        curves.splice(curves.indexOf(crv), 1);
+      }
     }
   }
 
@@ -10053,72 +10177,35 @@ exports.default = {
           }
         },
         [
-          _c(
-            "svg",
-            {
-              staticStyle: {
-                position: "absolute",
-                right: "3",
-                top: "3",
-                width: "14px",
-                height: "14px",
-                stroke: "white",
-                "stroke-width": "1",
-                fill: "#00000055"
-              },
-              on: { click: _vm.onToggle }
-            },
-            [
-              _c("circle", {
-                attrs: {
-                  r: "6",
-                  cx: "7",
-                  cy: "7",
-                  stroke: "white",
-                  fill: "inherit"
-                }
-              }),
-              _vm._v(" "),
-              _c("line", {
-                staticStyle: {
-                  fill: "none",
-                  stroke: "#ffffff99",
-                  "stroke-width": "1",
-                  "vector-effect": "non-scaling-stroke"
-                },
-                attrs: { x1: "3", y1: "7", x2: "11", y2: "7" }
-              }),
-              _vm._v(" "),
-              !_vm.isShown
-                ? _c("line", {
-                    staticStyle: {
-                      fill: "none",
-                      stroke: "#ffffff99",
-                      "stroke-width": "1",
-                      "vector-effect": "non-scaling-stroke"
-                    },
-                    attrs: { y1: "3", x1: "7", y2: "11", x2: "7" }
-                  })
-                : _vm._e()
-            ]
-          ),
-          _vm._v(" "),
           _vm.isShown
             ? _c(
                 "div",
                 {
                   staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
+                    border: "solid 1px #ffffff44",
+                    display: "flex"
                   }
                 },
                 [
+                  _c("EditorButton", {
+                    attrs: {
+                      offSymbol: "−",
+                      symbol: "+",
+                      isToggled: _vm.isShown,
+                      onClick: _vm.onToggle
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("EditorButton", {
+                    attrs: { onClick: _vm.deleteCurveDialogue, symbol: "×" }
+                  }),
+                  _vm._v(" "),
                   _c("input", {
                     staticStyle: {
                       border: "none",
                       background: "#00000000",
-                      color: "white"
+                      color: "white",
+                      "margin-left": "1em"
                     },
                     attrs: { type: "text", name: "curveName" },
                     domProps: { value: _vm.curve.name },
@@ -10169,18 +10256,33 @@ exports.default = {
                         }
                       })
                     : _vm._e()
-                ]
+                ],
+                1
               )
             : _c(
-                "label",
-                {
-                  staticStyle: {
-                    "padding-top": "6px",
-                    "min-height": "22px",
-                    border: "solid 1px #ffffff44"
-                  }
-                },
-                [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
+                "div",
+                [
+                  _c("EditorButton", {
+                    attrs: {
+                      offSymbol: "−",
+                      symbol: "+",
+                      isToggled: _vm.isShown,
+                      onClick: _vm.onToggle
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticStyle: {
+                        "padding-top": "6px",
+                        border: "solid 1px #ffffff44"
+                      }
+                    },
+                    [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
+                  )
+                ],
+                1
               )
         ]
       ),
@@ -10319,12 +10421,30 @@ exports.default = {
                                 attrs: {
                                   x: p[1],
                                   y: "0",
-                                  width: _vm.end - p[1],
+                                  width: Math.abs(_vm.end - p[1]),
                                   height: "1"
                                 }
                               })
                         ])
                       }),
+                      _vm._v(" "),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#000000ff",
+                              fill: "none",
+                              "stroke-width": "1.5",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.curve.currentPosition,
+                              y1: 0,
+                              x2: _vm.curve.currentPosition,
+                              y2: 1
+                            }
+                          })
+                        : _vm._e(),
                       _vm._v(" "),
                       _vm._l(_vm.curve.points, function(p, index) {
                         return _c("line", {
@@ -10353,28 +10473,24 @@ exports.default = {
                           "g",
                           { attrs: { transform: _vm.getTextTransform(p) } },
                           [
-                            _vm.isMounted
-                              ? _c(
-                                  "text",
-                                  {
-                                    style: {
-                                      "user-select": "none",
-                                      "pointer-events": "none",
-                                      stroke:
-                                        p === _vm.activePoint
-                                          ? "cyan"
-                                          : "#ffffffaa"
-                                    }
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n            " +
-                                        _vm._s(p[0]) +
-                                        "\n          "
-                                    )
-                                  ]
+                            _c(
+                              "text",
+                              {
+                                style: {
+                                  "user-select": "none",
+                                  pointerEvents: "none",
+                                  stroke:
+                                    p === _vm.activePoint ? "cyan" : "#ffffffaa"
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n            " +
+                                    _vm._s(p[0]) +
+                                    "\n          "
                                 )
-                              : _vm._e()
+                              ]
+                            )
                           ]
                         )
                       })
@@ -10418,7 +10534,7 @@ render._withStripped = true
         
       }
     })();
-},{"./Composer/Utils":"Composer/Utils.js","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js","./Composer/eases":"Composer/eases.js","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
+},{"./Composer/Utils":"Composer/Utils.js","./Composer/StringCurve":"Composer/StringCurve.js","./EditorButton":"EditorButton.vue","vue-hot-reload-api":"../node_modules/vue-hot-reload-api/dist/index.js","vue":"../node_modules/vue/dist/vue.runtime.esm.js"}],"../node_modules/save-as/lib/index.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10852,11 +10968,7 @@ exports.default = {
       this.addCurve(new _StringCurve2.default(options));
     },
     addCurve: function addCurve(curve) {
-
-      console.log('addCurve');
-
       this.curves.push(curve);
-
       this.$forceUpdate();
     },
     loadCurves: function loadCurves(json) {
@@ -10938,7 +11050,7 @@ exports.default = {
       attrs: { id: "CurveComposer" }
     },
     [
-      _c("div", { staticStyle: { height: "24px" } }, [
+      _c("div", { staticStyle: { height: "24px", "user-select": "none" } }, [
         _vm._v("\n\n    " + _vm._s(_vm.title) + "\n\n    "),
         _c(
           "label",
@@ -11000,7 +11112,7 @@ exports.default = {
             },
             attrs: { for: "createCurveInput" }
           },
-          [_vm._v("new curve")]
+          [_vm._v("add curve")]
         ),
         _vm._v(" "),
         _c("button", {
@@ -11019,13 +11131,13 @@ exports.default = {
               "font-size": "0.75em",
               padding: "0 4px"
             },
-            attrs: { for: "createCurveInput" }
+            attrs: { for: "createStringCurveInput" }
           },
-          [_vm._v("new string curve")]
+          [_vm._v("add string curve")]
         ),
         _vm._v(" "),
         _c("button", {
-          attrs: { id: "createCurveInput", hidden: "" },
+          attrs: { id: "createStringCurveInput", hidden: "" },
           on: { click: _vm.createStringCurve }
         })
       ]),
@@ -11148,24 +11260,12 @@ module.exports = {
 },{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}],"test.json":[function(require,module,exports) {
 module.exports = [{
   "name": "Animation Curve",
-  "points": [[-0.8, -0.2252, "smooth"], [-0.9, 0.1436, "smooth"], [-0.36, 0.3209, "smooth"], [-1, 1, "smooth"]],
+  "points": [[-0.8, -0.2252, "smooth"], [-0.9, 0.1436, "smooth"], [-0.36, 0.3209, "smooth"], [-0.7888, 9.7553, "smooth"]],
   "type": "number"
 }, {
   "name": "string curve A",
-  "points": [["one", 0, "smooth"], ["two", 0.2455, "smooth"], ["ten", 0.66, "smooth"], ["string_name", 1.1078, "smooth"]],
+  "points": [["one", 0, "smooth"], ["two", 4.0608, "smooth"], ["string_name", 10.5488, "smooth"], ["ten", 18.5304, "smooth"]],
   "type": "string"
-}, {
-  "name": "string curve B",
-  "points": [["one", 0, "smooth"], ["two", 0.33, "smooth"], ["three", 0.66, "smooth"], ["four", 1.2167, "smooth"], ["five", 1.643, "smooth"]],
-  "type": "string"
-}, {
-  "name": "Number Curve A",
-  "points": [[0.41, -0.1225, "smooth"], [0.48, 0.4983, "smooth"], [0.68, 0.8484, "smooth"]],
-  "type": "number"
-}, {
-  "name": "Number Curve B",
-  "points": [[0.44, -0.2298, "smooth"], [0.44, 0.4376, "smooth"], [0.77, 0.6663, "smooth"]],
-  "type": "number"
 }];
 },{}],"main.js":[function(require,module,exports) {
 'use strict';
@@ -11184,12 +11284,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var cc = _CurveComposer2.default.setup();
 cc.loadCurves(_test2.default);
 
-cc.start = -1;
-cc.end = 2;
-
-setTimeout(function () {
-  cc.createCurve();
-}, 1000);
+cc.start = 0;
+cc.end = 30;
 
 console.log(cc);
 
@@ -11228,7 +11324,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '56692' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '55319' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 

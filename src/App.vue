@@ -9,7 +9,7 @@
       overflow: scroll;
       color: white;'>
 
-    <div style="height: 24px;">
+    <div style="height: 24px; user-select: none;">
 
       {{title}}
 
@@ -51,7 +51,7 @@
         border: white solid 1px;
         border-radius: 5px;
         font-size: 0.75em;
-        padding: 0 4px;" for="createCurveInput">new curve</label>
+        padding: 0 4px;" for="createCurveInput">add curve</label>
       <button
         id="createCurveInput"
         hidden
@@ -64,9 +64,9 @@
         border: white solid 1px;
         border-radius: 5px;
         font-size: 0.75em;
-        padding: 0 4px;" for="createCurveInput">new string curve</label>
+        padding: 0 4px;" for="createStringCurveInput">add string curve</label>
       <button
-        id="createCurveInput"
+        id="createStringCurveInput"
         hidden
         @click="createStringCurve"></button>
 
@@ -147,11 +147,7 @@ export default {
     },
 
     addCurve(curve) {
-
-      console.log( 'addCurve' );
-
       this.curves.push(curve)
-
       this.$forceUpdate()
     },
 

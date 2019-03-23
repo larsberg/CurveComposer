@@ -18,8 +18,8 @@
         "smooth"
       ],
       [
-        -1,
-        1,
+        -0.7888,
+        9.7553,
         "smooth"
       ]
     ],
@@ -35,93 +35,20 @@
       ],
       [
         "two",
-        0.2455,
-        "smooth"
-      ],
-      [
-        "ten",
-        0.66,
+        4.0608,
         "smooth"
       ],
       [
         "string_name",
-        1.1078,
+        10.5488,
+        "smooth"
+      ],
+      [
+        "ten",
+        18.5304,
         "smooth"
       ]
     ],
     "type": "string"
-  },
-  {
-    "name": "string curve B",
-    "points": [
-      [
-        "one",
-        0,
-        "smooth"
-      ],
-      [
-        "two",
-        0.33,
-        "smooth"
-      ],
-      [
-        "three",
-        0.66,
-        "smooth"
-      ],
-      [
-        "four",
-        1.2167,
-        "smooth"
-      ],
-      [
-        "five",
-        1.643,
-        "smooth"
-      ]
-    ],
-    "type": "string"
-  },
-  {
-    "name": "Number Curve A",
-    "points": [
-      [
-        0.41,
-        -0.1225,
-        "smooth"
-      ],
-      [
-        0.48,
-        0.4983,
-        "smooth"
-      ],
-      [
-        0.68,
-        0.8484,
-        "smooth"
-      ]
-    ],
-    "type": "number"
-  },
-  {
-    "name": "Number Curve B",
-    "points": [
-      [
-        0.44,
-        -0.2298,
-        "smooth"
-      ],
-      [
-        0.44,
-        0.4376,
-        "smooth"
-      ],
-      [
-        0.77,
-        0.6663,
-        "smooth"
-      ]
-    ],
-    "type": "number"
   }
 ]

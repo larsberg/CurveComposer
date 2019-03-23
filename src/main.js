@@ -5,12 +5,13 @@ import testJSON from './test.json'
 var cc = CurveComposer.setup()
 cc.loadCurves(testJSON)
 
-cc.start = -1
-cc.end = 2
+cc.start = 0
+cc.end = 30
 
-setTimeout( function () {
-  cc.createCurve()
-}, 1000)
+
+
+
+
 
 
 console.log( cc );

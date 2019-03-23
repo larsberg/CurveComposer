@@ -9,52 +9,22 @@
     <!-- info bar -->
     <div style="
       position: relative;
-      min-height: 20px;
+      min-height: 16px;
       width: 100%;
       background: #00000044;">
 
-      <!-- toggle expand button -->
-      <svg
-      @click="onToggle"
-      style="
-        position: absolute;
-        right: 3;
-        top: 3;
-        width: 14px;
-        height: 14px;
-        stroke: white;
-        stroke-width: 1;
-        fill: #00000055">
-
-        <circle r="6" cx="7" cy="7" stroke="white" fill="inherit"/>
-
-        <line
-          style="
-            fill: none;
-            stroke: #ffffff99;
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;"
-          x1="3" y1="7" x2="11" y2="7" />
-        <line
-          style="
-            fill: none;
-            stroke: #ffffff99;
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;"
-          v-if="!isShown" y1="3" x1="7" y2="11" x2="7" />
-
-      </svg>
-
       <!-- curve name and inputs -->
-      <div
-        v-if="isShown"
-        style="
-          padding-top: 6px;
-          min-height: 22px;
-          border: solid 1px #ffffff44;">
-        <!-- <div style="width: 100%; font-size: 0.75em;">
-          {{curve.name}} {{ bUpdateCrosshairs ? Number(curve.currentSample.toFixed(3)) : ''}}
-        </div> -->
+      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex;">
+
+        <EditorButton
+          :offSymbol="'−'"
+          :symbol="'+'"
+          :isToggled="isShown"
+          :onClick='onToggle'></EditorButton>
+
+        <EditorButton
+          :onClick="deleteCurveDialogue"
+          :symbol="'×'"></EditorButton>
 
         <input
           type="text"
@@ -62,11 +32,12 @@
           style="
             border: none;
             background: #00000000;
-            color: white;"
+            color: white;
+            margin-left: 1em;"
           :value="curve.name"
           @change="onCurveTitleChange">
 
-        <label style="color: darkgrey;">hi:</label>
+        <label  style="font-size: 0.75em" style="color: darkgrey;">hi:</label>
         <input
           style="
             color: #ff00ff;
@@ -81,7 +52,7 @@
           @change="onRangeChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
-        <label style="color: darkgrey;">low:</label>
+        <label  style="font-size: 0.75em" style="color: darkgrey;">low:</label>
         <input
           style="
             color: #ff00ff;
@@ -97,12 +68,11 @@
           @focus="onInputFocus"
           @blur="onInputBlur">
 
-        <label v-if="activePoint">pt:</label>
+        <label  style="font-size: 0.75em" v-if="activePoint">pt:</label>
         <select
           v-if="activePoint"
           style="
             color: #00ffff;
-            width: 5em;
             margin-right: 10px;
             background: #00000099;
             border: none;"
@@ -113,7 +83,7 @@
             :value='e'
             :selected="activePoint && activePoint[2] === e">{{e}}</option>
         </select>
-        <label v-if="activePoint">u:</label>
+        <label  style="font-size: 0.75em" v-if="activePoint">u:</label>
         <input
           v-if="activePoint"
           style="
@@ -129,7 +99,7 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
-        <label v-if="activePoint">v:</label>
+        <label style="font-size: 0.75em" v-if="activePoint">value:</label>
         <input
           v-if="activePoint"
           style="
@@ -146,12 +116,15 @@
           @focus="onInputFocus"
           @blur="onInputBlur">
       </div>
-      <label
-        v-else
-        style="
-          padding-top: 6px;
-          min-height: 22px;
-          border: solid 1px #ffffff44;"> {{curve.name}} </label>
+      <div v-else style="border: solid 1px #ffffff44; display: flex;">
+
+        <EditorButton
+          :offSymbol="'−'"
+          :symbol="'+'"
+          :isToggled="isShown"
+          :onClick='onToggle'></EditorButton>
+        <div style="color: white; margin-left: 1em; font-size: 1em;"> {{curve.name}} </div>
+      </div>
     </div>
 
     <div
@@ -216,7 +189,7 @@
           <line
             v-if="bUpdateCrosshairs"
             style="
-              stroke: #99999933;
+              stroke: #000000ff;
               fill: none;
               stroke-width: 1;
               vector-effect: non-scaling-stroke;
@@ -229,7 +202,7 @@
           <line
             v-if="bUpdateCrosshairs"
             style="
-              stroke: #ffffff33;
+              stroke: #000000ff;
               fill: none;
               stroke-width: 1;
               vector-effect: non-scaling-stroke;
@@ -294,6 +267,7 @@
 </template>
 
 <script>
+import EditorButton from './EditorButton'
 import {mapLinear, lerp, clamp} from './Composer/Utils'
 import Curve from './Composer/Curve'
 import eases from './Composer/eases'
@@ -348,6 +322,10 @@ export default {
       path: this.getPath(),
       bUpdateCrosshairs: true
     }
+  },
+
+  components: {
+    EditorButton
   },
 
   mounted () {
@@ -511,7 +489,7 @@ export default {
       this.mouse.x = pos.x
       this.mouse.y = pos.y
 
-      if(this.mouseDown && !e.metaKey ) {
+      if(e.buttons && this.mouseDown && !e.metaKey ) {
         this.dragged = true
         this.onDrag(e)
       }
@@ -551,6 +529,15 @@ export default {
 
       }
 
+    },
+
+    deleteCurveDialogue(e) {
+
+      if (window.confirm("delete this curve?")) {
+        var crv = this.curve
+        var curves = this.$parent.curves
+        curves.splice(curves.indexOf(crv), 1)
+      }
     }
 
   }
