@@ -8615,12 +8615,12 @@ exports.default = _default;
     "div",
     {
       style: {
+        position: "relative",
         margin: "3px",
         border: "white solid 1px",
         borderRadius: "0%",
-        width: "16px",
-        height: "16px",
-        position: "relative",
+        width: "11px",
+        height: "11px",
         userSelect: "none",
         background: "grey"
       },
@@ -9279,6 +9279,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
 const easeTypes = Object.keys(_eases.default);
 
 const defaultCurve = () => new _Curve.default();
@@ -9334,7 +9335,6 @@ var _default = {
   mounted() {
     this.min = this.curve.getMinValue();
     this.max = this.curve.getMaxValue();
-    console.log(this.start, this.end);
   },
 
   methods: {
@@ -9448,7 +9448,6 @@ var _default = {
     },
 
     onCurveTitleChange(e) {
-      console.log(e.target.value);
       this.curve.name = e.target.value;
     },
 
@@ -9569,7 +9568,8 @@ exports.default = _default;
                 {
                   staticStyle: {
                     border: "solid 1px #ffffff44",
-                    display: "flex"
+                    display: "inline-flex",
+                    "flex-wrap": "wrap"
                   }
                 },
                 [
@@ -10360,7 +10360,6 @@ var _default = {
     this.isMounted = true;
     var wtf = this.$el.querySelector('[name="workspace"]');
     this.boundbox = wtf.getBoundingClientRect();
-    console.log(this.boundbox, this.$el.querySelector('[name="workspace"]'));
   },
 
   methods: {
@@ -10520,7 +10519,6 @@ var _default = {
     },
 
     onCurveTitleChange(e) {
-      console.log(e.target.value);
       this.curve.name = e.target.value;
     },
 
@@ -11363,6 +11361,12 @@ var _default = {
     curves: {
       default: () => []
     },
+    start: {
+      default: 0
+    },
+    duration: {
+      default: 1
+    },
     title: {
       default: 'curve composer'
     }
@@ -11373,8 +11377,6 @@ var _default = {
   },
   data: function () {
     return {
-      start: 0,
-      end: 1,
       stringCurveTextSize: 1.5
     };
   },
@@ -11392,6 +11394,10 @@ var _default = {
       this.$forceUpdate();
     },
 
+    setCurves(curves) {
+      this.curves = curves;
+    },
+
     loadCurves(json) {
       // remove the current curves
       this.curves.length = 0; // add the json curves
@@ -11407,12 +11413,12 @@ var _default = {
 
       this.$nextTick(function () {
         if (this.$refs.curves) {
+          // seems like that if there's only one curve it's not an array
           if (Array.isArray(this.$refs.curves)) {
             this.$refs.curves.forEach(crv => {
               crv.updatePath();
             });
-          } else {
-            this.$refs.updatePath();
+          } else {// this.$refs.curves.updatePath()
           }
         }
       });
@@ -11435,12 +11441,6 @@ var _default = {
         type: 'application/json'
       });
       (0, _saveAs.default)(blob, 'curves.json');
-    },
-
-    setRange(start, end) {
-      this.start = start;
-      this.end = end;
-      this.$forceUpdate();
     }
 
   }
@@ -11573,7 +11573,11 @@ exports.default = _default;
               ? _c("CurveEditor", {
                   ref: "curves",
                   refInFor: true,
-                  attrs: { curve: c, start: _vm.start, end: _vm.end }
+                  attrs: {
+                    curve: c,
+                    start: _vm.start,
+                    end: _vm.start + _vm.duration
+                  }
                 })
               : c.type === "string"
               ? _c("StringCurveEditor", {
@@ -11583,7 +11587,7 @@ exports.default = _default;
                     textScale: _vm.stringCurveTextSize,
                     curve: c,
                     start: _vm.start,
-                    end: _vm.end
+                    end: _vm.start + _vm.duration
                   }
                 })
               : _vm._e()
@@ -11620,20 +11624,21 @@ var _StringCurve = _interopRequireDefault(require("./Composer/StringCurve"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// if(true && module.hot){
-//   module.hot.accept(()=>{window.location.reload(true);})
-// }
-// import { readFileSync } from 'fs';
-// const rawStylz = readFileSync(__dirname + '/CurveComposer.css', 'utf-8');
-// var style = document.createElement('style')
-// style.type = 'text/css'
-// style.appendChild(document.createTextNode(rawStylz))
-// document.head.appendChild(style)
 const CurveEditor = _vue.default.extend(_App.default);
 
-function CurveComposer(elementId = "#CurveComposer") {
+function CurveComposer({
+  elementId = "#CurveComposer",
+  curves = [],
+  start = 0,
+  duration = 1
+}) {
   var instance = new CurveEditor({
-    el: elementId
+    el: elementId,
+    propsData: {
+      curves: curves,
+      duration: duration,
+      start: start
+    }
   });
   return instance;
 }
