@@ -91,6 +91,8 @@
       v-if="isShown"
       tabIndex=1
       name="workspace"
+      @keydown.left="onLeftArrow"
+      @keydown.right="onRightArrow"
       @keyup.delete="onDelete"
       @mouseleave="onMouseLeave"
       style="
@@ -343,6 +345,20 @@ export default {
         this.curve.findAndRemove(this.activePoint)
         this.activePoint = null
         this.updatePath()
+      }
+    },
+
+    onLeftArrow(e) {
+      if(this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint)
+        this.activePoint = this.curve.points[ Math.max(0, index - 1) ]
+      }
+    },
+
+    onRightArrow(e) {
+      if(this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint)
+        this.activePoint = this.curve.points[ Math.min(this.curve.points.length - 1, index + 1) ]
       }
     },
 

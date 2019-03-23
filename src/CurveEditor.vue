@@ -123,13 +123,20 @@
           :symbol="'+'"
           :isToggled="isShown"
           :onClick='onToggle'></EditorButton>
-        <div style="color: white; margin-left: 1em; font-size: 1em;"> {{curve.name}} </div>
+        <div style="
+          color: white;
+          margin-left: 1em;
+          font-size: 1em;">
+          {{curve.name}}
+        </div>
       </div>
     </div>
 
     <div
       tabIndex=1
       name="workspace"
+      @keydown.left="onLeftArrow"
+      @keydown.right="onRightArrow"
       @keyup.delete="onDelete"
       @mouseleave="onMouseLeave"
       v-if="isShown"
@@ -138,6 +145,28 @@
         height: 100px;
         width: 100%;
         background: #00000055;">
+
+      <!-- min and max values at the top and bottom of the workspace -->
+      <div style="
+        color: #ff00ff;
+        position: absolute;
+        top: 1;
+        right: 0;
+        font-size: 0.75em;
+        pointer-events: none;
+        user-select: none;">
+        {{max}}
+      </div>
+      <div style="
+        color: #ff00ff;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 0.75em;
+        pointer-events: none;
+        user-select: none;">
+        {{min}}
+      </div>
 
       <svg
         @mouseup="onMouseUp"
@@ -243,25 +272,6 @@
 
       </svg>
 
-      <!-- min and max values at the top and bottom of the workspace -->
-      <div style="
-        color: #ff00ff;
-        position: absolute;
-        top: 1;
-        right: 0;
-        font-size: 0.75em;
-        user-select: none;">
-        {{max}}
-      </div>
-      <div style="
-        color: #ff00ff;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        font-size: 0.75em;
-        user-select: none;">
-        {{min}}
-      </div>
     </div>
   </div>
 </template>
@@ -379,6 +389,20 @@ export default {
         this.curve.findAndRemove(this.activePoint)
         this.activePoint = null
         this.updatePath()
+      }
+    },
+
+    onLeftArrow(e) {
+      if(this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint)
+        this.activePoint = this.curve.points[ Math.max(0, index - 1) ]
+      }
+    },
+
+    onRightArrow(e) {
+      if(this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint)
+        this.activePoint = this.curve.points[ Math.min(this.curve.points.length - 1, index + 1) ]
       }
     },
 

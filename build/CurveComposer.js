@@ -9269,6 +9269,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 const easeTypes = Object.keys(_eases.default);
 
 const defaultCurve = () => new _Curve.default();
@@ -9365,6 +9375,20 @@ var _default = {
         this.curve.findAndRemove(this.activePoint);
         this.activePoint = null;
         this.updatePath();
+      }
+    },
+
+    onLeftArrow(e) {
+      if (this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint);
+        this.activePoint = this.curve.points[Math.max(0, index - 1)];
+      }
+    },
+
+    onRightArrow(e) {
+      if (this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint);
+        this.activePoint = this.curve.points[Math.min(this.curve.points.length - 1, index + 1)];
       }
     },
 
@@ -9731,7 +9755,7 @@ exports.default = _default;
                         "font-size": "1em"
                       }
                     },
-                    [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
+                    [_vm._v("\n        " + _vm._s(_vm.curve.name) + "\n      ")]
                   )
                 ],
                 1
@@ -9751,6 +9775,38 @@ exports.default = _default;
               },
               attrs: { tabIndex: "1", name: "workspace" },
               on: {
+                keydown: [
+                  function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "left", 37, $event.key, [
+                        "Left",
+                        "ArrowLeft"
+                      ])
+                    ) {
+                      return null
+                    }
+                    if ("button" in $event && $event.button !== 0) {
+                      return null
+                    }
+                    return _vm.onLeftArrow($event)
+                  },
+                  function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "right", 39, $event.key, [
+                        "Right",
+                        "ArrowRight"
+                      ])
+                    ) {
+                      return null
+                    }
+                    if ("button" in $event && $event.button !== 2) {
+                      return null
+                    }
+                    return _vm.onRightArrow($event)
+                  }
+                ],
                 keyup: function($event) {
                   if (
                     !$event.type.indexOf("key") &&
@@ -9768,6 +9824,38 @@ exports.default = _default;
               }
             },
             [
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "#ff00ff",
+                    position: "absolute",
+                    top: "1",
+                    right: "0",
+                    "font-size": "0.75em",
+                    "pointer-events": "none",
+                    "user-select": "none"
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    color: "#ff00ff",
+                    position: "absolute",
+                    bottom: "0",
+                    right: "0",
+                    "font-size": "0.75em",
+                    "pointer-events": "none",
+                    "user-select": "none"
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
+              ),
+              _vm._v(" "),
               _c(
                 "svg",
                 {
@@ -9908,36 +9996,6 @@ exports.default = _default;
                     2
                   )
                 ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "#ff00ff",
-                    position: "absolute",
-                    top: "1",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.max) + "\n    ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: {
-                    color: "#ff00ff",
-                    position: "absolute",
-                    bottom: "0",
-                    right: "0",
-                    "font-size": "0.75em",
-                    "user-select": "none"
-                  }
-                },
-                [_vm._v("\n      " + _vm._s(_vm.min) + "\n    ")]
               )
             ]
           )
@@ -10016,6 +10074,8 @@ var _EditorButton = _interopRequireDefault(require("./EditorButton"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
 //
 //
 //
@@ -10347,6 +10407,20 @@ var _default = {
       }
     },
 
+    onLeftArrow(e) {
+      if (this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint);
+        this.activePoint = this.curve.points[Math.max(0, index - 1)];
+      }
+    },
+
+    onRightArrow(e) {
+      if (this.activePoint) {
+        var index = this.curve.points.indexOf(this.activePoint);
+        this.activePoint = this.curve.points[Math.min(this.curve.points.length - 1, index + 1)];
+      }
+    },
+
     onToggle(e) {
       this.isShown = !this.isShown;
     },
@@ -10636,6 +10710,38 @@ exports.default = _default;
               },
               attrs: { tabIndex: "1", name: "workspace" },
               on: {
+                keydown: [
+                  function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "left", 37, $event.key, [
+                        "Left",
+                        "ArrowLeft"
+                      ])
+                    ) {
+                      return null
+                    }
+                    if ("button" in $event && $event.button !== 0) {
+                      return null
+                    }
+                    return _vm.onLeftArrow($event)
+                  },
+                  function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "right", 39, $event.key, [
+                        "Right",
+                        "ArrowRight"
+                      ])
+                    ) {
+                      return null
+                    }
+                    if ("button" in $event && $event.button !== 2) {
+                      return null
+                    }
+                    return _vm.onRightArrow($event)
+                  }
+                ],
                 keyup: function($event) {
                   if (
                     !$event.type.indexOf("key") &&
