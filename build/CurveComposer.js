@@ -9269,40 +9269,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 const easeTypes = Object.keys(_eases.default);
 
 const defaultCurve = () => new _Curve.default();
@@ -9604,7 +9570,7 @@ exports.default = _default;
                     on: { change: _vm.onCurveTitleChange }
                   }),
                   _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
+                  _c("label", { staticStyle: { "font-size": "0.75em" } }, [
                     _vm._v("hi:")
                   ]),
                   _vm._v(" "),
@@ -9625,7 +9591,7 @@ exports.default = _default;
                     }
                   }),
                   _vm._v(" "),
-                  _c("label", { staticStyle: { color: "darkgrey" } }, [
+                  _c("label", { staticStyle: { "font-size": "0.75em" } }, [
                     _vm._v("low:")
                   ]),
                   _vm._v(" "),
@@ -9646,7 +9612,11 @@ exports.default = _default;
                     }
                   }),
                   _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("pt:")]) : _vm._e(),
+                  _vm.activePoint
+                    ? _c("label", { staticStyle: { "font-size": "0.75em" } }, [
+                        _vm._v("pt:")
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint
                     ? _c(
@@ -9678,7 +9648,11 @@ exports.default = _default;
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
+                  _vm.activePoint
+                    ? _c("label", { staticStyle: { "font-size": "0.75em" } }, [
+                        _vm._v("u:")
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint
                     ? _c("input", {
@@ -9703,7 +9677,11 @@ exports.default = _default;
                       })
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("v:")]) : _vm._e(),
+                  _vm.activePoint
+                    ? _c("label", { staticStyle: { "font-size": "0.75em" } }, [
+                        _vm._v("value:")
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint
                     ? _c("input", {
@@ -9728,6 +9706,12 @@ exports.default = _default;
               )
             : _c(
                 "div",
+                {
+                  staticStyle: {
+                    border: "solid 1px #ffffff44",
+                    display: "flex"
+                  }
+                },
                 [
                   _c("EditorButton", {
                     attrs: {
@@ -9739,11 +9723,12 @@ exports.default = _default;
                   }),
                   _vm._v(" "),
                   _c(
-                    "label",
+                    "div",
                     {
                       staticStyle: {
-                        "padding-top": "6px",
-                        border: "solid 1px #ffffff44"
+                        color: "white",
+                        "margin-left": "1em",
+                        "font-size": "1em"
                       }
                     },
                     [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
@@ -10031,6 +10016,7 @@ var _EditorButton = _interopRequireDefault(require("./EditorButton"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
 //
 //
 //
@@ -10548,27 +10534,11 @@ exports.default = _default;
                     on: { change: _vm.onCurveTitleChange }
                   }),
                   _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("value")]) : _vm._e(),
-                  _vm._v(" "),
                   _vm.activePoint
-                    ? _c("input", {
-                        staticStyle: {
-                          color: "cyan",
-                          "margin-right": "10px",
-                          background: "#00000099",
-                          border: "none"
-                        },
-                        attrs: { type: "text", name: "value" },
-                        domProps: { value: _vm.activePoint[0] },
-                        on: {
-                          change: _vm.onPointChange,
-                          focus: _vm.onInputFocus,
-                          blur: _vm.onInputBlur
-                        }
-                      })
+                    ? _c("label", { staticStyle: { "font-size": "0.75em" } }, [
+                        _vm._v("u:")
+                      ])
                     : _vm._e(),
-                  _vm._v(" "),
-                  _vm.activePoint ? _c("label", [_vm._v("u:")]) : _vm._e(),
                   _vm._v(" "),
                   _vm.activePoint
                     ? _c("input", {
@@ -10591,12 +10561,42 @@ exports.default = _default;
                           blur: _vm.onInputBlur
                         }
                       })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c("label", { staticStyle: { "font-size": "0.75em" } }, [
+                        _vm._v("value:")
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.activePoint
+                    ? _c("input", {
+                        staticStyle: {
+                          color: "cyan",
+                          "margin-right": "10px",
+                          background: "#00000099",
+                          border: "none"
+                        },
+                        attrs: { type: "text", name: "value" },
+                        domProps: { value: _vm.activePoint[0] },
+                        on: {
+                          change: _vm.onPointChange,
+                          focus: _vm.onInputFocus,
+                          blur: _vm.onInputBlur
+                        }
+                      })
                     : _vm._e()
                 ],
                 1
               )
             : _c(
                 "div",
+                {
+                  staticStyle: {
+                    border: "solid 1px #ffffff44",
+                    display: "flex"
+                  }
+                },
                 [
                   _c("EditorButton", {
                     attrs: {
@@ -10608,14 +10608,15 @@ exports.default = _default;
                   }),
                   _vm._v(" "),
                   _c(
-                    "label",
+                    "div",
                     {
                       staticStyle: {
-                        "padding-top": "6px",
-                        border: "solid 1px #ffffff44"
+                        color: "white",
+                        "margin-left": "1em",
+                        "font-size": "1em"
                       }
                     },
-                    [_vm._v(" " + _vm._s(_vm.curve.name) + " ")]
+                    [_vm._v("\n        " + _vm._s(_vm.curve.name) + "\n      ")]
                   )
                 ],
                 1
