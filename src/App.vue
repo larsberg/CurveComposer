@@ -78,14 +78,14 @@
         ref="curves"
         :curve="c"
         :start="start"
-        :end="end"></CurveEditor>
+        :end="start + duration"></CurveEditor>
 
       <StringCurveEditor v-else-if="c.type === 'string'"
         ref="curves"
         :textScale="stringCurveTextSize"
         :curve="c"
         :start="start"
-        :end="end"></StringCurveEditor>
+        :end="start + duration"></StringCurveEditor>
 
     </div>
 
@@ -111,7 +111,6 @@ function loadFile (file, callback) {
   }, false );
 
   reader.readAsText( file );
-
 };
 
 export default {
@@ -120,6 +119,8 @@ export default {
     curves: {
       default: () => ([])
     },
+    start: {default: 0},
+    duration: {default: 1},
     title: {default: 'curve composer'}
   },
 
@@ -130,9 +131,7 @@ export default {
 
   data: function(){
     return {
-      start: 0,
-      end: 1,
-      stringCurveTextSize: 1.5
+      stringCurveTextSize: 1.5,
     }
   },
 
@@ -149,6 +148,10 @@ export default {
     addCurve(curve) {
       this.curves.push(curve)
       this.$forceUpdate()
+    },
+
+    setCurves( curves ) {
+      this.curves = curves
     },
 
     loadCurves(json){
@@ -168,13 +171,16 @@ export default {
       // update the paths for each curve
       this.$nextTick( function() {
         if(this.$refs.curves){
+
+          // seems like that if there's only one curve it's not an array
           if(Array.isArray(this.$refs.curves)) {
             this.$refs.curves.forEach( ( crv ) => {
               crv.updatePath()
             });
           } else {
-            this.$refs.updatePath()
+            // this.$refs.curves.updatePath()
           }
+
         }
       })
     },
@@ -198,11 +204,11 @@ export default {
       saveAs( blob, 'curves.json' )
     },
 
-    setRange(start, end){
-      this.start = start
-      this.end = end
-      this.$forceUpdate()
-    }
+    // setRange(start, end){
+    //   this.start = start
+    //   this.end = end
+    //   this.$forceUpdate()
+    // }
   }
 
 };

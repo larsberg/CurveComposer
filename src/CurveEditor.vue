@@ -14,7 +14,8 @@
       background: #00000044;">
 
       <!-- curve name and inputs -->
-      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex;">
+      <div v-if="isShown" style="border: solid 1px #ffffff44; display: inline-flex;
+    flex-wrap: wrap;">
 
         <EditorButton
           :offSymbol="'−'"
@@ -341,7 +342,6 @@ export default {
   mounted () {
     this.min = this.curve.getMinValue()
     this.max = this.curve.getMaxValue()
-    console.log( this.start, this.end );
   },
 
   methods: {
@@ -465,7 +465,6 @@ export default {
     },
 
     onCurveTitleChange(e) {
-      console.log( e.target.value );
       this.curve.name = e.target.value
     },
 

@@ -4,12 +4,12 @@
   <div
     @click.stop="onClick"
     :style="{
+      position: 'relative',
       margin: '3px',
       border: 'white solid 1px',
       borderRadius: '0%',
-      width: '16px',
-      height: '16px',
-      position: 'relative',
+      width: '11px',
+      height: '11px',
       userSelect: 'none',
       background: 'grey'
     }"

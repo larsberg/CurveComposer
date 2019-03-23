@@ -1,27 +1,20 @@
-
-// if(true && module.hot){
-//   module.hot.accept(()=>{window.location.reload(true);})
-// }
-
 import Vue from 'vue';
 import App from './App';
 import Curve from './Composer/Curve'
 import StringCurve from './Composer/StringCurve'
 
-// import { readFileSync } from 'fs';
-// const rawStylz = readFileSync(__dirname + '/CurveComposer.css', 'utf-8');
-// var style = document.createElement('style')
-// style.type = 'text/css'
-// style.appendChild(document.createTextNode(rawStylz))
-// document.head.appendChild(style)
-
 
 const CurveEditor = Vue.extend(App)
 
 
-function CurveComposer( elementId = "#CurveComposer") {
+function CurveComposer({elementId = "#CurveComposer", curves=[], start=0, duration=1}) {
   var instance = new CurveEditor({
-    el: elementId
+    el: elementId,
+    propsData: {
+      curves: curves,
+      duration: duration,
+      start: start,
+    }
   })
 
   return instance

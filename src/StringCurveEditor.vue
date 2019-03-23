@@ -285,10 +285,8 @@ export default {
     this.max = 1
     this.isMounted = true
 
-
     var wtf = this.$el.querySelector('[name="workspace"]')
     this.boundbox = wtf.getBoundingClientRect()
-    console.log( this.boundbox, this.$el.querySelector('[name="workspace"]') );
   },
 
   methods: {
@@ -476,7 +474,6 @@ export default {
     },
 
     onCurveTitleChange(e) {
-      console.log( e.target.value );
       this.curve.name = e.target.value
     },
 

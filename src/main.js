@@ -1,24 +1,23 @@
 // main.js
 import CurveComposer from './CurveComposer'
+import CurvePlayer from './CurvePlayer'
 import testJSON from './test.json'
 
-var cc = CurveComposer.setup()
-cc.loadCurves(testJSON)
-
-cc.start = 0
-cc.end = 30
 
 
+var cp = new CurvePlayer({
+  start: 0,
+  duration: 30
+})
+cp.loadJSON(testJSON)
+
+var cc = CurveComposer.setup({
+  curves: cp.curves,
+  start: cp.start,
+  duration: cp.duration,
+})
 
 
-
-
-
-console.log( cc );
-
-/*
-TODO:
-  - [ ] input options:
-    - [ ] collapse all the curves
-    - [ ] background hex-color
- */
+setInterval( function () {
+  cp.position = Math.random()
+}, 4000)
