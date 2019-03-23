@@ -9382,6 +9382,8 @@ var _default = {
       if (this.activePoint) {
         var index = this.curve.points.indexOf(this.activePoint);
         this.activePoint = this.curve.points[Math.max(0, index - 1)];
+      } else {
+        this.activePoint = this.curve.points[0];
       }
     },
 
@@ -9389,6 +9391,8 @@ var _default = {
       if (this.activePoint) {
         var index = this.curve.points.indexOf(this.activePoint);
         this.activePoint = this.curve.points[Math.min(this.curve.points.length - 1, index + 1)];
+      } else {
+        this.activePoint = this.curve.points[this.curve.points.length - 1];
       }
     },
 
