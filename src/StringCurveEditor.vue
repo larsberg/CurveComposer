@@ -14,7 +14,7 @@
       background: #00000044;">
 
       <!-- curve name and inputs -->
-      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex;">
+      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex; ">
 
         <EditorButton
           :offSymbol="'−'"
@@ -26,16 +26,16 @@
           :onClick="deleteCurveDialogue"
           :symbol="'×'"></EditorButton>
 
-          <input
-            type="text"
-            name="curveName"
-            style="
-              border: none;
-              background: #00000000;
-              color: white;
-              margin-left: 1em;"
-            :value="curve.name"
-            @change="onCurveTitleChange">
+        <input
+          type="text"
+          name="curveName"
+          style="
+            border: none;
+            background: #00000000;
+            color: white;
+            margin-left: 1em;"
+          :value="curve.name"
+          @change="onCurveTitleChange">
 
         <label style="font-size: 0.75em" v-if="activePoint">u:</label>
         <input
@@ -69,6 +69,7 @@
           @focus="onInputFocus"
           @blur="onInputBlur">
 
+        <label style="font-size: 0.75em; margin-left: auto; color: cyan;">{{curve.currentSample}}</label>
       </div>
       <div v-else style="border: solid 1px #ffffff44; display: flex;">
 
@@ -128,8 +129,8 @@
               y1="0"
               y2="0"
               gradientUnits="objectBoundingBox">
-              <stop offset="10%" stop-color="#00000044"/>
-              <stop offset="95%" stop-color="#ffffff44"/>
+              <stop offset="10%" stop-color="#00000022"/>
+              <stop offset="95%" stop-color="#ffffff22"/>
             </linearGradient>
           </defs>
 
@@ -164,20 +165,6 @@
 
           </g>
 
-          <!-- current sample crosshairs -->
-          <line
-            v-if="bUpdateCrosshairs"
-            style="
-              stroke: #000000ff;
-              fill: none;
-              stroke-width: 1.5;
-              vector-effect: non-scaling-stroke;
-              pointer-events: none;"
-            :x1="curve.currentPosition"
-            :y1="0"
-            :x2="curve.currentPosition"
-            :y2="1" />
-
           <line
             v-for="(p, index) in curve.points"
             :style="{
@@ -195,6 +182,22 @@
             :x2="p[1]"
             :y2="0"
             fill="red"/>
+
+
+          <!-- current sample crosshairs -->
+          <line
+            v-if="bUpdateCrosshairs"
+            style="
+              stroke: #cfcfff88;
+              fill: none;
+              stroke-width: 1.5;
+              vector-effect: non-scaling-stroke;
+              pointer-events: none;"
+            :x1="curve.currentPosition"
+            :y1="0"
+            :x2="curve.currentPosition"
+            :y2="1" />
+
 
           <g v-for="(p, index) in curve.points"
             :transform="getTextTransform(p)">

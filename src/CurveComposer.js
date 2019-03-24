@@ -2,12 +2,13 @@ import Vue from 'vue';
 import App from './App';
 import Curve from './Composer/Curve'
 import StringCurve from './Composer/StringCurve'
+import CurvePlayer from './CurvePlayer'
 
 
 const CurveEditor = Vue.extend(App)
 
 
-function CurveComposer({elementId = "#CurveComposer", curves=[], start=0, duration=1}) {
+function createCurveComposer({elementId = "#CurveComposer", curves=[], start=0, duration=1}) {
   var instance = new CurveEditor({
     el: elementId,
     propsData: {
@@ -24,7 +25,9 @@ Vue.config.productionTip = false
 
 module.exports = {
 
-  setup: CurveComposer,
+  createCurveComposer: createCurveComposer,
+
+  CurvePlayer: CurvePlayer,
 
   curve: Curve,
 

@@ -14,7 +14,7 @@
       background: #00000044;">
 
       <!-- curve name and inputs -->
-      <div v-if="isShown" style="border: solid 1px #ffffff44; display: inline-flex;
+      <div v-if="isShown" style="border: solid 1px #ffffff44; display: flex;
     flex-wrap: wrap;">
 
         <EditorButton
@@ -116,6 +116,10 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
+        <label style="
+          font-size: 0.75em;
+          margin-left: auto;
+          color: cyan;">{{Number(curve.currentSample.toFixed(3))}}</label>
       </div>
       <div v-else style="border: solid 1px #ffffff44; display: flex;">
 
@@ -219,7 +223,7 @@
           <line
             v-if="bUpdateCrosshairs"
             style="
-              stroke: #000000ff;
+              stroke: #cfcfff88;
               fill: none;
               stroke-width: 1;
               vector-effect: non-scaling-stroke;
@@ -232,7 +236,7 @@
           <line
             v-if="bUpdateCrosshairs"
             style="
-              stroke: #000000ff;
+              stroke: #cfcfff88;
               fill: none;
               stroke-width: 1;
               vector-effect: non-scaling-stroke;

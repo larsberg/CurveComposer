@@ -1,9 +1,6 @@
 // main.js
-import CurveComposer from './CurveComposer'
-import CurvePlayer from './CurvePlayer'
+import {CurvePlayer, createCurveComposer} from './CurveComposer'
 import testJSON from './test.json'
-
-
 
 var cp = new CurvePlayer({
   start: 0,
@@ -11,13 +8,12 @@ var cp = new CurvePlayer({
 })
 cp.loadJSON(testJSON)
 
-var cc = CurveComposer.setup({
+var cc = createCurveComposer({
   curves: cp.curves,
   start: cp.start,
   duration: cp.duration,
 })
 
-
 setInterval( function () {
-  cp.position = Math.random()
-}, 4000)
+  cp.position = (cp.position + 0.01) % cp.duration
+}, 10)

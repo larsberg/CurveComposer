@@ -13,7 +13,7 @@ class StringCurve extends Curve {
 
   }
 
-  sample(u) {
+  sample(u, bSetCurrentPosition=true ) {
 
     // curvePoint = [value, u, ease]
     if(!this.points.length)  return undefined;
@@ -35,6 +35,14 @@ class StringCurve extends Curve {
       // always return the ower index value
       sample = cp[loIndex][0]
     }
+
+
+    // this is used to set the current position
+    if(bSetCurrentPosition){
+      this.currentPosition = u
+      this.currentSample = sample
+    }
+
 
     return sample
 
