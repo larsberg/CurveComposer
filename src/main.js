@@ -17,3 +17,8 @@ var cc = createCurveComposer({
 setInterval( function () {
   cp.position = (cp.position + 0.01) % cp.duration
 }, 10)
+
+
+cp.onChange('stringCurve', (value, prev) => {
+  demo.innerHTML = value
+} )

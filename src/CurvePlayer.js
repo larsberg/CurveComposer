@@ -96,6 +96,10 @@ class CurvePlayer{
   createStringCurve(options) {
     return this.addCurve(new StringCurve(options))
   }
+
+  onChange(name, callback) {
+    this.onChangeEvents[name] = callback
+  }
 }
 
 

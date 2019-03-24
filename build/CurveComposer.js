@@ -9280,6 +9280,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
 const easeTypes = Object.keys(_eases.default);
 
 const defaultCurve = () => new _Curve.default();
@@ -9568,7 +9572,7 @@ exports.default = _default;
                 {
                   staticStyle: {
                     border: "solid 1px #ffffff44",
-                    display: "inline-flex",
+                    display: "flex",
                     "flex-wrap": "wrap"
                   }
                 },
@@ -9728,7 +9732,19 @@ exports.default = _default;
                           blur: _vm.onInputBlur
                         }
                       })
-                    : _vm._e()
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticStyle: {
+                        "font-size": "0.75em",
+                        "margin-left": "auto",
+                        color: "cyan"
+                      }
+                    },
+                    [_vm._v(_vm._s(Number(_vm.curve.currentSample.toFixed(3))))]
+                  )
                 ],
                 1
               )
@@ -9930,7 +9946,7 @@ exports.default = _default;
                       _vm.bUpdateCrosshairs
                         ? _c("line", {
                             staticStyle: {
-                              stroke: "#000000ff",
+                              stroke: "#cfcfff88",
                               fill: "none",
                               "stroke-width": "1",
                               "vector-effect": "non-scaling-stroke",
@@ -9948,7 +9964,7 @@ exports.default = _default;
                       _vm.bUpdateCrosshairs
                         ? _c("line", {
                             staticStyle: {
-                              stroke: "#000000ff",
+                              stroke: "#cfcfff88",
                               fill: "none",
                               "stroke-width": "1",
                               "vector-effect": "non-scaling-stroke",
@@ -10036,7 +10052,7 @@ class StringCurve extends _Curve.default {
     }, options || {}));
   }
 
-  sample(u) {
+  sample(u, bSetCurrentPosition = true) {
     // curvePoint = [value, u, ease]
     if (!this.points.length) return undefined;
     var sample,
@@ -10054,6 +10070,12 @@ class StringCurve extends _Curve.default {
       var loIndex = cp[hiIndex][1] > u ? Math.max(0, hiIndex - 1) : hiIndex; // always return the ower index value
 
       sample = cp[loIndex][0];
+    } // this is used to set the current position
+
+
+    if (bSetCurrentPosition) {
+      this.currentPosition = u;
+      this.currentSample = sample;
     }
 
     return sample;
@@ -10078,6 +10100,9 @@ var _EditorButton = _interopRequireDefault(require("./EditorButton"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
 //
 //
 //
@@ -10665,7 +10690,19 @@ exports.default = _default;
                           blur: _vm.onInputBlur
                         }
                       })
-                    : _vm._e()
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticStyle: {
+                        "font-size": "0.75em",
+                        "margin-left": "auto",
+                        color: "cyan"
+                      }
+                    },
+                    [_vm._v(_vm._s(_vm.curve.currentSample))]
+                  )
                 ],
                 1
               )
@@ -10809,11 +10846,11 @@ exports.default = _default;
                         },
                         [
                           _c("stop", {
-                            attrs: { offset: "10%", "stop-color": "#00000044" }
+                            attrs: { offset: "10%", "stop-color": "#00000022" }
                           }),
                           _vm._v(" "),
                           _c("stop", {
-                            attrs: { offset: "95%", "stop-color": "#ffffff44" }
+                            attrs: { offset: "95%", "stop-color": "#ffffff22" }
                           })
                         ],
                         1
@@ -10877,24 +10914,6 @@ exports.default = _default;
                         ])
                       }),
                       _vm._v(" "),
-                      _vm.bUpdateCrosshairs
-                        ? _c("line", {
-                            staticStyle: {
-                              stroke: "#000000ff",
-                              fill: "none",
-                              "stroke-width": "1.5",
-                              "vector-effect": "non-scaling-stroke",
-                              "pointer-events": "none"
-                            },
-                            attrs: {
-                              x1: _vm.curve.currentPosition,
-                              y1: 0,
-                              x2: _vm.curve.currentPosition,
-                              y2: 1
-                            }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
                       _vm._l(_vm.curve.points, function(p, index) {
                         return _c("line", {
                           style: {
@@ -10916,6 +10935,24 @@ exports.default = _default;
                           }
                         })
                       }),
+                      _vm._v(" "),
+                      _vm.bUpdateCrosshairs
+                        ? _c("line", {
+                            staticStyle: {
+                              stroke: "#cfcfff88",
+                              fill: "none",
+                              "stroke-width": "1.5",
+                              "vector-effect": "non-scaling-stroke",
+                              "pointer-events": "none"
+                            },
+                            attrs: {
+                              x1: _vm.curve.currentPosition,
+                              y1: 0,
+                              x2: _vm.curve.currentPosition,
+                              y2: 1
+                            }
+                          })
+                        : _vm._e(),
                       _vm._v(" "),
                       _vm._l(_vm.curve.points, function(p, index) {
                         return _c(
@@ -11611,7 +11648,110 @@ render._withStripped = true
           };
         })());
       
-},{"./CurveEditor":"CurveEditor.vue","./StringCurveEditor":"StringCurveEditor.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js","save-as":"../node_modules/save-as/lib/index.js"}],"CurveComposer.js":[function(require,module,exports) {
+},{"./CurveEditor":"CurveEditor.vue","./StringCurveEditor":"StringCurveEditor.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js","save-as":"../node_modules/save-as/lib/index.js"}],"CurvePlayer.js":[function(require,module,exports) {
+"use strict";
+
+var _Curve = _interopRequireDefault(require("./Composer/Curve"));
+
+var _StringCurve = _interopRequireDefault(require("./Composer/StringCurve"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// CurvePlayer.js
+class CurvePlayer {
+  constructor(options) {
+    Object.assign(this, {
+      start: 0,
+      duration: 1,
+      curves: [],
+      onChangeEvents: {},
+      _position: 0,
+      _values: {}
+    }, options || {});
+    const onChangeEvents = this.onChangeEvents;
+    const handler = {
+      set(obj, prop, value) {
+        // if the value is different call onchange
+        if (obj[prop] !== value) {
+          if (onChangeEvents[prop]) {
+            onChangeEvents[prop](value, obj[prop]);
+          } // else {
+          //   console.log( `'${prop}' ${obj[prop]} → ${value} ` );
+          // }
+
+        }
+
+        return Reflect.set(...arguments);
+      }
+
+    };
+    this.values = new Proxy(this._values, handler);
+    var arrayMonitor = new Proxy(this.curves, handler);
+  }
+
+  set position(value) {
+    this._position = value;
+    this.updateValues();
+  }
+
+  get position() {
+    return this._position;
+  }
+
+  updateValues() {
+    this.curves.forEach(crv => {
+      this.values[crv.name] = crv.sample(this._position);
+    });
+  }
+
+  getValue(curveName, autoAdd = true, valueType = "number") {
+    if (this.values[name]) {
+      return this.values[name];
+    } else if (autoAdd) {
+      if (valueType === 'string') {
+        this.createStringCurve({
+          name: curveName
+        });
+      } else {
+        this.createCurve({
+          name: curveName
+        });
+      }
+    }
+  }
+
+  addCurve(curve) {
+    this.curves.push(curve);
+    this.values[curve.name] = curve.points.length ? curve.points[0][0] : 0;
+    return curve;
+  }
+
+  loadJSON(json) {
+    for (var i in json) {
+      if (json[i].type === 'string') {
+        this.addCurve(new _StringCurve.default(json[i]));
+      } else {
+        this.addCurve(new _Curve.default(json[i]));
+      }
+    }
+  }
+
+  createCurve(options) {
+    return this.addCurve(new _Curve.default(options));
+  }
+
+  createStringCurve(options) {
+    return this.addCurve(new _StringCurve.default(options));
+  }
+
+  onChange(name, callback) {
+    this.onChangeEvents[name] = callback;
+  }
+
+}
+
+module.exports = CurvePlayer;
+},{"./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}],"CurveComposer.js":[function(require,module,exports) {
 "use strict";
 
 var _vue = _interopRequireDefault(require("vue"));
@@ -11622,11 +11762,13 @@ var _Curve = _interopRequireDefault(require("./Composer/Curve"));
 
 var _StringCurve = _interopRequireDefault(require("./Composer/StringCurve"));
 
+var _CurvePlayer = _interopRequireDefault(require("./CurvePlayer"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const CurveEditor = _vue.default.extend(_App.default);
 
-function CurveComposer({
+function createCurveComposer({
   elementId = "#CurveComposer",
   curves = [],
   start = 0,
@@ -11645,8 +11787,9 @@ function CurveComposer({
 
 _vue.default.config.productionTip = false;
 module.exports = {
-  setup: CurveComposer,
+  createCurveComposer: createCurveComposer,
+  CurvePlayer: _CurvePlayer.default,
   curve: _Curve.default,
   stringCurve: _StringCurve.default
 };
-},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js"}]},{},["CurveComposer.js"], null)
+},{"vue":"../node_modules/vue/dist/vue.runtime.esm.js","./App":"App.vue","./Composer/Curve":"Composer/Curve.js","./Composer/StringCurve":"Composer/StringCurve.js","./CurvePlayer":"CurvePlayer.js"}]},{},["CurveComposer.js"], null)
