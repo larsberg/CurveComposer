@@ -71,6 +71,32 @@
         hidden
         @click="createStringCurve"></button>
 
+        <!-- collapse expand inputs -->
+      <label style="
+        background: #00000099;
+        color: white;
+        border: none;
+        border: white solid 1px;
+        border-radius: 5px;
+        font-size: 0.75em;
+        padding: 0 4px;" for="collapseAllInput">↧</label>
+      <button
+        id="collapseAllInput"
+        hidden
+        @click="collapseAll"></button>
+
+      <label style="
+        background: #00000099;
+        color: white;
+        border: none;
+        border: white solid 1px;
+        border-radius: 5px;
+        font-size: 0.75em;
+        padding: 0 4px;" for="expandAllInput">↥</label>
+      <button
+        id="expandAllInput"
+        hidden
+        @click="expandAll"></button>
     </div>
 
     <div v-for="c in curves" >
@@ -184,6 +210,22 @@ export default {
 
         }
       })
+    },
+
+    collapseAll(){
+
+      this.$children.forEach( ( child ) => {
+        if(child.collapse) child.collapse()
+      });
+    },
+
+    expandAll(){
+
+      this.$children.forEach( ( child ) => {
+        if(child.expand) {
+          child.expand()
+        }
+      });
     },
 
     onLoad(e){

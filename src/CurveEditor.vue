@@ -420,6 +420,14 @@ export default {
       this.isShown = !this.isShown
     },
 
+    expand(e) {
+      this.isShown = true
+    },
+
+    collapse(e) {
+      this.isShown = false
+    },
+
     onPointChange(e) {
 
       if(this.activePoint) {

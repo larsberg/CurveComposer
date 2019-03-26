@@ -9406,6 +9406,14 @@ var _default = {
       this.isShown = !this.isShown;
     },
 
+    expand(e) {
+      this.isShown = true;
+    },
+
+    collapse(e) {
+      this.isShown = false;
+    },
+
     onPointChange(e) {
       if (this.activePoint) {
         switch (e.target.name) {
@@ -10542,6 +10550,14 @@ var _default = {
       }
     },
 
+    expand(e) {
+      this.isShown = true;
+    },
+
+    collapse(e) {
+      this.isShown = false;
+    },
+
     onDrag(e) {
       if (this.activePoint) {
         var pos = this.getEventPosition(e);
@@ -11396,6 +11412,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 function loadFile(file, callback) {
   var reader = new FileReader();
   reader.addEventListener('load', function (event) {
@@ -11470,6 +11512,20 @@ var _default = {
             });
           } else {// this.$refs.curves.updatePath()
           }
+        }
+      });
+    },
+
+    collapseAll() {
+      this.$children.forEach(child => {
+        if (child.collapse) child.collapse();
+      });
+    },
+
+    expandAll() {
+      this.$children.forEach(child => {
+        if (child.expand) {
+          child.expand();
         }
       });
     },
@@ -11612,6 +11668,48 @@ exports.default = _default;
         _c("button", {
           attrs: { id: "createStringCurveInput", hidden: "" },
           on: { click: _vm.createStringCurve }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          {
+            staticStyle: {
+              background: "#00000099",
+              color: "white",
+              border: "white solid 1px",
+              "border-radius": "5px",
+              "font-size": "0.75em",
+              padding: "0 4px"
+            },
+            attrs: { for: "collapseAllInput" }
+          },
+          [_vm._v("↧")]
+        ),
+        _vm._v(" "),
+        _c("button", {
+          attrs: { id: "collapseAllInput", hidden: "" },
+          on: { click: _vm.collapseAll }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          {
+            staticStyle: {
+              background: "#00000099",
+              color: "white",
+              border: "white solid 1px",
+              "border-radius": "5px",
+              "font-size": "0.75em",
+              padding: "0 4px"
+            },
+            attrs: { for: "expandAllInput" }
+          },
+          [_vm._v("↥")]
+        ),
+        _vm._v(" "),
+        _c("button", {
+          attrs: { id: "expandAllInput", hidden: "" },
+          on: { click: _vm.expandAll }
         })
       ]),
       _vm._v(" "),

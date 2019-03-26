@@ -464,6 +464,15 @@ export default {
       }
     },
 
+
+    expand(e) {
+      this.isShown = true
+    },
+
+    collapse(e) {
+      this.isShown = false
+    },
+
     onDrag(e) {
 
       if(this.activePoint) {
