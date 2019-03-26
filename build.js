@@ -18,23 +18,14 @@ const options = {
   watch: false
 }
 
-const optionsMin = {
-  outDir: './build',
-  outFile: 'CurveComposer.min.js',
-  publicUrl: './',
-  cache: false,
-  minify: true,
-  target: 'node',
-  bundleNodeModules: true,
-  sourceMaps: false,
-  scopeHoist: false,
-  watch: false
-}
-
 const bundler = new Bundler(entryFiles, options)
 bundler.bundle().then( result => {
 
-  const bundlerMin = new Bundler(entryFiles, optionsMin)
+  const bundlerMin = new Bundler(entryFiles, Object.assign({},
+    options,{
+      minify: true,
+      outFile: options.outFile.replace('.js', '.min.js')
+    }))
   bundlerMin.bundle()
 
 })
