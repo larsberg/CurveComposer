@@ -118,10 +118,10 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
-        <!-- <label style="
+        <label style="
           font-size: 0.75em;
           margin-left: auto;
-          color: cyan;">{{Number(curve.currentSample.toFixed(3))}}</label> -->
+          color: cyan;">{{Number(curve.currentSample.toFixed(3))}}</label>
       </div>
       <div v-else style="border: solid 1px #ffffff44; display: flex;">
 

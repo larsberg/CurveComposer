@@ -9738,7 +9738,19 @@ exports.default = _default;
                           blur: _vm.onInputBlur
                         }
                       })
-                    : _vm._e()
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticStyle: {
+                        "font-size": "0.75em",
+                        "margin-left": "auto",
+                        color: "cyan"
+                      }
+                    },
+                    [_vm._v(_vm._s(Number(_vm.curve.currentSample.toFixed(3))))]
+                  )
                 ],
                 1
               )
