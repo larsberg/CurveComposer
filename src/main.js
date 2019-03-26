@@ -22,3 +22,6 @@ setInterval( function () {
 cp.onChange('stringCurve', (value, prev) => {
   demo.innerHTML = value
 } )
+
+
+console.log( CurveComposer );

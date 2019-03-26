@@ -11520,7 +11520,7 @@ exports.default = _default;
         overflow: "scroll",
         color: "white"
       },
-      attrs: { tabIndex: "1", id: "CurveComposer" }
+      attrs: { id: "CurveComposer", tabIndex: "1" }
     },
     [
       _c("div", { staticStyle: { height: "24px", "user-select": "none" } }, [
