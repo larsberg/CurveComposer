@@ -160,7 +160,7 @@
               y="0"
               :width="Math.abs(end - p[1])"
               height="1"
-              style="pointer-events: none; stroke: none; fill: #ffffff44"
+              style="pointer-events: none; stroke: none; fill: url(#Gradient)"
               />
 
           </g>

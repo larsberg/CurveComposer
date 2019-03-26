@@ -10902,7 +10902,7 @@ exports.default = _default;
                                 staticStyle: {
                                   "pointer-events": "none",
                                   stroke: "none",
-                                  fill: "#ffffff44"
+                                  fill: "url(#Gradient)"
                                 },
                                 attrs: {
                                   x: p[1],
