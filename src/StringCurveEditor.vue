@@ -1,6 +1,7 @@
 <template>
   <!-- outer container -->
   <div
+    tabIndex=1
     style="
       position: relative;
       width: calc(100%-4);
@@ -35,6 +36,7 @@
             color: white;
             margin-left: 1em;"
           :value="curve.name"
+          @input="onCurveTitleChange"
           @change="onCurveTitleChange">
 
         <label style="font-size: 0.75em" v-if="activePoint">u:</label>

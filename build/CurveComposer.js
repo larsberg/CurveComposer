@@ -9284,6 +9284,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
 const easeTypes = Object.keys(_eases.default);
 
 const defaultCurve = () => new _Curve.default();
@@ -9552,7 +9554,8 @@ exports.default = _default;
         position: "relative",
         width: "calc(100%-4)",
         "border-bottom": "#ffffffaa solid 0.5px"
-      }
+      },
+      attrs: { tabIndex: "1" }
     },
     [
       _c(
@@ -9599,7 +9602,10 @@ exports.default = _default;
                     },
                     attrs: { type: "text", name: "curveName" },
                     domProps: { value: _vm.curve.name },
-                    on: { change: _vm.onCurveTitleChange }
+                    on: {
+                      input: _vm.onCurveTitleChange,
+                      change: _vm.onCurveTitleChange
+                    }
                   }),
                   _vm._v(" "),
                   _c("label", { staticStyle: { "font-size": "0.75em" } }, [
@@ -9732,19 +9738,7 @@ exports.default = _default;
                           blur: _vm.onInputBlur
                         }
                       })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "label",
-                    {
-                      staticStyle: {
-                        "font-size": "0.75em",
-                        "margin-left": "auto",
-                        color: "cyan"
-                      }
-                    },
-                    [_vm._v(_vm._s(Number(_vm.curve.currentSample.toFixed(3))))]
-                  )
+                    : _vm._e()
                 ],
                 1
               )
@@ -10320,6 +10314,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
 const defaultCurve = () => new Curve();
 
 var _default = {
@@ -10590,7 +10586,8 @@ exports.default = _default;
         position: "relative",
         width: "calc(100%-4)",
         "border-bottom": "#ffffffaa solid 0.5px"
-      }
+      },
+      attrs: { tabIndex: "1" }
     },
     [
       _c(
@@ -10636,7 +10633,10 @@ exports.default = _default;
                     },
                     attrs: { type: "text", name: "curveName" },
                     domProps: { value: _vm.curve.name },
-                    on: { change: _vm.onCurveTitleChange }
+                    on: {
+                      input: _vm.onCurveTitleChange,
+                      change: _vm.onCurveTitleChange
+                    }
                   }),
                   _vm._v(" "),
                   _vm.activePoint
@@ -11383,6 +11383,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
 function loadFile(file, callback) {
   var reader = new FileReader();
   reader.addEventListener('load', function (event) {
@@ -11507,7 +11508,7 @@ exports.default = _default;
         overflow: "scroll",
         color: "white"
       },
-      attrs: { id: "CurveComposer" }
+      attrs: { tabIndex: "1", id: "CurveComposer" }
     },
     [
       _c("div", { staticStyle: { height: "24px", "user-select": "none" } }, [

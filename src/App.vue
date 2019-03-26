@@ -1,5 +1,6 @@
 <template>
   <div
+    tabIndex=1
     id='CurveComposer'
     style='
       font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;

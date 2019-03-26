@@ -1,6 +1,7 @@
 <template>
   <!-- outer container -->
   <div
+    tabIndex=1
     style="
       position: relative;
       width: calc(100%-4);
@@ -36,6 +37,7 @@
             color: white;
             margin-left: 1em;"
           :value="curve.name"
+          @input="onCurveTitleChange"
           @change="onCurveTitleChange">
 
         <label  style="font-size: 0.75em" style="color: darkgrey;">hi:</label>
@@ -116,10 +118,10 @@
           @change="onPointChange"
           @focus="onInputFocus"
           @blur="onInputBlur">
-        <label style="
+        <!-- <label style="
           font-size: 0.75em;
           margin-left: auto;
-          color: cyan;">{{Number(curve.currentSample.toFixed(3))}}</label>
+          color: cyan;">{{Number(curve.currentSample.toFixed(3))}}</label> -->
       </div>
       <div v-else style="border: solid 1px #ffffff44; display: flex;">
 
