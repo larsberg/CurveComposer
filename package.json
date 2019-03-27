@@ -1,6 +1,6 @@
 {
   "name": "CurveComposer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "animtion curve ditor",
   "homepage": "https://github.com/larsberg/CurveComposer.git",
   "main": "build/CurveComposer.min.js",
