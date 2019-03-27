@@ -322,6 +322,10 @@ export default {
     end: {
       type: Number,
       default: 1
+    },
+    minRange: {
+      type: Number,
+      default: 0.1
     }
   },
 
@@ -346,8 +350,22 @@ export default {
   },
 
   mounted () {
+
+    // set the range
     this.min = this.curve.getMinValue()
     this.max = this.curve.getMaxValue()
+
+    // avoid infinitly small ranges
+    var delta = Math.abs(this.min - this.max)
+    if(delta < this.minRange) {
+      var x = (this.minRange - delta) / 2
+      this.max += x
+      this.min -= x
+    }
+
+    // keep it clean
+    this.max = Number(this.max.toFixed(3) )
+    this.min = Number(this.min.toFixed(3))
   },
 
   methods: {
