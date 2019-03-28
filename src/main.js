@@ -24,7 +24,11 @@ cp.onChange('stringCurve', (value, prev) => {
 } )
 
 
-cp.curves[0].addPoint(0.5,0.5,'smooth', {x:0,y:0,z:0})
+function onSample(...args) {
+  console.log( args );
+}
+
+// cp.curves[1].onSample = onSample
 
 
-console.log( CurveComposer );
+// console.log( CurveComposer );

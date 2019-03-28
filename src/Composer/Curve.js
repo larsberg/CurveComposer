@@ -11,7 +11,8 @@ class Curve {
       points: [],
       currentPosition: 0,
       currentSample: 0,
-      type: 'number'
+      type: 'number',
+      onSample: null
     }, options || {})
   }
 
@@ -59,14 +60,23 @@ class Curve {
     if(!this.points.length)  return 0;
 
     var cp = this.points
-    var sample = 0
+    var value = 0
 
     if(cp[cp.length - 1][1] <= u) {
       // return first or last values when on the edges.
       // I think this makes things faster but never tested it...
-      sample = cp[cp.length - 1][0]
+      value = cp[cp.length - 1][0]
+      if(this.onSample) {
+        this.onSample(value, u, cp[cp.length-1],cp[cp.length-1], 1 )
+      }
     } else if(cp[0][1] > u) {
-      sample = cp[0][0]
+
+      value = cp[0][0]
+
+      if(this.onSample) {
+        this.onSample(value, u, cp[0],cp[0], 0 )
+      }
+
     } else {
 
       // find high and low indices
@@ -78,17 +88,21 @@ class Curve {
       var b = cp[hiIndex]
       var t = mapLinear(u, a[1], b[1], 0, 1 )
 
-      sample = lerp( a[0], b[0], eases[a[2]]( t ) );
+      value = lerp( a[0], b[0], eases[a[2]]( t ) );
+
+      if(this.onSample) {
+        this.onSample(value, u, a, b, t )
+      }
     }
 
 
     // this is used to set the current position
     if(bSetCurrentPosition){
       this.currentPosition = u
-      this.currentSample = sample
+      this.currentSample = value
     }
 
-    return sample
+    return value
 
   }
 
