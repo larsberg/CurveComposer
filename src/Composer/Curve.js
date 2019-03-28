@@ -27,9 +27,9 @@ class Curve {
     })
   }
 
-  addPoint( value, u, ease ) {
+  addPoint( value, u, ease='smooth', ...args ) {
 
-    var cp = [value, u, ease || 'smooth']
+    var cp = [value, u, ease, ...args]
 
     this.points.push( cp )
 

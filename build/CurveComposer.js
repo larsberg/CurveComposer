@@ -8907,8 +8907,8 @@ class Curve {
     });
   }
 
-  addPoint(value, u, ease) {
-    var cp = [value, u, ease || 'smooth'];
+  addPoint(value, u, ease = 'smooth', ...args) {
+    var cp = [value, u, ease, ...args];
     this.points.push(cp);
     this.sortPoints();
     return cp;
