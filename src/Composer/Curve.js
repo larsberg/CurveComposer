@@ -56,16 +56,18 @@ class Curve {
 
   sample( u, bSetCurrentPosition=true ) {
 
-    // curvePoint = [value, u, ease]
+    // return 0 in there aren't any points
     if(!this.points.length)  return 0;
 
     var cp = this.points
     var value = 0
 
     if(cp[cp.length - 1][1] <= u) {
+
       // return first or last values when on the edges.
       // I think this makes things faster but never tested it...
       value = cp[cp.length - 1][0]
+
       if(this.onSample) {
         this.onSample(value, u, cp[cp.length-1],cp[cp.length-1], 1 )
       }

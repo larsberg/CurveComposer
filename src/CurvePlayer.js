@@ -100,6 +100,10 @@ class CurvePlayer{
   onChange(name, callback) {
     this.onChangeEvents[name] = callback
   }
+
+  getCurveByName(name) {
+    return this.curves.find( c => c.name === name )
+  }
 }
 
 

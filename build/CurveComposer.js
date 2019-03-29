@@ -8932,7 +8932,7 @@ class Curve {
   }
 
   sample(u, bSetCurrentPosition = true) {
-    // curvePoint = [value, u, ease]
+    // return 0 in there aren't any points
     if (!this.points.length) return 0;
     var cp = this.points;
     var value = 0;
@@ -11887,6 +11887,10 @@ class CurvePlayer {
 
   onChange(name, callback) {
     this.onChangeEvents[name] = callback;
+  }
+
+  getCurveByName(name) {
+    return this.curves.find(c => c.name === name);
   }
 
 }

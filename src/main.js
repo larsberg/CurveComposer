@@ -28,6 +28,9 @@ function onSample(...args) {
   console.log( args );
 }
 
+
+console.log( cp.getCurveByName('curveThree').name );
+
 // cp.curves[1].onSample = onSample
 
 
