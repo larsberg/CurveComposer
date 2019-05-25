@@ -37,8 +37,6 @@ class CurvePlayer{
     };
 
     this.values = new Proxy(this._values, handler);
-
-    var arrayMonitor = new Proxy(this.curves, handler)
   }
 
   set position(value){
